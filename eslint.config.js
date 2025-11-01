@@ -19,6 +19,7 @@ export default [
       globals: {
         window: 'readonly',
         document: 'readonly',
+        ...globals.browser,
       },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
