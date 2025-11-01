@@ -1,1 +1,34 @@
 @import "tailwindcss";
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+/* theme.css (o dentro de tu index.css, antes de tus @layers) */
+@theme {
+  /* Tipografías */
+  --font-display: "Manrope", "sans-serif";
+
+  /* Breakpoints opcionales (ejemplo) */
+  --breakpoint-3xl: 120rem;
+
+  /* Radios (de tu config) */
+  --radius: 0.25rem;
+  --radius-lg: 0.5rem;
+  --radius-xl: 0.75rem;
+  --radius-full: 9999px;
+
+  /* Colores base (tus tokens) */
+  --color-primary: #38e07b;
+  --color-background-light: #f6f8f7;
+  --color-background-dark: #122017;
+
+  /* Derivados útiles (texto sobre fondos) */
+  --color-on-primary: #122017;      /* texto sobre primary */
+  --color-on-bg-light: #0f172a;     /* ~slate-900 */
+  --color-on-bg-dark: #f1f5f9;      /* ~slate-100 */
+
+  /* Easing comunes */
+  --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
+  --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
+}
