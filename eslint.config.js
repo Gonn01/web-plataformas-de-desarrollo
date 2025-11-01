@@ -7,6 +7,7 @@ import pluginImport from 'eslint-plugin-import';
 import pluginUnicorn from 'eslint-plugin-unicorn';
 import prettier from 'eslint-config-prettier';
 import pluginPrettier from 'eslint-plugin-prettier';
+import globals from 'globals';
 
 export default [
   js.configs.recommended,
@@ -19,13 +20,20 @@ export default [
       globals: {
         window: 'readonly',
         document: 'readonly',
+        ...globals.node,
         ...globals.browser,
       },
       parserOptions: { ecmaFeatures: { jsx: true } },
     },
     settings: {
       react: { version: 'detect' },
-      'import/resolver': { node: { extensions: ['.js', '.jsx'] } },
+      'import/resolver': {
+        node: { extensions: ['.js', '.jsx'] },
+        alias: {
+          map: [['@', './src']],
+          extensions: ['.js', '.jsx'],
+        },
+      },
     },
     plugins: {
       react: pluginReact,
