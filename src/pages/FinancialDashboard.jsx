@@ -1,3 +1,4 @@
+// src/pages/FinanceDashboard.jsx
 import { useState } from 'react';
 import Icon from '../components/Icon';
 import Sidebar from '../components/Sidebar';
@@ -6,9 +7,13 @@ import CurrencyToggle from '../components/CurrencyToggle';
 import ActiveExpenses from '../components/ActiveExpenses';
 import Upcoming from '../components/Upcoming';
 
+// 👇 importa el modal
+import NewExpenseModal from './NewExpenseCard';
+
 export default function FinanceDashboard() {
   const [currency, setCurrency] = useState('ARS');
   const [query, setQuery] = useState('');
+  const [openNewExpense, setOpenNewExpense] = useState(false); // 👈 estado para el modal
 
   return (
     <div className="font-display bg-background-light dark:bg-background-dark min-h-screen">
@@ -29,7 +34,10 @@ export default function FinanceDashboard() {
                   Un resumen de tus finanzas personales.
                 </p>
               </div>
-              <button className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-background-dark text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors">
+              <button
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-background-dark text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors"
+                onClick={() => setOpenNewExpense(true)} // 👈 abre modal
+              >
                 <Icon name="add_circle" className="mr-2 text-lg" />
                 <span className="truncate">Crear Gasto / Deuda</span>
               </button>
@@ -53,13 +61,25 @@ export default function FinanceDashboard() {
               <Upcoming />
             </div>
 
-            {/* Campo de búsqueda controlado (colocado fuera para que ActiveExpenses quede puro) */}
+            {/* Campo de búsqueda controlado (oculto aquí) */}
             <div className="sr-only">
               <input value={query} onChange={(e) => setQuery(e.target.value)} />
             </div>
           </div>
         </main>
       </div>
+
+      {/* Modal de "Nuevo Gasto" */}
+      {openNewExpense && (
+        <NewExpenseModal
+          onClose={() => setOpenNewExpense(false)}
+          onSave={(payload) => {
+            // Acá podés hacer el POST a tu API, guardar en estado global, etc.
+            console.log('Nuevo gasto:', payload);
+            setOpenNewExpense(false);
+          }}
+        />
+      )}
     </div>
   );
 }
