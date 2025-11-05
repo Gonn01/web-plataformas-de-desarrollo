@@ -42,12 +42,8 @@ export default function Sidebar() {
             <Icon name="arrow_downward" className="text-2xl text-green-500" />
             <p className="text-sm font-medium leading-normal">Me Deben</p>
           </a>
-          <a
-            className="flex items-center gap-3 px-3 py-2 text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5 rounded-lg"
-            href="#"
-          >
-            <Icon name="history" className="text-2xl" />
-            <p className="text-sm font-medium leading-normal">Historial</p>
+          <a className="flex items-center gap-3 px-3 py-2 text-slate-700 dark:text-slate-300 hover:bg-primary/10 hover:text-primary rounded-lg" href="/entidades"> <Icon name="account_balance" className="text-2xl text-primary" />
+            <p className="text-sm font-medium leading-normal">Entidades Financieras</p>
           </a>
         </nav>
       </div>
