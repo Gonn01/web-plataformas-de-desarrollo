@@ -1,0 +1,156 @@
+/* ===== Reset mínimo y tipografía ===== */
+* { box-sizing: border-box; }
+html, body, #root { height: 100%; }
+body { margin: 0; font-family: Inter, system-ui, Arial; }
+
+/* ===== Paleta como en la muestra ===== */
+:root{
+  --bg: #0c1813;        /* fondo general */
+  --bg-soft: #0f1d17;   /* variantes */
+  --card: #11211a;
+  --stroke: #1e3a2f;
+  --stroke-soft:#1a332a;
+  --text:#e8f2ec;
+  --muted:#9ab0a6;
+  --accent:#2edd7a;     /* botón verde */
+  --accent-2:#25c06a;   /* hover */
+  --error:#ff6464;
+}
+
+/* ===== Layout centrado ===== */
+.auth__layout {
+  width: 100vw;                  /* ocupa todo el ancho visible */
+  height: 100vh;                 /* ocupa toda la altura visible */
+  display: flex;
+  justify-content: center;       /* centra horizontalmente */
+  align-items: center;           /* centra verticalmente */
+  background: radial-gradient(60% 60% at 50% 30%, #0f1d17 0%, #0c1813 60%, #0a150f 100%);
+  padding: 0;
+  margin: 0;
+  overflow: hidden;              /* evita scroll lateral */
+}
+
+
+/* ===== Card ===== */
+.auth__card{
+  width: 100%;
+  max-width: 460px;
+  background: var(--card);
+  border: 1px solid var(--stroke);
+  border-radius: 18px;
+  padding: 28px 30px;
+  box-shadow: 0 10px 28px rgba(0,0,0,.35);
+}
+
+/* ===== Brand (logo + título + subtítulo) ===== */
+.auth__brand{ text-align:center; margin-bottom: 12px; }
+.auth__logo{
+  width: 50px; height: 50px; border-radius: 12px;
+  background: #0e7c43; color:#0c1813; display:grid; place-items:center;
+  margin: 0 auto 8px; font-size: 24px; font-weight: 700;
+}
+.auth__title{ margin: 0; font-size: 22px; }
+.auth__subtitle{ margin: 2px 0 0; color: var(--muted); font-size: 13.5px; }
+
+.auth__welcome{ text-align:center; margin: 12px 0 2px; }
+.auth__hint{ text-align:center; color: var(--muted); margin: 0 0 16px; }
+
+/* ===== Form ===== */
+.auth__form{ display: grid; gap: 10px; }
+
+.auth__label{ font-size: 13.5px; color: var(--muted); }
+
+.auth__row{
+  display:flex; align-items:center; justify-content:space-between; margin-top: 6px;
+}
+.auth__link{
+  background:none; border:0; color:#34e989; font-size: 13px; cursor:pointer;
+}
+
+/* Inputs con icono a la izquierda y “ojo” a la derecha */
+.auth__input{
+  display:grid; grid-template-columns:28px 1fr 36px; align-items:center; gap:8px;
+  height: 44px; padding: 0 10px;
+  border:1px solid var(--stroke-soft); background:#0f1b16; border-radius:10px;
+}
+.auth__input input{
+  border:0; outline:0; background:transparent; color:var(--text);
+  height:100%;
+}
+.auth__input input::placeholder{ color:#7f9b90; }
+.auth__input:focus-within{
+  border-color:#2bcf76; box-shadow: 0 0 0 3px rgba(43,207,118,.12);
+}
+.auth__eye{ background:none; border:0; color:#8aa399; cursor:pointer; }
+
+/* Error */
+.auth__error{
+  background:#3a0e0e; border:1px solid #5b1c1c; color:#ffd9d9;
+  padding:8px 10px; border-radius:8px; font-size:14px;
+}
+
+/* Botón principal */
+.auth__btn{
+  width:100%; height:46px; border:0; border-radius:10px; cursor:pointer;
+  background: var(--accent); color:#0e2318; font-weight:800; letter-spacing:.2px;
+  box-shadow: inset 0 -2px 0 rgba(0,0,0,.15);
+}
+.auth__btn:hover{ background: var(--accent-2); }
+.auth__btn:disabled{ opacity:.75; cursor:default; }
+
+/* Divider “o continúa con” */
+.auth__or{
+  display:grid; place-items:center; color:#7f9b90; font-size:13px; margin: 14px 0 10px;
+  position:relative;
+}
+.auth__or::before, .auth__or::after{
+  content:""; position:absolute; top:50%; width:40%; height:1px; background:var(--stroke);
+}
+.auth__or::before{ left:0; } .auth__or::after{ right:0; }
+
+/* Botón Google (borde) */
+.auth__btn--alt{
+  width:100%; height:46px; border-radius:10px; cursor:pointer;
+  background:#0f1b16; border:1px solid var(--stroke); color:var(--text);
+}
+
+/* Footer */
+.auth__footer{ text-align:center; margin-top: 12px; color: var(--muted); font-size: 13.5px; }
+.auth__footer a{ color:#34e989; text-decoration:none; }
+.auth__demo{ text-align:center; color:var(--muted); font-size:12px; margin-top:10px; }
+
+/* Pequeños ajustes responsivos */
+@media (max-width: 420px){
+  .auth__card{ padding: 24px; }
+}
+
+
+/* Título principal */
+.login-container h1,
+.login-container h2 {
+  color: #ffffff; /* blanco */
+}
+
+/* Subtítulo o texto debajo de los títulos */
+.login-container p,
+.login-container label {
+  color: #bdbdbd; /* gris suave para contraste */
+}
+
+.login-title,
+.welcome-title {
+  color: #ffffff;
+}
+
+/* Forzar color blanco en los títulos principales */
+.auth__title,
+.auth__welcome {
+  color: #ffffff !important;
+}
+
+/* Aclarar los textos secundarios */
+.auth__subtitle,
+.auth__hint {
+  color: #bdbdbd !important;
+}
+
