@@ -4,13 +4,14 @@ import { useParams } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import Icon from '../components/Icon';
 
-
-const MOCK = {
-    
-};
+const MOCK = {};
 
 const fmt = (n, currency) => {
-  const f = new Intl.NumberFormat('es-AR', { style: 'currency', currency, minimumFractionDigits: 2 });
+  const f = new Intl.NumberFormat('es-AR', {
+    style: 'currency',
+    currency,
+    minimumFractionDigits: 2,
+  });
   const sign = n < 0 ? '-' : '';
   return `${sign}${f.format(Math.abs(n))}`;
 };
@@ -19,7 +20,6 @@ export default function EntidadDetalle() {
   const { id } = useParams();
   const [tab, setTab] = useState('activos'); // 'activos' | 'finalizados' | 'log'
 
-  
   const entity = useMemo(() => {
     if (MOCK[id]) return MOCK[id];
     // fallback genérico (ejemplo)
@@ -29,13 +29,16 @@ export default function EntidadDetalle() {
     };
   }, [id]);
 
-  
-  const activos = [
-   
-  ];
+  const activos = [];
 
   const finalizados = [
-    { icon: 'shopping_bag', title: 'Electrodomésticos', subtitle: 'Cuotas finalizadas', due: '—', progress: 100 },
+    {
+      icon: 'shopping_bag',
+      title: 'Electrodomésticos',
+      subtitle: 'Cuotas finalizadas',
+      due: '—',
+      progress: 100,
+    },
   ];
 
   const log = [
@@ -89,20 +92,32 @@ export default function EntidadDetalle() {
             {/* Stats */}
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
               <div className="flex flex-1 flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/50">
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Balance Total (ARS)</p>
-                <p className={`text-2xl font-bold tracking-tight ${entity.stats.ars < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  Balance Total (ARS)
+                </p>
+                <p
+                  className={`text-2xl font-bold tracking-tight ${entity.stats.ars < 0 ? 'text-red-500' : 'text-green-500'}`}
+                >
                   {fmt(entity.stats.ars, 'ARS')}
                 </p>
               </div>
               <div className="flex flex-1 flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/50">
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Balance Total (USD)</p>
-                <p className={`text-2xl font-bold tracking-tight ${entity.stats.usd < 0 ? 'text-red-500' : 'text-green-500'}`}>
+                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  Balance Total (USD)
+                </p>
+                <p
+                  className={`text-2xl font-bold tracking-tight ${entity.stats.usd < 0 ? 'text-red-500' : 'text-green-500'}`}
+                >
                   {fmt(entity.stats.usd, 'USD')}
                 </p>
               </div>
               <div className="flex flex-1 flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/50">
-                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Deudas Activas</p>
-                <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">{entity.stats.debts}</p>
+                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                  Deudas Activas
+                </p>
+                <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
+                  {entity.stats.debts}
+                </p>
               </div>
             </div>
 
@@ -160,10 +175,15 @@ export default function EntidadDetalle() {
                       </div>
 
                       <div className="hidden md:flex flex-col items-end gap-1 text-sm">
-                        <p className="font-medium text-zinc-900 dark:text-white">Vence: {item.due}</p>
+                        <p className="font-medium text-zinc-900 dark:text-white">
+                          Vence: {item.due}
+                        </p>
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                            <div className="h-full rounded-full bg-primary" style={{ width: `${item.progress}%` }} />
+                            <div
+                              className="h-full rounded-full bg-primary"
+                              style={{ width: `${item.progress}%` }}
+                            />
                           </div>
                           <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
                             {Math.round(item.progress)}%
@@ -178,8 +198,8 @@ export default function EntidadDetalle() {
                               item.status.tone === 'green'
                                 ? 'bg-green-500/10 text-green-600 dark:text-green-400'
                                 : item.status.tone === 'yellow'
-                                ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
-                                : 'bg-red-500/10 text-red-600 dark:text-red-400'
+                                  ? 'bg-yellow-500/10 text-yellow-600 dark:text-yellow-400'
+                                  : 'bg-red-500/10 text-red-600 dark:text-red-400'
                             }`}
                           >
                             {item.status.label}
@@ -201,7 +221,10 @@ export default function EntidadDetalle() {
               {tab === 'finalizados' && (
                 <div className="flex flex-col divide-y divide-zinc-200 dark:divide-zinc-800">
                   {finalizados.map((item, i) => (
-                    <div key={i} className="flex items-center gap-4 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-white/5">
+                    <div
+                      key={i}
+                      className="flex items-center gap-4 py-4 transition-colors hover:bg-zinc-50 dark:hover:bg-white/5"
+                    >
                       <div className="flex shrink-0 items-center justify-center rounded-lg bg-primary/20 size-10 text-primary">
                         <Icon name={item.icon} />
                       </div>
@@ -210,12 +233,19 @@ export default function EntidadDetalle() {
                         <p className="text-sm text-zinc-600 dark:text-zinc-400">{item.subtitle}</p>
                       </div>
                       <div className="hidden md:flex flex-col items-end gap-1 text-sm">
-                        <p className="font-medium text-zinc-900 dark:text-white">Vence: {item.due}</p>
+                        <p className="font-medium text-zinc-900 dark:text-white">
+                          Vence: {item.due}
+                        </p>
                         <div className="flex items-center gap-2">
                           <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
-                            <div className="h-full rounded-full bg-primary" style={{ width: `${item.progress}%` }} />
+                            <div
+                              className="h-full rounded-full bg-primary"
+                              style={{ width: `${item.progress}%` }}
+                            />
                           </div>
-                          <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">100%</span>
+                          <span className="text-xs font-semibold text-zinc-500 dark:text-zinc-400">
+                            100%
+                          </span>
                         </div>
                       </div>
                       <div className="flex items-center gap-2">

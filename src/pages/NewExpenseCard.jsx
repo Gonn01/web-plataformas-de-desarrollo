@@ -18,11 +18,12 @@ export default function NewExpenseCard({ onClose, onSave }) {
 
   const totalInstallments = Number(installments) || 0;
   const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
-  const progressPct = totalInstallments > 0 ? Math.min(100, Math.max(0, (paid / totalInstallments) * 100)) : 0;
+  const progressPct =
+    totalInstallments > 0 ? Math.min(100, Math.max(0, (paid / totalInstallments) * 100)) : 0;
 
   const canSave = useMemo(
     () => name.trim() && entity.trim() && Number(amount) > 0 && currency,
-    [name, entity, amount, currency]
+    [name, entity, amount, currency],
   );
 
   const handleSubmit = () => {
@@ -70,7 +71,7 @@ export default function NewExpenseCard({ onClose, onSave }) {
       <div className="p-6 space-y-6">
         {/* Type selector */}
         <div className="flex h-12 items-center justify-center rounded-lg bg-[#29382f] p-1.5">
-          <label className="flex cursor-pointer h-full grow items-center justify-center gap-2 overflow-hidden rounded-md px-3 has-[:checked]:bg-red-500/10 has-[:checked]:text-red-400 text-[#9eb7a8] text-sm font-medium transition-colors">
+          <label className="flex cursor-pointer h-full grow items-center justify-center gap-2 overflow-hidden rounded-md px-3 has-checked:bg-red-500/10 has-checked:text-red-400 text-[#9eb7a8] text-sm font-medium transition-colors">
             <Icon name="arrow_upward" className="text-base" />
             <span className="truncate">Debo</span>
             <input
@@ -82,7 +83,7 @@ export default function NewExpenseCard({ onClose, onSave }) {
               onChange={() => setType('Debo')}
             />
           </label>
-          <label className="flex cursor-pointer h-full grow items-center justify-center gap-2 overflow-hidden rounded-md px-3 has-[:checked]:bg-green-500/10 has-[:checked]:text-green-400 text-[#9eb7a8] text-sm font-medium transition-colors">
+          <label className="flex cursor-pointer h-full grow items-center justify-center gap-2 overflow-hidden rounded-md px-3 has-checked:bg-green-500/10 has-checked:text-green-400 text-[#9eb7a8] text-sm font-medium transition-colors">
             <Icon name="arrow_downward" className="text-base" />
             <span className="truncate">Me deben</span>
             <input
@@ -133,7 +134,10 @@ export default function NewExpenseCard({ onClose, onSave }) {
           </label>
 
           <div className="relative col-span-1 sm:col-span-2">
-            <label className="text-white text-sm font-medium pb-2 absolute -top-7" htmlFor="currency-select">
+            <label
+              className="text-white text-sm font-medium pb-2 absolute -top-7"
+              htmlFor="currency-select"
+            >
               Moneda
             </label>
             <select
@@ -201,11 +205,18 @@ export default function NewExpenseCard({ onClose, onSave }) {
               <div className="flex flex-col items-center justify-center pt-5 pb-6">
                 <Icon name="cloud_upload" className="text-4xl text-[#9eb7a8]" />
                 <p className="mb-2 text-sm text-[#9eb7a8]">
-                  <span className="font-semibold text-primary">Haz clic para subir</span> o arrastra y suelta
+                  <span className="font-semibold text-primary">Haz clic para subir</span> o arrastra
+                  y suelta
                 </p>
                 <p className="text-xs text-gray-500">PNG, JPG o PDF (MAX. 5MB)</p>
               </div>
-              <input className="hidden" id="dropzone-file" type="file" multiple onChange={(e) => setFiles(e.target.files)} />
+              <input
+                className="hidden"
+                id="dropzone-file"
+                type="file"
+                multiple
+                onChange={(e) => setFiles(e.target.files)}
+              />
             </label>
           </div>
         </div>
@@ -224,7 +235,7 @@ export default function NewExpenseCard({ onClose, onSave }) {
                 checked={ignoreInBalance}
                 onChange={(e) => setIgnoreInBalance(e.target.checked)}
               />
-              <div className="w-11 h-6 bg-[#29382f] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary" />
+              <div className="w-11 h-6 bg-[#29382f] rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-0.5 after:left-0.5 after:bg-white after:border after:border-gray-300 after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-primary" />
             </div>
           </label>
         </div>

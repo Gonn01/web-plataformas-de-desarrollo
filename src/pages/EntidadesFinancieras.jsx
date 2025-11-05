@@ -2,9 +2,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
-const MOCK_ENTITIES = [
- 
-];
+const MOCK_ENTITIES = [];
 
 function formatMoney(amount, currency) {
   const f = new Intl.NumberFormat('es-AR', {
@@ -28,7 +26,9 @@ function EntityIcon({ type }) {
 function BalancePill({ amount, currency }) {
   const positive = amount >= 0;
   return (
-    <p className={`${positive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'} text-sm font-medium leading-normal`}>
+    <p
+      className={`${positive ? 'text-green-600 dark:text-green-500' : 'text-red-600 dark:text-red-500'} text-sm font-medium leading-normal`}
+    >
       {`Balance Neto ${currency}: ${formatMoney(amount, currency)}`}
     </p>
   );
@@ -43,7 +43,9 @@ function EntityCard({ entity, onClick }) {
       <div className="flex items-center gap-4">
         <EntityIcon type={entity.type} />
         <div className="flex flex-1 flex-col justify-center">
-          <p className="text-slate-900 dark:text-white text-base font-bold leading-normal">{entity.name}</p>
+          <p className="text-slate-900 dark:text-white text-base font-bold leading-normal">
+            {entity.name}
+          </p>
           <div className="flex flex-col sm:flex-row sm:gap-4">
             {entity.balances.map((b, i) => (
               <BalancePill key={i} amount={b.amount} currency={b.currency} />
@@ -70,9 +72,12 @@ function EmptyState({ onCreate }) {
         <span className="material-symbols-outlined text-4xl">add_card</span>
       </div>
       <div className="flex flex-col gap-2">
-        <h2 className="text-slate-900 dark:text-white text-xl font-bold">Aún no tienes entidades creadas</h2>
+        <h2 className="text-slate-900 dark:text-white text-xl font-bold">
+          Aún no tienes entidades creadas
+        </h2>
         <p className="text-slate-500 dark:text-slate-400 max-w-sm">
-          Crea tu primera entidad para empezar a organizar tus finanzas y llevar un control de tus deudas y saldos.
+          Crea tu primera entidad para empezar a organizar tus finanzas y llevar un control de tus
+          deudas y saldos.
         </p>
       </div>
       <button
@@ -123,7 +128,9 @@ export default function EntidadesFinancieras() {
             <div className="layout-content-container flex w-full flex-col max-w-[960px] flex-1 gap-6">
               {/* Heading */}
               <div className="flex flex-wrap items-center justify-between gap-4">
-                <h1 className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tighter">Mis Entidades</h1>
+                <h1 className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-tighter">
+                  Mis Entidades
+                </h1>
                 <button
                   onClick={handleAdd}
                   className="flex min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold leading-normal tracking-wide shadow-sm hover:opacity-90 transition-opacity"
@@ -171,6 +178,3 @@ export default function EntidadesFinancieras() {
     </div>
   );
 }
-
-
-
