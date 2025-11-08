@@ -6,11 +6,11 @@ import App from './App';
 import React from 'react';
 
 createRoot(document.querySelector('#root')).render(
-  <React.StrictMode>
-    <AuthProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </AuthProvider>
-  </React.StrictMode>,
+    <React.StrictMode>
+        <AuthProvider>
+            <BrowserRouter>
+                <App />
+            </BrowserRouter>
+        </AuthProvider>
+    </React.StrictMode>,
 );
