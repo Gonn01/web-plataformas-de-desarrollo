@@ -27,6 +27,14 @@ export default function NewExpenseCard({ onClose, onSave }) {
         [name, entity, amount, currency],
     );
 
+    // Cerrar con Escape
+    useEffect(() => {
+        if (!open) return;
+        const onKey = (e) => e.key === 'Escape' && onClose?.();
+        document.addEventListener('keydown', onKey);
+        return () => document.removeEventListener('keydown', onKey);
+    }, [onClose]);
+
     const handleSubmit = () => {
         if (!canSave) return;
         onSave?.({
@@ -72,7 +80,10 @@ export default function NewExpenseCard({ onClose, onSave }) {
             }}
         >
             {/* Backdrop */}
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+            <div
+                className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+                onMouseDown={onClose} // click en backdrop cierra
+            />
 
             {/* Contenedor del modal */}
             <div

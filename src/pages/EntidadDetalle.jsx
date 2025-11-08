@@ -3,12 +3,14 @@ import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Icon from '../components/Icon';
 import { formatMoney } from '../utils/FormatMoney';
+import NewExpenseModal from '../components/modals/NewExpenseCard';
 
 const MOCK = {};
 
 export default function EntidadDetalle() {
     const { id } = useParams();
     const [tab, setTab] = useState('activos');
+    const [openNewExpense, setOpenNewExpense] = useState(false);
 
     const entity = useMemo(() => {
         if (MOCK[id]) return MOCK[id];
@@ -40,7 +42,7 @@ export default function EntidadDetalle() {
                 <div className="flex items-center gap-2">
                     <button
                         className="flex h-10 min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary/20 px-4 text-sm font-bold text-primary hover:bg-primary/30"
-                        onClick={() => alert('Abrir modal para “Agregar Gasto”')}
+                        onClick={() => setOpenNewExpense(true)}
                     >
                         <Icon name="add" className="text-base" />
                         <span className="truncate">Agregar Gasto</span>
@@ -182,6 +184,16 @@ export default function EntidadDetalle() {
                     </div>
                 )}
             </div>
+            {/* Modal */}
+            {openNewExpense && (
+                <NewExpenseModal
+                    onClose={() => setOpenNewExpense(false)}
+                    onSave={(payload) => {
+                        console.log('Nuevo gasto:', payload);
+                        setOpenNewExpense(false);
+                    }}
+                />
+            )}
         </>
     );
 }
