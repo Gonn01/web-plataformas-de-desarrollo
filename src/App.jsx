@@ -1,7 +1,7 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import FinanceDashboard from './pages/FinancialDashboard';
 import EntidadesFinancieras from './pages/EntidadesFinancieras';
-import EntidadDetalle from './pages/EntidadDetalle';             
+import EntidadDetalle from './pages/EntidadDetalle';
 
 export default function App() {
   return (
