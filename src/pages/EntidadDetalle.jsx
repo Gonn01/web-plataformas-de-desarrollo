@@ -2,7 +2,7 @@
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Icon from '../components/Icon';
-import { formatMoney } from '@/utils/format-money';
+import { formatMoney } from '../utils/FormatMoney';
 
 const MOCK = {};
 
