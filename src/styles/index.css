@@ -1,0 +1,33 @@
+/* Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* --- Reset mínimo propio (sin colores ni layout) --- */
+:root {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* El root de la app ocupa toda la altura */
+html, body, #root {
+  height: 100%;
+}
+
+/* Fondo global y color de texto (Tailwind) */
+body {
+  @apply bg-background-dark text-white;
+  margin: 0;
+}
+
+/* Fondo “gradiente” para toda la pantalla (opcional).
+   Si querés el fondo sólido solamente, borrá esta clase del body en tu JSX.
+*/
+@layer utilities {
+  .bg-app {
+    background: radial-gradient(60% 60% at 50% 30%, #0f1d17 0%, #0c1813 60%, #0a150f 100%);
+    background-attachment: fixed; /* evita “bandas” al scrollear */
+    background-repeat: no-repeat;
+    background-size: cover;
+  }
+}
