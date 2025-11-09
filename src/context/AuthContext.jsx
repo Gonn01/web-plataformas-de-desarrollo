@@ -1,9 +1,9 @@
 import { createContext, useState, useEffect } from 'react';
 
-// Context en minúsculas para que Fast Refresh no lo confunda con componente
+// ✅ export nombrado en MAYÚSCULA
 export const authContext = createContext(null);
 
-// Export default del Provider
+// ✅ export default del Provider
 export default function AuthProvider({ children }) {
     const [usuario, setUsuario] = useState(null);
     const [cargando, setCargando] = useState(true);

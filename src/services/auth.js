@@ -1,8 +1,8 @@
-// Mock de autenticación simple:
-// Acepta: email = admin@prueba.com  |  password = 123456
-export async function autenticar(email, password) {
-    await new Promise((r) => setTimeout(r, 400)); // pequeño delay
-    const ok = email?.toLowerCase() === 'admin@prueba.com' && password === '123456';
-    if (!ok) throw new Error('Credenciales inválidas');
-    return { email };
+export async function autenticar(email, clave) {
+    // simulación
+    await new Promise((r) => setTimeout(r, 600));
+    if (email === 'usuario@email.com' && clave === '123456') {
+        return { id: 1, email, nombre: 'Usuario' };
+    }
+    throw new Error('Credenciales inválidas');
 }

@@ -91,7 +91,9 @@ export default function EntidadDetalle() {
                     </p>
                 </div>
                 <div className="flex flex-1 flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/50">
-                    <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">Deudas Activas</p>
+                    <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
+                        Deudas Activas
+                    </p>
                     <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
                         {entity.stats.debts}
                     </p>
@@ -105,17 +107,18 @@ export default function EntidadDetalle() {
                         {['activos', 'finalizados', 'log'].map((t) => (
                             <button
                                 key={t}
-                                className={`pb-3 pt-2 text-sm ${tab === t
-                                    ? 'text-primary font-bold border-b-2 border-b-primary'
-                                    : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 border-b-2 border-b-transparent font-medium'
-                                    }`}
+                                className={`pb-3 pt-2 text-sm ${
+                                    tab === t
+                                        ? 'text-primary font-bold border-b-2 border-b-primary'
+                                        : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-800 dark:hover:text-zinc-200 border-b-2 border-b-transparent font-medium'
+                                }`}
                                 onClick={() => setTab(t)}
                             >
                                 {t === 'activos'
                                     ? 'Gastos Activos'
                                     : t === 'finalizados'
-                                        ? 'Gastos Finalizados'
-                                        : 'Log de Cambios'}
+                                      ? 'Gastos Finalizados'
+                                      : 'Log de Cambios'}
                             </button>
                         ))}
                     </div>
@@ -142,11 +145,17 @@ export default function EntidadDetalle() {
                                     <Icon name={item.icon} />
                                 </div>
                                 <div className="flex flex-1 flex-col justify-center">
-                                    <p className="font-medium text-zinc-900 dark:text-white">{item.title}</p>
-                                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{item.subtitle}</p>
+                                    <p className="font-medium text-zinc-900 dark:text-white">
+                                        {item.title}
+                                    </p>
+                                    <p className="text-sm text-zinc-600 dark:text-zinc-400">
+                                        {item.subtitle}
+                                    </p>
                                 </div>
                                 <div className="hidden md:flex flex-col items-end gap-1 text-sm">
-                                    <p className="font-medium text-zinc-900 dark:text-white">Vence: {item.due}</p>
+                                    <p className="font-medium text-zinc-900 dark:text-white">
+                                        Vence: {item.due}
+                                    </p>
                                     <div className="flex items-center gap-2">
                                         <div className="h-1.5 w-24 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-700">
                                             <div
@@ -178,7 +187,9 @@ export default function EntidadDetalle() {
                         {log.map((l, i) => (
                             <div key={i} className="flex items-center justify-between py-3">
                                 <p className="text-sm text-zinc-600 dark:text-zinc-400">{l.text}</p>
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400">{l.date}</span>
+                                <span className="text-xs text-zinc-500 dark:text-zinc-400">
+                                    {l.date}
+                                </span>
                             </div>
                         ))}
                     </div>

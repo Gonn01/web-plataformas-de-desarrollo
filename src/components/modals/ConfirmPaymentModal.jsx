@@ -189,7 +189,7 @@ export default function ConfirmInstallmentPaymentModal({
                                                             0,
                                                             (single.paidInstallments /
                                                                 single.totalInstallments) *
-                                                            100,
+                                                                100,
                                                         ),
                                                     )}%`,
                                                 }}

@@ -1,8 +1,12 @@
+// src/guards/ProtectedRoute.jsx
 import { Navigate, Outlet } from 'react-router-dom';
-import { useAuth } from '../context/useAuth';
+import useAuth from '../context/use-auth';
 
-export default function ProtectedRoute() {
+export default function ProtectedRoute({ children }) {
     const { usuario, cargando } = useAuth();
-    if (cargando) return null; // Podés poner un spinner si querés
-    return usuario ? <Outlet /> : <Navigate to="/login" replace />;
+
+    if (cargando) return null; // o spinner
+    if (!usuario) return <Navigate to="/login" replace />;
+
+    return children ?? <Outlet />;
 }

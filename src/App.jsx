@@ -1,28 +1,42 @@
 // src/App.jsx
-import { Navigate, Route, Routes } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
+import Login from './pages/Login';
 import AppLayout from './layouts/AppLayout';
+import FinanceDashboard from './pages/FinancialDashboard';
 import EntidadesFinancieras from './pages/EntidadesFinancieras';
 import EntidadDetalle from './pages/EntidadDetalle';
-import FinanceDashboard from './pages/FinancialDashboard';
+import ProtectedRoute from './guards/ProtectedRoute';
+import CompraDetalle from './pages/CompraDetalle';
+import Debo from './pages/Debo';
 
 export default function App() {
     return (
         <Routes>
-            {/* Ruta pública (si querés usar un login real) */}
-            {/* <Route path="/login" element={<Login />} />s */}
+            {/* Redirect raíz → /login */}
+            <Route path="/" element={<Navigate to="/login" replace />} />
 
-            {/* Todo lo que va con Sidebar fijo */}
-            <Route path="/" element={<AppLayout />}>
-                {/* Redirigí raíz a /dashboard */}
-                <Route index element={<Navigate to="/dashboard" replace />} />
+            {/* Pública */}
+            <Route path="/login" element={<Login />} />
 
+            {/* Protegidas */}
+            <Route
+                path="/app/*"
+                element={
+                    <ProtectedRoute>
+                        <AppLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={<FinanceDashboard />} />
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
-
-                {/* 404 → dashboard */}
-                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+                <Route path="debo" element={<Debo />} />
+                <Route path="deuda/:id" element={<CompraDetalle />} />
             </Route>
+
+            {/* Fallback */}
+            {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
         </Routes>
     );
 }
