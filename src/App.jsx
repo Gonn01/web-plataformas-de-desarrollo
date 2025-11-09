@@ -1,15 +1,28 @@
-import { Routes, Route, Navigate } from "react-router-dom";
-import Login from "./pages/Login";
-export default function App() {
-  return (
-    <Routes>
-      {/* redirijo raíz a /login por ahora */}
-      <Route path="/" element={<Navigate to="/login" replace />} />
-      <Route path="/login" element={<Login />} />
+// src/App.jsx
+import { Navigate, Route, Routes } from 'react-router-dom';
+import AppLayout from './layouts/AppLayout';
+import EntidadesFinancieras from './pages/EntidadesFinancieras';
+import EntidadDetalle from './pages/EntidadDetalle';
+import FinanceDashboard from './pages/FinancialDashboard';
 
-      {/* si alguien entra a cualquier otra ruta, vuelve al login */}
-      <Route path="*" element={<Navigate to="/login" replace />} />
-      <Route path="/deuda/:id" element={<CompraDetalle />} />
-    </Routes>
-  );
+export default function App() {
+    return (
+        <Routes>
+            {/* Ruta pública (si querés usar un login real) */}
+            {/* <Route path="/login" element={<Login />} />s */}
+
+            {/* Todo lo que va con Sidebar fijo */}
+            <Route path="/" element={<AppLayout />}>
+                {/* Redirigí raíz a /dashboard */}
+                <Route index element={<Navigate to="/dashboard" replace />} />
+
+                <Route path="dashboard" element={<FinanceDashboard />} />
+                <Route path="entidades" element={<EntidadesFinancieras />} />
+                <Route path="entidades/:id" element={<EntidadDetalle />} />
+
+                {/* 404 → dashboard */}
+                <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            </Route>
+        </Routes>
+    );
 }

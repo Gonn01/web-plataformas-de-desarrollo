@@ -4,14 +4,14 @@ import { useAuth } from "../context/useAuth";
 import { autenticar } from "../services/auth";    
 
 export default function Login() {
-  const nav = useNavigate();
-  const { login } = useAuth();
+    const nav = useNavigate();
+    const { login } = useAuth();
 
-  const [email, setEmail] = useState("");
-  const [clave, setClave] = useState("");
-  const [mostrar, setMostrar] = useState(false);
-  const [cargando, setCargando] = useState(false);
-  const [error, setError] = useState("");
+    const [email, setEmail] = useState('');
+    const [clave, setClave] = useState('');
+    const [mostrar, setMostrar] = useState(false);
+    const [cargando, setCargando] = useState(false);
+    const [error, setError] = useState('');
 
   // --- validaciones como antes ---
   const validar = () => {
@@ -20,10 +20,10 @@ export default function Login() {
     return "";
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
-    const msg = validar();
-    if (msg) return setError(msg);
+    const onSubmit = async (e) => {
+        e.preventDefault();
+        const msg = validar();
+        if (msg) return setError(msg);
 
     try {
       setCargando(true);
