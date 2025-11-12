@@ -1,58 +1,112 @@
-// src/pages/CompraDetalle.jsx
-import { Link } from 'react-router-dom';
+//compraDetalle.jsx
+import { useNavigate, useParams } from 'react-router-dom';
+import { useMemo, useState } from 'react';
+
+// ---- Página ----
 export default function CompraDetalle() {
-    // Datos mock para mostrar progreso, etc.
-    const total = 1200;
-    const pagado = 300;
-    // const cuotas = 12;
-    const porcentaje = (pagado / total) * 100;
+    const nav = useNavigate();
+    const { id } = useParams();
+
+    // Mock local (luego podemos traer por id desde services/deudas.js)
+    const [detalle, setDetalle] = useState({
+        id,
+        titulo: 'Compra Notebook',
+        estado: 'Pendiente',
+        entidad: 'Tienda de Electrónica',
+        total: 1200,
+        moneda: 'USD',
+        tipo: 'Compra Tarjeta',
+        cuotas: [
+            { nro: 3, monto: 100, venc: '15 Mar 2024', pagada: true },
+            { nro: 4, monto: 100, venc: '15 Abr 2024', pagada: false, proxima: true },
+            { nro: 5, monto: 100, venc: '15 May 2024', pagada: false },
+        ],
+        adjuntos: [], // {name, url} locales
+    });
+
+    const totalPagado = useMemo(
+        () => detalle.cuotas.filter((c) => c.pagada).reduce((a, c) => a + c.monto, 0),
+        [detalle.cuotas],
+    );
+    const porcentaje = useMemo(
+        () => Math.min(100, (totalPagado / detalle.total) * 100),
+        [totalPagado, detalle.total],
+    );
+
+    const volverADebo = () => nav('/app/debo'); // o nav(-1) si preferís "volver" genérico
+
+    const marcarProximaComoPagada = () => {
+        setDetalle((prev) => {
+            const idx = prev.cuotas.findIndex((c) => c.proxima && !c.pagada);
+            if (idx === -1) return prev;
+            const nuevas = prev.cuotas.map((c, i) =>
+                i === idx ? { ...c, pagada: true, proxima: false } : c,
+            );
+            // Siguiente no pagada queda como "proxima"
+            const nextIdx = nuevas.findIndex((c) => !c.pagada);
+            if (nextIdx !== -1) nuevas[nextIdx] = { ...nuevas[nextIdx], proxima: true };
+            return { ...prev, cuotas: nuevas };
+        });
+    };
+
+    const abrirEditar = () => {
+        alert('Abrir modal de edición (pendiente): cambiar entidad, total, moneda, etc.');
+    };
+
+    const onSeleccionAdjuntos = (e) => {
+        const files = Array.from(e.target.files || []);
+        if (!files.length) return;
+        const nuevos = files.map((f) => ({ name: f.name, url: URL.createObjectURL(f) }));
+        setDetalle((prev) => ({ ...prev, adjuntos: [...prev.adjuntos, ...nuevos] }));
+    };
 
     return (
         <div className="min-h-dvh w-full bg-background-dark text-white font-display">
             <div className="px-4 md:px-10 lg:px-20 xl:px-40 py-6 sm:py-10 flex justify-center">
                 <div className="w-full max-w-[960px] flex flex-col gap-8">
-                    {/* 🔙 Botón para volver */}
-                    <div>
-                        <Link
-                            to="/app/debo"
-                            className="text-sm text-primary hover:underline flex items-center gap-1"
-                        >
-                            <span className="material-symbols-outlined text-base">arrow_back</span>
-                            Volver a Debo
-                        </Link>
-                    </div>
-
                     {/* Migas */}
                     <div className="flex flex-wrap gap-2 text-sm">
-                        <a className="text-[#9eb7a8] hover:text-primary transition-colors" href="#">
+                        <button
+                            onClick={() => nav('/app/dashboard')}
+                            className="text-[#9eb7a8] hover:text-primary transition-colors"
+                        >
                             Inicio
-                        </a>
+                        </button>
                         <span className="text-[#9eb7a8]">/</span>
-                        <a className="text-[#9eb7a8] hover:text-primary transition-colors" href="#">
+                        <button
+                            onClick={volverADebo}
+                            className="text-[#9eb7a8] hover:text-primary transition-colors"
+                        >
                             Debo
-                        </a>
+                        </button>
                         <span className="text-[#9eb7a8]">/</span>
-                        <span className="text-white">Compra Notebook</span>
+                        <span className="text-white">{detalle.titulo}</span>
                     </div>
 
                     {/* Título + acciones */}
                     <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
                         <div>
                             <p className="text-4xl font-black tracking-[-0.033em]">
-                                Compra Notebook
+                                {detalle.titulo}
                             </p>
                             <div className="mt-2">
                                 <span className="bg-yellow-400/20 text-yellow-400 text-xs font-semibold px-2.5 py-1 rounded-full">
-                                    Pendiente
+                                    {detalle.estado}
                                 </span>
                             </div>
                         </div>
 
                         <div className="flex flex-wrap gap-3 w-full sm:w-auto">
-                            <button className="h-10 px-4 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-opacity-90 transition-opacity">
+                            <button
+                                onClick={marcarProximaComoPagada}
+                                className="h-10 px-4 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-opacity-90 transition-opacity"
+                            >
                                 Marcar cuota como pagada
                             </button>
-                            <button className="h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all">
+                            <button
+                                onClick={abrirEditar}
+                                className="h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all"
+                            >
                                 Editar
                             </button>
                         </div>
@@ -62,10 +116,10 @@ export default function CompraDetalle() {
                     <div className="bg-[#111714] rounded-xl p-6 shadow-sm flex flex-col gap-6">
                         {/* Datos clave */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-                            <InfoItem label="Entidad" value="Tienda de Electrónica" />
-                            <InfoItem label="Monto Total" value={`$${total}`} />
-                            <InfoItem label="Tipo" value="Compra Tarjeta" />
-                            <InfoItem label="Moneda" value="USD" />
+                            <InfoItem label="Entidad" value={detalle.entidad} />
+                            <InfoItem label="Monto Total" value={`$${detalle.total}`} />
+                            <InfoItem label="Tipo" value={detalle.tipo} />
+                            <InfoItem label="Moneda" value={detalle.moneda} />
                         </div>
 
                         {/* Progreso */}
@@ -80,7 +134,7 @@ export default function CompraDetalle() {
                                 />
                             </div>
                             <p className="text-sm text-[#9eb7a8]">
-                                3 de 12 cuotas pagadas (${pagado} / ${total})
+                                {`${detalle.cuotas.filter((c) => c.pagada).length} de ${detalle.cuotas.length} cuotas pagadas ($${totalPagado} / $${detalle.total})`}
                             </p>
                         </div>
                     </div>
@@ -88,57 +142,56 @@ export default function CompraDetalle() {
                     {/* Cuotas */}
                     <section className="flex flex-col gap-4">
                         <h2 className="text-xl font-bold">Cuotas</h2>
-
-                        {/* Pagada */}
-                        <Cuota
-                            icon="check_circle"
-                            title="Cuota #3"
-                            venc="15 Mar 2024"
-                            monto="$100.00"
-                            paid
-                        />
-
-                        {/* Próxima */}
-                        <Cuota
-                            icon="arrow_circle_right"
-                            title="Cuota #4"
-                            venc="15 Abr 2024"
-                            monto="$100.00"
-                            next
-                        />
-
-                        {/* Futura */}
-                        <Cuota
-                            icon="schedule"
-                            title="Cuota #5"
-                            venc="15 May 2024"
-                            monto="$100.00"
-                        />
+                        {detalle.cuotas.map((c) => (
+                            <Cuota
+                                key={c.nro}
+                                icon={
+                                    c.pagada
+                                        ? 'check_circle'
+                                        : c.proxima
+                                          ? 'arrow_circle_right'
+                                          : 'schedule'
+                                }
+                                title={`Cuota #${c.nro}`}
+                                venc={c.venc}
+                                monto={`$${c.monto.toFixed(2)}`}
+                                paid={c.pagada}
+                                next={!!c.proxima}
+                            />
+                        ))}
                     </section>
 
                     {/* Adjuntos */}
                     <section className="flex flex-col gap-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-xl font-bold">Archivos Adjuntos</h2>
-                            <button className="h-9 px-3 rounded-lg bg-[#29382f] text-sm font-bold hover:bg-opacity-80 transition-all flex items-center gap-2">
+                            <label className="h-9 px-3 rounded-lg bg-[#29382f] text-sm font-bold hover:bg-opacity-80 transition-all flex items-center gap-2 cursor-pointer">
                                 <span className="material-symbols-outlined text-base">
                                     upload_file
                                 </span>
                                 Subir archivo
-                            </button>
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    multiple
+                                    onChange={onSeleccionAdjuntos}
+                                />
+                            </label>
                         </div>
 
+                        {detalle.adjuntos.length === 0 && (
+                            <div className="text-sm text-[#9eb7a8]">Sin adjuntos.</div>
+                        )}
+
                         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                            <img
-                                className="aspect-square w-full rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                                alt="Recibo de compra"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuCj77qzDIzB8C29rr_d17cpNDztVos5Bm2V661F5ItebT2S0HjNdINnLkCcDUwiZBXYl10ba6nnmJB4aqhPf_vaIhuGupEjAHMnelpAe5deCTi2ddTDKIyPC62hLBs_DVfFtRo5HPjfLWg7K4mc_OVzmI0lgtSGfSzbEiC6DC-au0TmcI-Fsar1-5LOSAe4BHsWE459xCthVFD6v1cLIKTlydS4bbP-kOFjXClIlt3JA7sDFN-lepVo-xtLAtO8nRCd5Bgam9gBTVw"
-                            />
-                            <img
-                                className="aspect-square w-full rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
-                                alt="Garantía"
-                                src="https://lh3.googleusercontent.com/aida-public/AB6AXuBsbvCoSgtX-JL4l5kEi9biatfhuzN_4wPhRd_heYmXYH3pKStWOhKl19gOJXDmQ-Tuh4NM-WlZ_2c1RdT3edlhMmkaNF5Zm45trrNpWxJUjzy2brz9qs805YAo1K4Mtl5ENE-GCbkWgZ1PDtShZykmkDXAjjCREdRfH6XH83R327TIw0Q0GrihOX7sJRBX-i-Lx8FDCR4TDEU2tcBiiW5kD7sFJESJvMm2a0DORZ59cJgb6ozh7oE20HV9GT_W4BXLPplblFgHgGA"
-                            />
+                            {detalle.adjuntos.map((f, i) => (
+                                <img
+                                    key={i}
+                                    alt={f.name}
+                                    className="aspect-square w-full rounded-lg object-cover cursor-pointer hover:opacity-80 transition-opacity"
+                                    src={f.url}
+                                />
+                            ))}
                             <div className="aspect-square w-full rounded-lg border-2 border-dashed border-gray-700 grid place-content-center text-center p-4">
                                 <span className="material-symbols-outlined text-3xl text-gray-600">
                                     add_photo_alternate
@@ -147,36 +200,6 @@ export default function CompraDetalle() {
                             </div>
                         </div>
                     </section>
-
-                    {/* Historial */}
-                    <section className="flex flex-col gap-4">
-                        <h2 className="text-xl font-bold">Historial de Actividad</h2>
-                        <ul className="flex flex-col gap-4">
-                            <HistItem
-                                icon="receipt_long"
-                                color="primary"
-                                text={
-                                    <>
-                                        <b>Cuota #3</b> marcada como pagada.
-                                    </>
-                                }
-                                date="15 Mar 2024, 10:30 AM"
-                            />
-                            <HistItem
-                                icon="edit"
-                                box="neutral"
-                                text={`Se editó la entidad de "Tienda X" a "Tienda de Electrónica".`}
-                                date="02 Ene 2024, 02:15 PM"
-                            />
-                            <HistItem
-                                icon="add_circle"
-                                box="neutral"
-                                text="Se creó el registro de la deuda."
-                                date="01 Ene 2024, 09:00 AM"
-                            />
-                        </ul>
-                    </section>
-
                     {/* Zona de peligro */}
                     <section className="mt-8 pt-6 border-t border-gray-800">
                         <h3 className="text-lg font-bold text-red-500">Zona de Peligro</h3>
@@ -192,12 +215,23 @@ export default function CompraDetalle() {
                             </button>
                         </div>
                     </section>
+
+                    {/* Botón Volver fijo abajo (opcional) */}
+                    <div className="pt-2">
+                        <button
+                            onClick={volverADebo}
+                            className="h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all"
+                        >
+                            ← Volver a Debo
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
     );
 }
 
+// ---- Subcomponentes ----
 function InfoItem({ label, value }) {
     return (
         <div className="flex flex-col gap-1">
@@ -229,20 +263,5 @@ function Cuota({ icon, title, venc, monto, paid, next }) {
                 {monto}
             </p>
         </div>
-    );
-}
-
-function HistItem({ icon, text, date, color = 'neutral' }) {
-    const circle = color === 'primary' ? 'bg-primary/20' : 'bg-[#29382f]';
-    return (
-        <li className="flex items-start gap-4">
-            <div className={`h-10 w-10 rounded-full grid place-content-center ${circle}`}>
-                <span className="material-symbols-outlined text-primary">{icon}</span>
-            </div>
-            <div>
-                <p>{text}</p>
-                <p className="text-sm text-[#9eb7a8]">{date}</p>
-            </div>
-        </li>
     );
 }
