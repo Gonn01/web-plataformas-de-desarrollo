@@ -8,7 +8,7 @@ const MOCK_DEUDAS = [
 export default function Debo() {
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold">Debo</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Debo</h1>
 
             {MOCK_DEUDAS.length === 0 && <p className="text-slate-500">No tenés deudas activas.</p>}
 
@@ -19,7 +19,7 @@ export default function Debo() {
                         className="rounded-lg border border-slate-700/50 bg-black/20 p-4 hover:bg-black/30"
                     >
                         <div className="flex items-center justify-between">
-                            <p className="font-medium">{d.titulo}</p>
+                            <p className="font-medium text-slate-900 dark:text-white">{d.titulo}</p>
                             <span className="text-red-400">
                                 ARS ${d.monto.toLocaleString('es-AR')}
                             </span>
