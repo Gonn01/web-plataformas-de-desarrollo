@@ -1,12 +1,21 @@
-import { NavLink } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import Icon from './Icon';
 import { USER } from '../data/constants';
+import useAuth from '../context/use-auth';
 
 export default function Sidebar() {
-    // 👉 definimos las clases base fuera del JSX
+    //agregue lo del logout para cerrar la seccion
     const base = 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium leading-normal';
     const idle = 'text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5';
     const active = 'bg-primary/20 text-primary';
+
+    const { logout } = useAuth();
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        logout();
+        navigate('/login', { replace: true });
+    };
 
     return (
         <aside className="flex w-64 flex-col border-r border-black/10 dark:border-white/10 p-4 bg-white/50 dark:bg-background-dark">
@@ -75,6 +84,11 @@ export default function Sidebar() {
                     <Icon name="settings" className="text-2xl" />
                     <p>Configuración</p>
                 </NavLink>
+                {/* Botón de Cerrar sesion */}
+                <button onClick={handleLogout} className={`${base} ${idle} text-left w-full`}>
+                    <Icon name="logout" className="text-2xl" />
+                    <p>Cerrar sesión</p>
+                </button>
             </div>
         </aside>
     );
