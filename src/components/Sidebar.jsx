@@ -18,6 +18,7 @@ export default function Sidebar() {
     };
 
     const avatar = usuario?.avatar || USER.avatar;
+    const nombreVisible = usuario?.nombre || USER.name;
 
     return (
         <aside className="flex w-64 flex-col border-r border-black/10 dark:border-white/10 p-4 bg-white/50 dark:bg-background-dark">
@@ -32,7 +33,7 @@ export default function Sidebar() {
                     />
                     <div className="flex flex-col">
                         <h1 className="text-slate-900 dark:text-white text-base font-medium leading-normal">
-                            {USER.name}
+                            {nombreVisible}
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">
                             {USER.email}

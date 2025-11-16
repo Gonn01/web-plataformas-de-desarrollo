@@ -21,7 +21,7 @@ export default function Configuracion() {
     };
 
     const handleSave = () => {
-        // armamos un objeto usuario actualizado
+        // objeto usuario actualizado
         const actualizado = {
             ...usuario,
             nombre: nombreVisible,
@@ -34,7 +34,7 @@ export default function Configuracion() {
             setUsuario(actualizado);
         }
 
-        // lo guardamos también en localStorage para persistir
+        // lo guardo en localStorage
         localStorage.setItem('auth_usuario', JSON.stringify(actualizado));
 
         alert('Datos de usuario actualizados.');
@@ -115,7 +115,7 @@ export default function Configuracion() {
                                 Moneda principal
                             </label>
                             <select
-                                className="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark px-3 py-2 text-sm"
+                                className="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark px-3 py-2 text-sm text-slate-900 dark:text-white"
                                 value={moneda}
                                 onChange={(e) => setMoneda(e.target.value)}
                             >

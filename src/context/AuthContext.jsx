@@ -1,9 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 
-// ✅ expor
 export const authContext = createContext(null);
 
-// ✅ export default del Provider
 export default function AuthProvider({ children }) {
     const [usuario, setUsuario] = useState(null);
     const [cargando, setCargando] = useState(true);
