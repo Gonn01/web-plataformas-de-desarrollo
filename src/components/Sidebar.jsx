@@ -9,13 +9,15 @@ export default function Sidebar() {
     const idle = 'text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5';
     const active = 'bg-primary/20 text-primary';
 
-    const { logout } = useAuth();
+    const { usuario, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
         logout();
         navigate('/login', { replace: true });
     };
+
+    const avatar = usuario?.avatar || USER.avatar;
 
     return (
         <aside className="flex w-64 flex-col border-r border-black/10 dark:border-white/10 p-4 bg-white/50 dark:bg-background-dark">
@@ -25,7 +27,8 @@ export default function Sidebar() {
                     <div
                         className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                         aria-label="User profile picture"
-                        style={{ backgroundImage: `url(${USER.avatar})` }}
+                        /* style={{ backgroundImage: `url(${USER.avatar})` }} */
+                        style={{ backgroundImage: `url(${avatar})` }}
                     />
                     <div className="flex flex-col">
                         <h1 className="text-slate-900 dark:text-white text-base font-medium leading-normal">

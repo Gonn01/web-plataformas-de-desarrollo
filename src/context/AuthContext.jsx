@@ -1,6 +1,6 @@
 import { createContext, useState, useEffect } from 'react';
 
-// ✅ export nombrado en MAYÚSCULA
+// ✅ expor
 export const authContext = createContext(null);
 
 // ✅ export default del Provider
@@ -26,7 +26,7 @@ export default function AuthProvider({ children }) {
     };
 
     return (
-        <authContext.Provider value={{ usuario, cargando, login, logout }}>
+        <authContext.Provider value={{ usuario, setUsuario, cargando, login, logout }}>
             {children}
         </authContext.Provider>
     );

@@ -8,6 +8,7 @@ import EntidadDetalle from './pages/EntidadDetalle';
 import ProtectedRoute from './guards/ProtectedRoute';
 import CompraDetalle from './pages/CompraDetalle';
 import Debo from './pages/Debo';
+import Configuracion from './pages/Configuracion';
 
 export default function App() {
     return (
@@ -33,6 +34,7 @@ export default function App() {
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
                 <Route path="debo" element={<Debo />} />
                 <Route path="deuda/:id" element={<CompraDetalle />} />
+                <Route path="configuracion" element={<Configuracion />} />
             </Route>
 
             {/* Fallback */}
