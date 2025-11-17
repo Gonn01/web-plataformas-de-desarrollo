@@ -1,9 +1,7 @@
 import { createContext, useState, useEffect } from 'react';
 
-// Context en minúsculas para que Fast Refresh no lo confunda con componente
 export const authContext = createContext(null);
 
-// Export default del Provider
 export default function AuthProvider({ children }) {
     const [usuario, setUsuario] = useState(null);
     const [cargando, setCargando] = useState(true);
@@ -26,7 +24,7 @@ export default function AuthProvider({ children }) {
     };
 
     return (
-        <authContext.Provider value={{ usuario, cargando, login, logout }}>
+        <authContext.Provider value={{ usuario, setUsuario, cargando, login, logout }}>
             {children}
         </authContext.Provider>
     );
