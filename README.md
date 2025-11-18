@@ -113,8 +113,6 @@ actualizarDeuda
 
 eliminarDeuda
 
-obtenerDeudas
-
 obtenerDeudaPorId
 
 🔧 Tecnologías usadas
@@ -143,8 +141,12 @@ Agustin Masa
 Romina Herrera
 
 
+Video y pdf
 
+https://drive.google.com/drive/folders/1aWYYho0riHqlliThUd-Cn9B_s-Sy-b3Z?usp=sharing
 
+Email: usuario@email.com
+pass: 123456
 
 
 
