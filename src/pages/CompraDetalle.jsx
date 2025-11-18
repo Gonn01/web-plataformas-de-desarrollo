@@ -53,7 +53,19 @@ export default function CompraDetalle() {
         return Math.min(100, (totalPagado / detalle.total) * 100);
     }, [detalle, totalPagado]);
 
-    const volverADebo = () => nav('/app/debo');
+    /* const volverADebo = () => nav('/app/debo'); */
+    const volverALista = () => {
+        if (!detalle) {
+            nav('/app/debo');
+            return;
+        }
+
+        if (detalle.tipo === 'Me deben') {
+            nav('/app/me-deben');
+        } else {
+            nav('/app/debo');
+        }
+    };
 
     // marca la próxima cuota como pagada, y si se pagaron todas elimina la deuda
     const marcarProximaComoPagada = () => {
@@ -75,9 +87,22 @@ export default function CompraDetalle() {
             const todasPagadas = nuevas.every((c) => c.pagada);
 
             if (todasPagadas) {
-                alert('¡Felicitaciones! Ya terminaste de pagar esta deuda.');
+                const esMeDeben = prev.tipo === 'Me deben';
+
+                const mensaje = esMeDeben
+                    ? `¡Genial! Registraste que ya te pagaron "${prev.titulo}".`
+                    : `¡Felicitaciones! Ya terminaste de pagar "${prev.titulo}".`;
+
+                alert(mensaje);
+
                 eliminarDeuda(prev.id);
-                nav('/app/debo');
+
+                // Volver a la sección correcta
+                if (esMeDeben) {
+                    nav('/app/me-deben');
+                } else {
+                    nav('/app/debo');
+                }
             } else {
                 actualizarDeuda(prev.id, {
                     cuotasPagadas: nuevas.filter((c) => c.pagada).length,
@@ -157,11 +182,12 @@ export default function CompraDetalle() {
                         </button>
                         <span className="text-[#9eb7a8]">/</span>
                         <button
-                            onClick={volverADebo}
+                            onClick={volverALista}
                             className="text-[#9eb7a8] hover:text-primary transition-colors"
                         >
-                            Debo
+                            {detalle.tipo === 'Me deben' ? 'Me deben' : 'Debo'}
                         </button>
+
                         <span className="text-[#9eb7a8]">/</span>
                         <span className="text-white">{detalle.titulo}</span>
                     </div>
@@ -312,10 +338,10 @@ export default function CompraDetalle() {
 
                     <div className="pt-2">
                         <button
-                            onClick={volverADebo}
+                            onClick={volverALista}
                             className="h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all"
                         >
-                            ← Volver a Debo
+                            ← Volver a {detalle.tipo === 'Me deben' ? 'Me deben' : 'Debo'}
                         </button>
                     </div>
                 </div>

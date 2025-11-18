@@ -33,7 +33,6 @@ export default function MeDeben() {
                             </span>
                         </div>
                         <div className="mt-3">
-                            {/* Si más adelante hacés detalle de "Me deben", cambiás la ruta */}
                             <Link
                                 to={`/app/deuda/${d.id}`}
                                 className="text-sm text-primary hover:underline"
