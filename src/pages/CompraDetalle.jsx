@@ -53,7 +53,7 @@ export default function CompraDetalle() {
         return Math.min(100, (totalPagado / detalle.total) * 100);
     }, [detalle, totalPagado]);
 
-    /* const volverADebo = () => nav('/app/debo'); */
+    // volver a la lista correcta según el tipo
     const volverALista = () => {
         if (!detalle) {
             nav('/app/debo');
@@ -61,56 +61,58 @@ export default function CompraDetalle() {
         }
 
         if (detalle.tipo === 'Me deben') {
-            nav('/app/me-deben');
+            nav('/app/medeben');
         } else {
             nav('/app/debo');
         }
     };
 
-    // marca la próxima cuota como pagada, y si se pagaron todas elimina la deuda
+    // marca la próxima cuota como pagada
     const marcarProximaComoPagada = () => {
         if (!detalle) return;
 
-        setDetalle((prev) => {
-            const idx = prev.cuotas.findIndex((c) => c.proxima && !c.pagada);
-            if (idx === -1) return prev;
+        // 1) calculamos TODO fuera de setDetalle (sin efectos secundarios)
+        const idx = detalle.cuotas.findIndex((c) => c.proxima && !c.pagada);
+        if (idx === -1) return;
 
-            const nuevas = prev.cuotas.map((c, i) =>
-                i === idx ? { ...c, pagada: true, proxima: false } : c,
-            );
+        const nuevasCuotas = detalle.cuotas.map((c, i) =>
+            i === idx ? { ...c, pagada: true, proxima: false } : c,
+        );
 
-            const nextIdx = nuevas.findIndex((c) => !c.pagada);
-            if (nextIdx !== -1) {
-                nuevas[nextIdx] = { ...nuevas[nextIdx], proxima: true };
-            }
+        const nextIdx = nuevasCuotas.findIndex((c) => !c.pagada);
+        if (nextIdx !== -1) {
+            nuevasCuotas[nextIdx] = { ...nuevasCuotas[nextIdx], proxima: true };
+        }
 
-            const todasPagadas = nuevas.every((c) => c.pagada);
+        const todasPagadas = nuevasCuotas.every((c) => c.pagada);
+        const esMeDeben = detalle.tipo === 'Me deben';
 
-            if (todasPagadas) {
-                const esMeDeben = prev.tipo === 'Me deben';
+        // 2) actualizamos el estado (sin alert ni nav adentro)
+        setDetalle((prev) => ({
+            ...prev,
+            cuotas: nuevasCuotas,
+        }));
 
-                const mensaje = esMeDeben
-                    ? `¡Genial! Registraste que ya te pagaron "${prev.titulo}".`
-                    : `¡Felicitaciones! Ya terminaste de pagar "${prev.titulo}".`;
+        // 3) efecto secundario según el caso (una sola vez)
+        if (todasPagadas) {
+            const mensaje = esMeDeben
+                ? `¡Genial! Registraste que ya te pagaron "${detalle.titulo}".`
+                : `¡Felicitaciones! Ya terminaste de pagar "${detalle.titulo}".`;
 
-                alert(mensaje);
+            alert(mensaje);
 
-                eliminarDeuda(prev.id);
+            eliminarDeuda(detalle.id);
 
-                // Volver a la sección correcta
-                if (esMeDeben) {
-                    nav('/app/me-deben');
-                } else {
-                    nav('/app/debo');
-                }
+            if (esMeDeben) {
+                nav('/app/medeben');
             } else {
-                actualizarDeuda(prev.id, {
-                    cuotasPagadas: nuevas.filter((c) => c.pagada).length,
-                });
+                nav('/app/debo');
             }
-
-            return { ...prev, cuotas: nuevas };
-        });
+        } else {
+            actualizarDeuda(detalle.id, {
+                cuotasPagadas: nuevasCuotas.filter((c) => c.pagada).length,
+            });
+        }
     };
 
     const abrirEditar = () => {
@@ -187,7 +189,6 @@ export default function CompraDetalle() {
                         >
                             {detalle.tipo === 'Me deben' ? 'Me deben' : 'Debo'}
                         </button>
-
                         <span className="text-[#9eb7a8]">/</span>
                         <span className="text-white">{detalle.titulo}</span>
                     </div>
@@ -312,7 +313,7 @@ export default function CompraDetalle() {
                         </div>
                     </section>
 
-                    {/* zona de peligro */}
+                    {/* Eliminar deuda */}
                     <section className="mt-8 pt-6 border-t border-gray-800">
                         <h3 className="text-lg font-bold text-red-500">Zona de Peligro</h3>
                         <div className="mt-4 p-4 rounded-lg bg-red-500/10 border border-red-500/20 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
@@ -326,7 +327,7 @@ export default function CompraDetalle() {
                                 onClick={() => {
                                     if (window.confirm('¿Seguro que querés eliminar esta deuda?')) {
                                         eliminarDeuda(detalle.id);
-                                        nav('/app/debo');
+                                        volverALista();
                                     }
                                 }}
                                 className="h-10 px-4 rounded-lg text-sm font-bold border border-red-500 text-red-500 hover:bg-red-500/10 transition-colors"
@@ -362,7 +363,7 @@ function InfoItem({ label, value }) {
     return (
         <div className="flex flex-col gap-1">
             <p className="text-sm text-[#9eb7a8]">{label}</p>
-            <p className="text-base font-medium text:white">{value}</p>
+            <p className="text-base font-medium text-white">{value}</p>
         </div>
     );
 }
@@ -433,10 +434,10 @@ function EditDeudaModal({ detalle, onCancel, onSave }) {
                     />
                 </label>
 
-                <label className="flex flex-col gap-1 text-sm text:white">
+                <label className="flex flex-col gap-1 text-sm text-white">
                     Entidad
                     <input
-                        className="h-10 rounded-lg border border-[#3d5245] bg-[#1c2620] px-3 text-sm text:white"
+                        className="h-10 rounded-lg border border-[#3d5245] bg-[#1c2620] px-3 text-sm text-white"
                         value={entidad}
                         onChange={(e) => setEntidad(e.target.value)}
                     />
