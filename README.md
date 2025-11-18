@@ -137,7 +137,9 @@ npm run dev
 👥 Autores
 
 Gonzalo Rigoni
+
 Agustin Masa
+
 Romina Herrera
 
 
