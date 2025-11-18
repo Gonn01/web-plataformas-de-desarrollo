@@ -72,7 +72,8 @@ export default function FinanceDashboard() {
                             monto,
                             entidad: payload.entity?.trim() || '',
                             moneda: payload.currency || 'ARS',
-                            tipo: payload.type,
+                            tipo: payload.type, // Debo / Me deben
+                            installments: payload.installments, // 👈 cantidad de cuotas del modal
                         });
 
                         setOpenNewExpense(false);

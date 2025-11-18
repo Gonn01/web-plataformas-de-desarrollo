@@ -1,27 +1,23 @@
-// src/pages/Debo.jsx
+// src/pages/MeDeben.jsx
 import { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { obtenerDeudas } from '../services/deudas';
 
-const MOCK_DEUDAS = [
-    { id: 'c1', titulo: 'Notebook', monto: 15000, moneda: 'ARS', tipo: 'Debo' },
-    { id: 'c2', titulo: 'Factura Internet', monto: 12000, moneda: 'ARS', tipo: 'Debo' },
-];
-
-export default function Debo() {
+export default function MeDeben() {
     const [deudas, setDeudas] = useState([]);
 
     useEffect(() => {
-        const extras = obtenerDeudas();
-        const soloDebo = [...MOCK_DEUDAS, ...extras].filter((d) => d.tipo === 'Debo' || !d.tipo);
-        setDeudas(soloDebo);
+        const todas = obtenerDeudas();
+        // sólo las que son "Me deben"
+        const soloMeDeben = todas.filter((d) => d.tipo === 'Me deben');
+        setDeudas(soloMeDeben);
     }, []);
 
     return (
         <div className="flex flex-col gap-4">
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Debo</h1>
+            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Me deben</h1>
 
-            {deudas.length === 0 && <p className="text-slate-500">No tenés deudas activas.</p>}
+            {deudas.length === 0 && <p className="text-slate-500">No tenés deudas a tu favor.</p>}
 
             <ul className="flex flex-col gap-3">
                 {deudas.map((d) => (
@@ -31,12 +27,13 @@ export default function Debo() {
                     >
                         <div className="flex items-center justify-between">
                             <p className="font-medium text-slate-900 dark:text-white">{d.titulo}</p>
-                            <span className="text-red-400">
+                            <span className="text-emerald-400">
                                 {d.moneda || 'ARS'}{' '}
                                 {`$${Number(d.monto || 0).toLocaleString('es-AR')}`}
                             </span>
                         </div>
                         <div className="mt-3">
+                            {/* Si más adelante hacés detalle de "Me deben", cambiás la ruta */}
                             <Link
                                 to={`/app/deuda/${d.id}`}
                                 className="text-sm text-primary hover:underline"
