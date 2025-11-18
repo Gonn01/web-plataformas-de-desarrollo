@@ -53,7 +53,7 @@ export default function CompraDetalle() {
         return Math.min(100, (totalPagado / detalle.total) * 100);
     }, [detalle, totalPagado]);
 
-    // volver a la lista correcta según el tipo
+    // volver a la lista
     const volverALista = () => {
         if (!detalle) {
             nav('/app/debo');
@@ -67,7 +67,7 @@ export default function CompraDetalle() {
         }
     };
 
-    // marca la próxima cuota como pagada
+    // marca la proxima cuota como pagada
     const marcarProximaComoPagada = () => {
         if (!detalle) return;
 
@@ -93,7 +93,7 @@ export default function CompraDetalle() {
             cuotas: nuevasCuotas,
         }));
 
-        // 3) efecto secundario según el caso (una sola vez)
+        // 3) mensajes de felicitacion
         if (todasPagadas) {
             const mensaje = esMeDeben
                 ? `¡Genial! Registraste que ya te pagaron "${detalle.titulo}".`
