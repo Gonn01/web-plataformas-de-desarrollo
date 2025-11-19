@@ -9,6 +9,7 @@ import ProtectedRoute from './guards/ProtectedRoute';
 import CompraDetalle from './pages/CompraDetalle';
 import Debo from './pages/Debo';
 import Configuracion from './pages/Configuracion';
+import MeDeben from './pages/MeDeben';
 
 export default function App() {
     return (
@@ -33,6 +34,7 @@ export default function App() {
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
                 <Route path="debo" element={<Debo />} />
+                <Route path="medeben" element={<MeDeben />} />
                 <Route path="deuda/:id" element={<CompraDetalle />} />
                 <Route path="configuracion" element={<Configuracion />} />
             </Route>

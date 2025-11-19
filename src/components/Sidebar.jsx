@@ -60,7 +60,7 @@ export default function Sidebar() {
                     </NavLink>
 
                     <NavLink
-                        to="/app/me-deben"
+                        to="/app/medeben"
                         className={({ isActive }) => `${base} ${isActive ? active : idle}`}
                     >
                         <Icon name="arrow_downward" className="text-2xl text-green-500" />
