@@ -1,3 +1,5 @@
+import { GROUPS } from "@/data/constants";
+
 // src/services/deudas.js
 const STORAGE_KEY = 'app_deudas';
 
@@ -46,8 +48,10 @@ export function agregarDeuda(deudaParcial = {}) {
 }
 
 // devuelve una deuda por id (o null)
-export function obtenerDeudaPorId(id) {
-    return obtenerDeudas().find((d) => d.id === id) ?? null;
+export function obtenerDeudaPorId() {
+    // const deudas = obtenerDeudas();
+    const deudas = GROUPS[0].items;
+    return deudas.length > 0 ? deudas[0] : null;
 }
 
 // actualiza una deuda por id con los cambios que se pasen
