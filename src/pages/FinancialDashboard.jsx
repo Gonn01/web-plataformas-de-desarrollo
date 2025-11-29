@@ -1,5 +1,5 @@
 // src/pages/FinanceDashboard.jsx
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Icon from '../components/Icon';
 import StatCards from '../components/StatCards';
 import CurrencyToggle from '../components/CurrencyToggle';
@@ -11,7 +11,18 @@ import { agregarDeuda } from '../services/deudas'; //aca agregue para las deudas
 export default function FinanceDashboard() {
     const [currency, setCurrency] = useState('ARS');
     const [query, setQuery] = useState('');
+    const [data, setData] = useState({ message: 'Go' });
     const [openNewExpense, setOpenNewExpense] = useState(false);
+
+    useEffect(() => {
+        fetch('http://localhost:3000/')
+            .then((res) => res.json())
+            .then((d) => {
+                console.log('Datos financieros cargados:', d);
+                setData(d);
+            })
+            .catch((err) => console.error('Error al cargar datos financieros:', err));
+    }, []);
 
     return (
         <>
@@ -23,6 +34,7 @@ export default function FinanceDashboard() {
                     </p>
                     <p className="text-slate-500 dark:text-slate-400 text-base font-normal">
                         Un resumen de tus finanzas personales.
+                        {data?.message}
                     </p>
                 </div>
                 <button
