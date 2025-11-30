@@ -1,6 +1,6 @@
 // src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './pages/Login';
+import Login from './pages/auth/Login/Login';
 import AppLayout from './layouts/AppLayout';
 import FinanceDashboard from './pages/FinancialDashboard';
 import EntidadesFinancieras from './pages/EntidadesFinancieras';
@@ -10,6 +10,7 @@ import CompraDetalle from './pages/CompraDetalle';
 import Debo from './pages/Debo';
 import Configuracion from './pages/Configuracion';
 import MeDeben from './pages/MeDeben';
+import Register from './pages/auth/Register/Register';
 
 export default function App() {
     return (
@@ -19,6 +20,7 @@ export default function App() {
 
             {/* Pública */}
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
 
             {/* Protegidas */}
             <Route
