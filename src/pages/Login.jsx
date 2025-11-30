@@ -1,7 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '../context/use-auth';
-import { autenticar } from '../services/auth'; //modifique para probar algo
+import { autenticar } from '../services/auth';
+import { auth, googleProvider } from '../../firebase.js';
+
+// Firebase
+import { signInWithPopup } from 'firebase/auth';
 
 export default function Login() {
     const nav = useNavigate();
@@ -13,13 +17,16 @@ export default function Login() {
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState('');
 
-    // --- validaciones como antes ---
+    // --- validaciones ---
     const validar = () => {
         if (!email.includes('@')) return 'Email inválido';
         if (clave.length < 6) return 'La contraseña debe tener 6+ caracteres';
         return '';
     };
 
+    // ================================
+    // 📌 LOGIN TRADICIONAL
+    // ================================
     const onSubmit = async (e) => {
         e.preventDefault();
         const msg = validar();
@@ -28,11 +35,51 @@ export default function Login() {
         try {
             setCargando(true);
             setError('');
-            const user = await autenticar(email, clave); // 🔁 usa tu service
-            login(user); // guarda en contexto
-            nav('/app/dashboard', { replace: true }); // redirige como antes
+            const user = await autenticar(email, clave);
+            login(user);
+            nav('/app/dashboard', { replace: true });
         } catch (err) {
             setError(err?.message || 'Error de autenticación');
+        } finally {
+            setCargando(false);
+        }
+    };
+
+    // ================================
+    // 📌 LOGIN CON GOOGLE
+    // ================================
+    const loginWithGoogle = async () => {
+        try {
+            setCargando(true);
+            setError('');
+
+            // 1. Popup Google
+            const result = await signInWithPopup(auth, googleProvider);
+            const firebaseUser = result.user;
+
+            // 3. Llamar backend
+            const res = await fetch('http://localhost:3000/api/auth/firebase-login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    firebaseId: firebaseUser.uid,
+                    name: firebaseUser.displayName,
+                    email: firebaseUser.email,
+                }),
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) throw new Error(data.error || 'Error con Google Login');
+
+            // 4. Guardar usuario en contexto
+            login(data.user);
+
+            // 5. Redirigir
+            nav('/app/dashboard', { replace: true });
+        } catch (err) {
+            console.log(err);
+            setError(err.message || 'Error iniciando sesión con Google');
         } finally {
             setCargando(false);
         }
@@ -102,6 +149,7 @@ export default function Login() {
                                     ¿Olvidaste tu contraseña?
                                 </button>
                             </div>
+
                             <div className="relative">
                                 <span className="material-symbols-outlined pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-gray-500">
                                     lock
@@ -158,13 +206,13 @@ export default function Login() {
                         </div>
                     </div>
 
-                    {/* Social */}
+                    {/* Botón Google */}
                     <button
                         type="button"
+                        onClick={loginWithGoogle}
+                        disabled={cargando}
                         className="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-700 bg-background-dark px-3 py-2.5 text-sm font-semibold text-gray-300 shadow-sm hover:bg-gray-800/50"
-                        onClick={() => alert('Google OAuth pendiente')}
                     >
-                        {/* icono Google */}
                         <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">
                             <g clipPath="url(#g)">
                                 <path
