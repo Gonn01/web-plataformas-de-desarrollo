@@ -6,9 +6,7 @@ import EntidadesFinancieras from './pages/EntidadesFinancieras';
 import EntidadDetalle from './pages/EntidadDetalle';
 import ProtectedRoute from './guards/ProtectedRoute';
 import CompraDetalle from './pages/CompraDetalle';
-import Debo from './pages/Debo';
 import Configuracion from './pages/Configuracion';
-import MeDeben from './pages/MeDeben';
 import Register from './pages/auth/Register/Register';
 import Dashboard from './pages/dashboard/Dashboard';
 
@@ -32,8 +30,6 @@ export default function App() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
-                <Route path="debo" element={<Debo />} />
-                <Route path="medeben" element={<MeDeben />} />
                 <Route path="deuda/:id" element={<CompraDetalle />} />
                 <Route path="configuracion" element={<Configuracion />} />
             </Route>

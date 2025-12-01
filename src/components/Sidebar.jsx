@@ -52,22 +52,6 @@ export default function Sidebar() {
                     </NavLink>
 
                     <NavLink
-                        to="/app/debo"
-                        className={({ isActive }) => `${base} ${isActive ? active : idle}`}
-                    >
-                        <Icon name="arrow_upward" className="text-2xl text-red-500" />
-                        <p>Debo</p>
-                    </NavLink>
-
-                    <NavLink
-                        to="/app/medeben"
-                        className={({ isActive }) => `${base} ${isActive ? active : idle}`}
-                    >
-                        <Icon name="arrow_downward" className="text-2xl text-green-500" />
-                        <p>Me Deben</p>
-                    </NavLink>
-
-                    <NavLink
                         to="/app/entidades"
                         className={({ isActive }) =>
                             `${base} ${isActive ? active : idle} hover:text-primary`
