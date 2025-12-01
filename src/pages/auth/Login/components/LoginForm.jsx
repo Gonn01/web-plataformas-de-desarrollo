@@ -4,16 +4,15 @@ import PasswordInput from '../../components/PasswordInput';
 import ErrorMessage from '../../components/ErrorMessage';
 import SubmitButton from '../../components/SubmitButton';
 import TextInput from '../../components/TextInput';
-import useAuth from '@/context/use-auth';
+import useAuth from '@/hooks/use-auth';
 
 export default function LoginForm() {
     const nav = useNavigate();
-
-    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [clave, setClave] = useState('');
     const [cargando, setCargando] = useState(false);
     const [error, setError] = useState('');
+    const auth = useAuth();
 
     const validar = () => {
         if (!email.includes('@')) return 'Email inválido';
@@ -29,15 +28,8 @@ export default function LoginForm() {
         try {
             setCargando(true);
             setError('');
-            const res = await fetch('http://localhost:3000/api/auth/login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email, password: clave }),
-            });
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error con Google');
-
-            login(data.user);
+            await auth.login({ email, password: clave });
+            console.log('Usuario autenticado');
             nav('/app/dashboard', { replace: true });
         } catch (err) {
             setError(err.message || 'Error de autenticación');

@@ -1,32 +1,35 @@
-// src/pages/FinanceDashboard.jsx
 import { useEffect, useState } from 'react';
 import Icon from './components/Icon';
 import StatCards from './components/StatCards';
 import CurrencyToggle from './components/CurrencyToggle';
 import ActiveExpenses from './components/ActiveExpenses';
-import Upcoming from './components/Upcoming';
 import NewExpenseModal from './components/modals/NewExpenseCard';
-import { agregarDeuda } from '../../services/deudas'; //aca agregue para las deudas
+import { agregarDeuda } from '../../services/deudas';
+import { fetchDashboardData } from '@/services/api';
+import useAuth from '@/hooks/use-auth';
 
 export default function Dashboard() {
     const [currency, setCurrency] = useState('ARS');
     const [query, setQuery] = useState('');
-    const [data, setData] = useState({ message: 'Go' });
+    const [data, setData] = useState(null);
     const [openNewExpense, setOpenNewExpense] = useState(false);
-
+    const auth = useAuth();
     useEffect(() => {
-        fetch('http://localhost:3000/')
-            .then((res) => res.json())
-            .then((d) => {
-                console.log('Datos financieros cargados:', d);
+        const fetchData = async () => {
+            try {
+                const d = await fetchDashboardData(auth.token);
                 setData(d);
-            })
-            .catch((err) => console.error('Error al cargar datos financieros:', err));
-    }, []);
+                console.log('Dashboard data cargada:', d);
+            } catch (err) {
+                console.error('Error al cargar dashboard:', err);
+            }
+        };
+
+        fetchData();
+    }, [auth.token]);
 
     return (
         <>
-            {/* Header */}
             <div className="flex flex-wrap items-start justify-between gap-4">
                 <div className="flex min-w-72 flex-col gap-2">
                     <p className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
@@ -34,7 +37,7 @@ export default function Dashboard() {
                     </p>
                     <p className="text-slate-500 dark:text-slate-400 text-base font-normal">
                         Un resumen de tus finanzas personales.
-                        {data?.message}
+                        {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
                     </p>
                 </div>
                 <button
@@ -45,9 +48,7 @@ export default function Dashboard() {
                     <span className="truncate">Crear Gasto / Deuda</span>
                 </button>
             </div>
-            {/* Grid */}
             <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mt-8">
-                {/* Left column */}
                 <div className="lg:col-span-1 xl:col-span-1 flex flex-col gap-6">
                     <StatCards />
                     <h3 className="text-slate-900 dark:text-white text-lg font-bold pt-4">
@@ -56,18 +57,11 @@ export default function Dashboard() {
                     <CurrencyToggle currency={currency} onChange={setCurrency} />
                 </div>
 
-                {/* Middle big card */}
                 <ActiveExpenses query={query} />
-
-                {/* Right column */}
-                <Upcoming />
             </div>
-            ...
-            {/* Buscador oculto */}
             <div className="sr-only">
                 <input value={query} onChange={(e) => setQuery(e.target.value)} />
             </div>
-            {/* Modal */}
             {openNewExpense && (
                 <NewExpenseModal
                     onClose={() => setOpenNewExpense(false)}
@@ -84,8 +78,8 @@ export default function Dashboard() {
                             monto,
                             entidad: payload.entity?.trim() || '',
                             moneda: payload.currency || 'ARS',
-                            tipo: payload.type, // Debo / Me deben
-                            installments: payload.installments, // 👈 cantidad de cuotas del modal
+                            tipo: payload.type,
+                            installments: payload.installments,
                         });
 
                         setOpenNewExpense(false);

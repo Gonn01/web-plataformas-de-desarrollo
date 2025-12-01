@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import Icon from '../pages/dashboard/components/Icon';
 import { USER } from '../data/constants';
-import useAuth from '../context/use-auth';
+import useAuth from '@/hooks/use-auth';
 
 export default function Sidebar() {
     //agregue lo del logout para cerrar la seccion

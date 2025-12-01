@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import useAuth from '../context/use-auth';
+import useAuth from '@/hooks/use-auth';
 
 export default function Configuracion() {
     const { usuario, setUsuario } = useAuth() || {};

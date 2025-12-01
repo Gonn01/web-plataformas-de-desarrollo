@@ -15,14 +15,11 @@ import Dashboard from './pages/dashboard/Dashboard';
 export default function App() {
     return (
         <Routes>
-            {/* Redirect raíz → /login */}
             <Route path="/" element={<Navigate to="/login" replace />} />
 
-            {/* Pública */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
-            {/* Protegidas */}
             <Route
                 path="/app/*"
                 element={
@@ -40,9 +37,6 @@ export default function App() {
                 <Route path="deuda/:id" element={<CompraDetalle />} />
                 <Route path="configuracion" element={<Configuracion />} />
             </Route>
-
-            {/* Fallback */}
-            {/* <Route path="*" element={<Navigate to="/login" replace />} /> */}
         </Routes>
     );
 }

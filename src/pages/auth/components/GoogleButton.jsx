@@ -2,7 +2,7 @@ import { auth, googleProvider } from '../../../../firebase';
 import { signInWithPopup } from 'firebase/auth';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
-import useAuth from '@/context/use-auth';
+import useAuth from '@/hooks/use-auth';
 
 export default function GoogleButton() {
     const nav = useNavigate();

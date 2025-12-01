@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../../../context/use-auth';
 
 import ErrorMessage from '../../components/ErrorMessage';
 import SubmitButton from '../../components/SubmitButton';
 import TextInput from '../../components/TextInput';
 import PasswordInput from '../../components/PasswordInput';
+import useAuth from '@/hooks/use-auth';
 
 export default function RegisterForm() {
     const nav = useNavigate();
