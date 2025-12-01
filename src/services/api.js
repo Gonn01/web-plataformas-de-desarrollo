@@ -8,12 +8,32 @@ const api = axios.create({
     },
 });
 
+export const register = async (userInfo) => {
+    try {
+        const { data } = await api.post('/auth/register', userInfo);
+        return data;
+    } catch (error) {
+        console.error('Error registering user:', error);
+        throw error;
+    }
+};
+
 export const login = async (credentials) => {
     try {
         const { data } = await api.post('/auth/login', credentials);
         return data;
     } catch (error) {
         console.error('Error creating category:', error);
+        throw error;
+    }
+};
+
+export const loginWithFirebase = async (firebaseData) => {
+    try {
+        const { data } = await api.post('/auth/firebase-login', firebaseData);
+        return data;
+    } catch (error) {
+        console.error('Error logging in with Firebase:', error);
         throw error;
     }
 };

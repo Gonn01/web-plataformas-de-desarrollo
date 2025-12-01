@@ -5,11 +5,10 @@ import ErrorMessage from '../../components/ErrorMessage';
 import SubmitButton from '../../components/SubmitButton';
 import TextInput from '../../components/TextInput';
 import PasswordInput from '../../components/PasswordInput';
-import useAuth from '@/hooks/use-auth';
+import { register } from '@/services/api';
 
 export default function RegisterForm() {
     const nav = useNavigate();
-    const { login } = useAuth();
 
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
@@ -33,16 +32,8 @@ export default function RegisterForm() {
             setCargando(true);
             setError('');
 
-            const res = await fetch('http://localhost:3000/api/auth/register', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, email, password: clave }),
-            });
+            await register({ name, email, password: clave });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error);
-
-            login(data.user);
             nav('/login');
         } catch (err) {
             setError(err.message || 'Error registrando usuario');

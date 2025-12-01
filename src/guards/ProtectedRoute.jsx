@@ -4,7 +4,7 @@ import useAuth from '@/hooks/use-auth';
 
 export default function ProtectedRoute({ children }) {
     const { user, loading } = useAuth();
-    console.log('ProtectedRoute - user:', user, 'loading:', loading);
+
     if (loading) return null; // o spinner
     if (!user) return <Navigate to="/login" replace />;
 

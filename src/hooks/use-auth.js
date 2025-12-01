@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { login } from '../services/api';
+import { login, loginWithFirebase } from '../services/api';
 
 const getStoredAuthData = () => {
     const storedUser = localStorage.getItem('user');
@@ -19,17 +19,36 @@ const useAuth = create((set) => ({
         set({ loading: true, error: null });
         try {
             const response = await login(formData);
-            const id = response['id'];
-            const name = response['name'];
-            const email = response['email'];
-            const token = response['token'];
 
-            set({ user: { id, name, email }, token, loading: false });
+            const user = response.data;
+            const token = response.token;
 
-            localStorage.setItem('user', JSON.stringify({ id, name, email }));
+            set({ user, token, loading: false });
+
+            localStorage.setItem('user', JSON.stringify(user));
             localStorage.setItem('token', token);
 
-            return { id, name, email };
+            return user;
+        } catch (error) {
+            set({ error: error.message, loading: false });
+            throw error;
+        }
+    },
+
+    loginWithFirebase: async (firebaseData) => {
+        set({ loading: true, error: null });
+        try {
+            const response = await loginWithFirebase(firebaseData);
+
+            const user = response.data;
+            const token = response.token;
+
+            set({ user, token, loading: false });
+
+            localStorage.setItem('user', JSON.stringify(user));
+            localStorage.setItem('token', token);
+
+            return user;
         } catch (error) {
             set({ error: error.message, loading: false });
             throw error;

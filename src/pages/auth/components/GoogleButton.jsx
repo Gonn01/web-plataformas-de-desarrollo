@@ -6,7 +6,7 @@ import useAuth from '@/hooks/use-auth';
 
 export default function GoogleButton() {
     const nav = useNavigate();
-    const { login } = useAuth();
+    const { loginWithFirebase } = useAuth();
     const [loading, setLoading] = useState(false);
 
     const loginWithGoogle = async () => {
@@ -16,20 +16,13 @@ export default function GoogleButton() {
             const result = await signInWithPopup(auth, googleProvider);
             const firebaseUser = result.user;
 
-            const res = await fetch('http://localhost:3000/api/auth/firebase-login', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    firebaseId: firebaseUser.uid,
-                    email: firebaseUser.email,
-                    name: firebaseUser.displayName,
-                }),
+            const res = await loginWithFirebase({
+                firebaseId: firebaseUser.uid,
+                email: firebaseUser.email,
+                name: firebaseUser.displayName,
             });
 
-            const data = await res.json();
-            if (!res.ok) throw new Error(data.error || 'Error con Google');
-
-            login(data.user);
+            loginWithFirebase(res);
             nav('/app/dashboard', { replace: true });
         } catch (err) {
             console.log(err);
