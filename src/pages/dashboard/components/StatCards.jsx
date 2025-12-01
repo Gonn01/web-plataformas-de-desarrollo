@@ -1,4 +1,4 @@
-import { CARDS } from '../data/constants';
+import { CARDS } from '../../../data/constants';
 
 export default function StatCards() {
     return (

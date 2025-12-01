@@ -1,6 +1,6 @@
 import { useMemo, useState, useCallback } from 'react';
 import Icon from './Icon';
-import { GROUPS } from '../data/constants';
+import { GROUPS } from '../../../data/constants';
 import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal';
 
 function parseAmountLabel(label) {
@@ -143,11 +143,10 @@ export default function ActiveExpenses({ query }) {
                                             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                                                 {it.chip && (
                                                     <span
-                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${
-                                                            it.chip.tone === 'red'
-                                                                ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
-                                                                : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                        }`}
+                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${it.chip.tone === 'red'
+                                                            ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                                                            : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                            }`}
                                                     >
                                                         {it.chip.text}
                                                     </span>

@@ -1,4 +1,4 @@
-import { formatMoney } from '../utils/FormatMoney';
+import { formatMoney } from '../../../utils/FormatMoney';
 
 export default function BalancePill({ amount, currency }) {
     const positive = amount >= 0;

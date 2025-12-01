@@ -1,16 +1,15 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '../../../../context/use-auth';
-import { autenticar } from '../../../../services/auth';
 import PasswordInput from '../../components/PasswordInput';
 import ErrorMessage from '../../components/ErrorMessage';
 import SubmitButton from '../../components/SubmitButton';
 import TextInput from '../../components/TextInput';
+import useAuth from '@/context/use-auth';
 
 export default function LoginForm() {
     const nav = useNavigate();
-    const { login } = useAuth();
 
+    const { login } = useAuth();
     const [email, setEmail] = useState('');
     const [clave, setClave] = useState('');
     const [cargando, setCargando] = useState(false);
@@ -30,8 +29,15 @@ export default function LoginForm() {
         try {
             setCargando(true);
             setError('');
-            const user = await autenticar(email, clave);
-            login(user);
+            const res = await fetch('http://localhost:3000/api/auth/login', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email, password: clave }),
+            });
+            const data = await res.json();
+            if (!res.ok) throw new Error(data.error || 'Error con Google');
+
+            login(data.user);
             nav('/app/dashboard', { replace: true });
         } catch (err) {
             setError(err.message || 'Error de autenticación');

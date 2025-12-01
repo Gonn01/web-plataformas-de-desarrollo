@@ -1,6 +1,6 @@
 // src/components/entities/EntityCard.jsx
 import EntityIcon from './EntityIcon';
-import BalancePill from './BalancePill';
+import BalancePill from '../pages/dashboard/components/BalancePill';
 
 export default function EntityCard({ entity, onClick }) {
     return (

@@ -1,14 +1,14 @@
 // src/pages/FinanceDashboard.jsx
 import { useEffect, useState } from 'react';
-import Icon from '../components/Icon';
-import StatCards from '../components/StatCards';
-import CurrencyToggle from '../components/CurrencyToggle';
-import ActiveExpenses from '../components/ActiveExpenses';
-import Upcoming from '../components/Upcoming';
-import NewExpenseModal from '../components/modals/NewExpenseCard';
-import { agregarDeuda } from '../services/deudas'; //aca agregue para las deudas
+import Icon from './components/Icon';
+import StatCards from './components/StatCards';
+import CurrencyToggle from './components/CurrencyToggle';
+import ActiveExpenses from './components/ActiveExpenses';
+import Upcoming from './components/Upcoming';
+import NewExpenseModal from './components/modals/NewExpenseCard';
+import { agregarDeuda } from '../../services/deudas'; //aca agregue para las deudas
 
-export default function FinanceDashboard() {
+export default function Dashboard() {
     const [currency, setCurrency] = useState('ARS');
     const [query, setQuery] = useState('');
     const [data, setData] = useState({ message: 'Go' });

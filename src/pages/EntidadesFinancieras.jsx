@@ -1,7 +1,7 @@
 // src/pages/EntidadesFinancieras.jsx
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import NewEntityModal from '../components/modals/NewEntityModal';
+import NewEntityModal from './dashboard/components/modals/NewEntityModal';
 import EntityCard from '@/components/EntityCard';
 
 // Mocks

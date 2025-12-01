@@ -2,7 +2,6 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/auth/Login/Login';
 import AppLayout from './layouts/AppLayout';
-import FinanceDashboard from './pages/FinancialDashboard';
 import EntidadesFinancieras from './pages/EntidadesFinancieras';
 import EntidadDetalle from './pages/EntidadDetalle';
 import ProtectedRoute from './guards/ProtectedRoute';
@@ -11,6 +10,7 @@ import Debo from './pages/Debo';
 import Configuracion from './pages/Configuracion';
 import MeDeben from './pages/MeDeben';
 import Register from './pages/auth/Register/Register';
+import Dashboard from './pages/dashboard/Dashboard';
 
 export default function App() {
     return (
@@ -32,7 +32,7 @@ export default function App() {
                 }
             >
                 <Route index element={<Navigate to="dashboard" replace />} />
-                <Route path="dashboard" element={<FinanceDashboard />} />
+                <Route path="dashboard" element={<Dashboard />} />
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
                 <Route path="debo" element={<Debo />} />

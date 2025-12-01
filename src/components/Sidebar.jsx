@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import Icon from './Icon';
+import Icon from '../pages/dashboard/components/Icon';
 import { USER } from '../data/constants';
 import useAuth from '../context/use-auth';
 

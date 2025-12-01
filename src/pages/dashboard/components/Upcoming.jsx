@@ -1,5 +1,5 @@
 import Icon from './Icon';
-import { UPCOMING } from '../data/constants';
+import { UPCOMING } from '../../../data/constants';
 
 export default function Upcoming() {
     return (
