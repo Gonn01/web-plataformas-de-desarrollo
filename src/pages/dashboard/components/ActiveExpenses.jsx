@@ -1,26 +1,24 @@
 import { useMemo, useState, useCallback } from 'react';
 import Icon from './Icon';
-import { GROUPS } from '../../../data/constants';
 import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal';
 
+
 function parseAmountLabel(label) {
-    // Ej: "ARS $15.000" -> { currency: "ARS", amount: 15000 }
     if (!label) return { currency: 'ARS', amount: 0 };
     const trimmed = String(label).trim();
-    // Busca código de moneda (ARS|USD|EUR) al inicio
     const matchCurr = trimmed.match(/^(ARS|USD|EUR)/i);
     const currency = matchCurr ? matchCurr[1].toUpperCase() : 'ARS';
-    // Busca número (con puntos como separadores de miles y coma como decimales)
+
     const matchNum = trimmed
         .replace(/\./g, '')
         .replace(',', '.')
         .match(/([\d]+(?:\.\d+)?)/);
     const amount = matchNum ? Number(matchNum[1]) : 0;
+
     return { currency, amount };
 }
 
 function parseTotalLabel(label, fallbackCurrency = 'ARS') {
-    // Ej: "de $60.000" -> { currency: fallbackCurrency, amount: 60000 }
     if (!label) return { currency: fallbackCurrency, amount: undefined };
     const cleaned = String(label)
         .replace(/[^\d,.]/g, '')
@@ -30,66 +28,136 @@ function parseTotalLabel(label, fallbackCurrency = 'ARS') {
     return { currency: fallbackCurrency, amount };
 }
 
-export default function ActiveExpenses({ query }) {
+export default function ActiveExpenses({
+    query,
+    groups = [],
+    token,          
+    onQueryChange,   
+    onPaid,         
+}) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalEntity, setModalEntity] = useState('');
     const [modalItems, setModalItems] = useState([]);
 
+    // Filtro por texto
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return GROUPS;
-        return GROUPS.map((g) => ({
-            ...g,
-            items: g.items.filter((it) => it.title.toLowerCase().includes(q)),
-        })).filter((g) => g.items.length > 0);
-    }, [query]);
+        if (!q) return groups;
 
+        return groups
+            .map((g) => ({
+                ...g,
+                items: g.items.filter((it) => it.title.toLowerCase().includes(q)),
+            }))
+            .filter((g) => g.items.length > 0);
+    }, [query, groups]);
+
+    
     const openModalForGroup = useCallback((group) => {
-        // construir items para el modal desde todos los items del grupo
-        const items = group.items.map((it, idx) => {
+        const items = group.items.map((it) => {
             const { currency, amount } = parseAmountLabel(it.amount);
             const { amount: totalAmount } = parseTotalLabel(it.total, currency);
+
             return {
-                id: `${group.title}-${idx}`,
+                id: it.id,
+                purchaseId: it.purchaseId ?? it.id, 
                 title: it.title,
-                type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
+                type:
+                    (it.chip?.text || '').toLowerCase() === 'me deben'
+                        ? 'me_deben'
+                        : 'debo',
                 currency,
                 amountToPay: amount,
-                totalAmount, // opcional
-                // Si querés, podés sumar paidInstallments/totalInstallments en tu data source y mapearlos acá
+                totalAmount,
+                paidInstallments: it.payed_quotas,
+                totalInstallments: it.number_of_quotas,
             };
         });
+
         setModalEntity(group.title);
         setModalItems(items);
         setModalOpen(true);
     }, []);
 
-    const openModalForItem = useCallback((group, it, idx) => {
+    const openModalForItem = useCallback((group, it) => {
         const { currency, amount } = parseAmountLabel(it.amount);
         const { amount: totalAmount } = parseTotalLabel(it.total, currency);
+
         const item = {
-            id: `${group.title}-${idx}`,
+            id: it.id,
+            purchaseId: it.purchaseId ?? it.id,
             title: it.title,
-            type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
+            type:
+                (it.chip?.text || '').toLowerCase() === 'me deben'
+                    ? 'me_deben'
+                    : 'debo',
             currency,
             amountToPay: amount,
-            totalAmount, // opcional
-            // Si tu dataset tiene cuotas, podés agregar:
-            // paidInstallments: it.paidInstallments,
-            // totalInstallments: it.totalInstallments,
+            totalAmount,
+            paidInstallments: it.payed_quotas,
+            totalInstallments: it.number_of_quotas,
         };
+
         setModalEntity(group.title);
         setModalItems([item]);
         setModalOpen(true);
     }, []);
 
-    const handleConfirm = () => {
-        // Acá hacés tu POST/acción para confirmar los pagos seleccionados (modalItems)
-        // Ejemplo:
-        // await api.confirmarPagoCuotas({ entity: modalEntity, items: modalItems })
-        console.log('Confirmar pago:', { entity: modalEntity, items: modalItems });
-        setModalOpen(false);
-    };
+    const handleConfirm = useCallback(async () => {
+        try {
+            if (!modalItems.length) {
+                setModalOpen(false);
+                return;
+            }
+
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+            if (modalItems.length === 1) {
+                const purchaseId = modalItems[0].purchaseId;
+                const res = await fetch(`${baseUrl}/dashboard/pagar-cuota`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ purchase_id: purchaseId }),
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error('Error al pagar cuota:', errText);
+                    alert('No se pudo registrar el pago de la cuota.');
+                    return;
+                }
+            } else {
+                const purchaseIds = modalItems.map((it) => it.purchaseId);
+                const res = await fetch(`${baseUrl}/dashboard/pagar-cuotas-lote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ purchase_ids: purchaseIds }),
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error('Error al pagar cuotas en lote:', errText);
+                    alert('No se pudieron registrar los pagos.');
+                    return;
+                }
+            }
+
+            setModalOpen(false);
+
+            if (onPaid) {
+                onPaid();
+            }
+        } catch (err) {
+            console.error('Error inesperado al pagar cuota(s):', err);
+            alert('Ocurrió un error al registrar el pago.');
+        }
+    }, [modalItems, token, onPaid]);
 
     return (
         <div className="lg:col-span-2 xl:col-span-2 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5">
@@ -107,10 +175,7 @@ export default function ActiveExpenses({ query }) {
                         placeholder="Buscar gasto..."
                         type="text"
                         value={query}
-                        onChange={() => {
-                            /* controlado desde el padre */
-                        }}
-                        readOnly
+                        onChange={(e) => onQueryChange?.(e.target.value)}
                     />
                 </div>
             </div>
@@ -143,10 +208,11 @@ export default function ActiveExpenses({ query }) {
                                             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                                                 {it.chip && (
                                                     <span
-                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${it.chip.tone === 'red'
-                                                            ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
-                                                            : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                            }`}
+                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${
+                                                            it.chip.tone === 'red'
+                                                                ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                                                                : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                        }`}
                                                     >
                                                         {it.chip.text}
                                                     </span>
@@ -165,7 +231,11 @@ export default function ActiveExpenses({ query }) {
                                     <div className="flex items-center gap-4 mt-2">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
-                                                className={`${it.chip?.tone === 'green' ? 'bg-green-500' : 'bg-red-500'} h-1.5 rounded-full`}
+                                                className={`${
+                                                    it.chip?.tone === 'green'
+                                                        ? 'bg-green-500'
+                                                        : 'bg-red-500'
+                                                } h-1.5 rounded-full`}
                                                 style={{ width: `${it.progressPct}%` }}
                                             />
                                         </div>
@@ -189,7 +259,6 @@ export default function ActiveExpenses({ query }) {
                 )}
             </div>
 
-            {/* Modal de confirmación */}
             <ConfirmInstallmentPaymentModal
                 open={modalOpen}
                 entityName={modalEntity}

@@ -7,7 +7,6 @@ function Icon({ name, className = '' }) {
 
 function formatMoney(amount, currency) {
     try {
-        // AR locale por defecto; si querés, podés pasarlo por prop
         const f = new Intl.NumberFormat('es-AR', {
             style: 'currency',
             currency,
@@ -20,26 +19,6 @@ function formatMoney(amount, currency) {
     }
 }
 
-/**
- * Modal de confirmación de pago de cuotas
- *
- * Props:
- * - open: boolean
- * - onCancel: () => void
- * - onConfirm: () => void
- * - entityName: string (p.ej.: "Banco Nación")
- * - items: Array<{
- *     id: string|number,
- *     title: string,               // "Pago Tarjeta", "Alquiler Dpto.", etc.
- *     type: 'debo'|'me_deben',     // define badge rojo/verde
- *     currency: 'ARS'|'USD'|'EUR',
- *     amountToPay: number,         // monto de ESTA cuota a registrar
- *     totalAmount?: number,        // monto total del gasto (opcional)
- *     paidInstallments?: number,   // cuotas pagadas (opcional)
- *     totalInstallments?: number,  // cuotas totales (opcional)
- *   }>
- * - notes?: string (opcional, texto extra)
- */
 export default function ConfirmInstallmentPaymentModal({
     open,
     onCancel,
@@ -48,7 +27,6 @@ export default function ConfirmInstallmentPaymentModal({
     items = [],
     notes,
 }) {
-    // Bloquea scroll y agrega cierre por Escape
     useEffect(() => {
         if (!open) return;
         const prev = document.body.style.overflow;
@@ -66,7 +44,6 @@ export default function ConfirmInstallmentPaymentModal({
     const isSingle = items.length === 1;
     const single = isSingle ? items[0] : null;
 
-    // Totales por moneda (para el caso múltiple)
     const totalsByCurrency = useMemo(() => {
         const map = new Map();
         for (const it of items) {
@@ -84,18 +61,17 @@ export default function ConfirmInstallmentPaymentModal({
             role="dialog"
             aria-modal="true"
             aria-labelledby="confirm-payment-title"
-            onMouseDown={onCancel} // click en backdrop cierra
+            onMouseDown={onCancel}
         >
             <div
                 className="w-full max-w-md rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark p-6 shadow-2xl"
-                onMouseDown={(e) => e.stopPropagation()} // evita cierre al clickear dentro
+                onMouseDown={(e) => e.stopPropagation()}
             >
                 <div className="flex flex-col gap-4 text-center">
                     <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
                         <Icon name="payments" className="text-4xl" />
                     </div>
 
-                    {/* Header dinámico */}
                     <div className="flex flex-col gap-2">
                         <h2
                             id="confirm-payment-title"
@@ -132,9 +108,7 @@ export default function ConfirmInstallmentPaymentModal({
                         )}
                     </div>
 
-                    {/* Contenido */}
                     {isSingle ? (
-                        // ---- Vista Detallada (1 gasto) ----
                         <div className="flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 text-left">
                             <div className="flex items-start justify-between gap-4">
                                 <div className="flex flex-col gap-1">
@@ -174,14 +148,17 @@ export default function ConfirmInstallmentPaymentModal({
                                 </div>
                             </div>
 
-                            {/* Barra de progreso si hay info de cuotas */}
                             {typeof single.paidInstallments === 'number' &&
                                 typeof single.totalInstallments === 'number' &&
                                 single.totalInstallments > 0 && (
                                     <div className="mt-1">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
                                             <div
-                                                className={`h-1.5 rounded-full ${single.type === 'debo' ? 'bg-red-500' : 'bg-green-500'}`}
+                                                className={`h-1.5 rounded-full ${
+                                                    single.type === 'debo'
+                                                        ? 'bg-red-500'
+                                                        : 'bg-green-500'
+                                                }`}
                                                 style={{
                                                     width: `${Math.min(
                                                         100,
@@ -204,7 +181,6 @@ export default function ConfirmInstallmentPaymentModal({
                                 </p>
                             )}
 
-                            {/* Total a pagar (resumen) */}
                             <div className="rounded-lg border border-black/10 dark:border-white/10 bg-white/60 dark:bg-background-dark/60 p-3">
                                 <div className="flex items-baseline justify-between">
                                     <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -218,7 +194,6 @@ export default function ConfirmInstallmentPaymentModal({
                             </div>
                         </div>
                     ) : (
-                        // ---- Vista Resumen (N gastos) ----
                         <div className="flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 text-left">
                             <div>
                                 <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
@@ -263,7 +238,6 @@ export default function ConfirmInstallmentPaymentModal({
                         </div>
                     )}
 
-                    {/* Footer */}
                     <div className="mt-2 flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
                         <button
                             type="button"

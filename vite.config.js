@@ -6,16 +6,15 @@ import eslint from 'vite-plugin-eslint';
 import tailwindcss from '@tailwindcss/vite';
 
 export default defineConfig({
-  plugins: [
-    eslint({
-      cache: false, // para que avise siempre
-      include: ['src/**/*.js', 'src/**/*.jsx', 'eslint.config.js'],
-    }),
-    react(),
-    tailwindcss(),
-  ],
-  resolve: {
-    alias: { '@': path.resolve(process.cwd(), 'src') },
-  },
+    plugins: [
+        eslint({
+            cache: false, // para que avise siempre
+            include: ['src/**/*.js', 'src/**/*.jsx', 'eslint.config.js'],
+        }),
+        react(),
+        tailwindcss(),
+    ],
+    resolve: {
+        alias: { '@': path.resolve(process.cwd(), 'src') },
+    },
 });
-

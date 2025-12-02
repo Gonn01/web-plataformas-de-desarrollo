@@ -1,4 +1,4 @@
-import { GROUPS } from "@/data/constants";
+import { GROUPS } from '@/data/constants';
 
 // src/services/deudas.js
 const STORAGE_KEY = 'app_deudas';

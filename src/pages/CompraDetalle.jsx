@@ -242,10 +242,9 @@ export default function CompraDetalle() {
                                 />
                             </div>
                             <p className="text-sm text-[#9eb7a8]">
-                                {`${detalle.cuotas.filter((c) => c.pagada).length} de ${detalle.cuotas.length
-                                    } cuotas pagadas ($${totalPagado.toFixed(
-                                        2,
-                                    )} / $${detalle.total})`}
+                                {`${detalle.cuotas.filter((c) => c.pagada).length} de ${
+                                    detalle.cuotas.length
+                                } cuotas pagadas ($${totalPagado.toFixed(2)} / $${detalle.total})`}
                             </p>
                         </div>
                     </div>
@@ -260,8 +259,8 @@ export default function CompraDetalle() {
                                     c.pagada
                                         ? 'check_circle'
                                         : c.proxima
-                                            ? 'arrow_circle_right'
-                                            : 'schedule'
+                                          ? 'arrow_circle_right'
+                                          : 'schedule'
                                 }
                                 title={`Cuota #${c.nro}`}
                                 venc={c.venc}
@@ -374,12 +373,13 @@ function Cuota({ icon, title, venc, monto, paid, next }) {
         <div className={`${base} ${mods}`}>
             <div className="flex items-center gap-4">
                 <span
-                    className={`material-symbols-outlined ${paid
-                        ? 'text-primary'
-                        : next
-                            ? 'text-primary animate-pulse'
-                            : 'text-gray-600'
-                        }`}
+                    className={`material-symbols-outlined ${
+                        paid
+                            ? 'text-primary'
+                            : next
+                              ? 'text-primary animate-pulse'
+                              : 'text-gray-600'
+                    }`}
                 >
                     {icon}
                 </span>
