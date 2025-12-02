@@ -1,9 +1,9 @@
 // src/pages/EntidadDetalle.jsx
 import { useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Icon from './dashboard/components/Icon';
-import { formatMoney } from '../utils/FormatMoney';
-import NewExpenseModal from './dashboard/components/modals/NewExpenseCard';
+import Icon from '../dashboard/components/Icon';
+import { formatMoney } from '../../utils/FormatMoney';
+import NewExpenseModal from '../dashboard/components/modals/NewExpenseCard';
 
 const MOCK = {};
 

@@ -1,6 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import Icon from '../pages/dashboard/components/Icon';
-import { USER } from '../data/constants';
 import useAuth from '@/hooks/use-auth';
 
 export default function Sidebar() {
@@ -9,7 +8,7 @@ export default function Sidebar() {
     const idle = 'text-slate-700 dark:text-slate-300 hover:bg-black/5 dark:hover:bg-white/5';
     const active = 'bg-primary/20 text-primary';
 
-    const { usuario, logout } = useAuth();
+    const { user, logout } = useAuth();
     const navigate = useNavigate();
 
     const handleLogout = () => {
@@ -17,8 +16,9 @@ export default function Sidebar() {
         navigate('/login', { replace: true });
     };
 
-    const avatar = usuario?.avatar || USER.avatar;
-    const nombreVisible = usuario?.nombre || USER.name;
+    const avatar = user?.avatar;
+    const nombreVisible = user?.name;
+    const email = user?.email;
 
     return (
         <aside className="flex w-64 flex-col border-r border-black/10 dark:border-white/10 p-4 bg-white/50 dark:bg-background-dark">
@@ -36,7 +36,7 @@ export default function Sidebar() {
                             {nombreVisible}
                         </h1>
                         <p className="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">
-                            {USER.email}
+                            {email}
                         </p>
                     </div>
                 </div>
