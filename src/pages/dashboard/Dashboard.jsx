@@ -27,8 +27,8 @@ export default function Dashboard() {
             const entities = Array.isArray(d?.data)
                 ? d.data
                 : Array.isArray(d?.entities)
-                ? d.entities
-                : [];
+                    ? d.entities
+                    : [];
 
             // === SUMMARY (StatCards) ===
             let totalDeboARS = 0;
@@ -42,13 +42,11 @@ export default function Dashboard() {
                     const payedQuotas = Number(g.payed_quotas) || 0;
                     const fixed = Boolean(g.fixed_expense);
                     const amount = Number(g.amount) || 0;
-                    const isActive =
-                        fixed || numQuotas === 0 || payedQuotas < numQuotas;
+                    const isActive = fixed || numQuotas === 0 || payedQuotas < numQuotas;
 
                     if (!isActive) return;
 
-                    const amountPerQuota =
-                        numQuotas > 0 ? amount / numQuotas : amount;
+                    const amountPerQuota = numQuotas > 0 ? amount / numQuotas : amount;
 
                     let remainingQuotas;
                     if (fixed) {
@@ -58,7 +56,6 @@ export default function Dashboard() {
                     }
 
                     const remainingAmount = remainingQuotas * amountPerQuota;
-
 
                     totalDeboARS += remainingAmount;
                 });
@@ -83,25 +80,16 @@ export default function Dashboard() {
                             const payedQuotas = Number(g.payed_quotas) || 0;
                             const fixed = Boolean(g.fixed_expense);
 
-                            return (
-                                fixed ||
-                                numQuotas === 0 ||
-                                payedQuotas < numQuotas
-                            );
+                            return fixed || numQuotas === 0 || payedQuotas < numQuotas;
                         })
                         .map((g) => {
-                            const numQuotas =
-                                Number(g.number_of_quotas) || 0;
-                            const payedQuotas =
-                                Number(g.payed_quotas) || 0;
+                            const numQuotas = Number(g.number_of_quotas) || 0;
+                            const payedQuotas = Number(g.payed_quotas) || 0;
                             const amount = Number(g.amount) || 0;
 
-                            const amountPerQuota =
-                                numQuotas > 0
-                                    ? amount / numQuotas
-                                    : amount;
+                            const amountPerQuota = numQuotas > 0 ? amount / numQuotas : amount;
 
-                            const currencyLabel = 'ARS'; 
+                            const currencyLabel = 'ARS';
 
                             const formattedCuota = `${currencyLabel} $${amountPerQuota.toLocaleString(
                                 'es-AR',
@@ -112,32 +100,20 @@ export default function Dashboard() {
                             )}`;
 
                             const totalLabel = numQuotas
-                                ? `de ${currencyLabel} $${amount.toLocaleString(
-                                      'es-AR',
-                                      {
-                                          minimumFractionDigits: 2,
-                                          maximumFractionDigits: 2,
-                                      },
-                                  )} · ${payedQuotas}/${numQuotas} cuotas`
-                                : `Total ${currencyLabel} $${amount.toLocaleString(
-                                      'es-AR',
-                                      {
-                                          minimumFractionDigits: 2,
-                                          maximumFractionDigits: 2,
-                                      },
-                                  )}${
-                                      g.fixed_expense
-                                          ? ' · gasto fijo'
-                                          : ''
-                                  }`;
+                                ? `de ${currencyLabel} $${amount.toLocaleString('es-AR', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                })} · ${payedQuotas}/${numQuotas} cuotas`
+                                : `Total ${currencyLabel} $${amount.toLocaleString('es-AR', {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                })}${g.fixed_expense ? ' · gasto fijo' : ''}`;
 
                             let progressPct = 0;
                             if (numQuotas > 0) {
                                 progressPct = Math.min(
                                     100,
-                                    Math.round(
-                                        (payedQuotas / numQuotas) * 100,
-                                    ),
+                                    Math.round((payedQuotas / numQuotas) * 100),
                                 );
                             } else if (g.fixed_expense) {
                                 progressPct = 50;
@@ -146,7 +122,7 @@ export default function Dashboard() {
                             return {
                                 id: g.id,
                                 purchaseId: g.id,
-                                title: g.title || g.name, 
+                                title: g.title || g.name,
                                 amount: formattedCuota,
                                 total: totalLabel,
                                 chip: {
@@ -157,7 +133,7 @@ export default function Dashboard() {
                                 action: 'Pagar cuota',
                                 payed_quotas: payedQuotas,
                                 number_of_quotas: numQuotas,
-                                currency_type: 1, 
+                                currency_type: 1,
                             };
                         });
 
@@ -228,11 +204,8 @@ export default function Dashboard() {
                     onSave={(payload) => {
                         console.log('Nuevo gasto:', payload);
 
-                        const titulo =
-                            payload.name?.trim() || 'Nuevo gasto / deuda';
-                        const monto = Number.isFinite(
-                            Number(payload.amount),
-                        )
+                        const titulo = payload.name?.trim() || 'Nuevo gasto / deuda';
+                        const monto = Number.isFinite(Number(payload.amount))
                             ? Number(payload.amount)
                             : 0;
 
