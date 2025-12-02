@@ -160,8 +160,7 @@ export default function EntidadDetalle() {
             {openNewExpense && (
                 <NewExpenseModal
                     onClose={() => setOpenNewExpense(false)}
-                    onSave={(payload) => {
-                        console.log('Nuevo gasto:', payload);
+                    onSave={() => {
                         setOpenNewExpense(false);
                     }}
                 />

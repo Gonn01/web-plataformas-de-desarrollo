@@ -23,9 +23,8 @@ export default function Dashboard() {
 
         try {
             const d = await fetchDashboardData(auth.token);
-            console.log('Dashboard data cargada:', d);
 
-            const entities = d?.entities || [];
+            const entities = d?.data || [];
 
             // === SUMMARY (StatCards) ===
             let totalDeboARS = 0;
@@ -81,16 +80,16 @@ export default function Dashboard() {
 
                     const totalLabel = numQuotas
                         ? `de ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                          })} · ${payedQuotas}/${numQuotas} cuotas`
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })} · ${payedQuotas}/${numQuotas} cuotas`
                         : `Total ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                              minimumFractionDigits: 2,
-                              maximumFractionDigits: 2,
-                          })}`;
+                            minimumFractionDigits: 2,
+                            maximumFractionDigits: 2,
+                        })}`;
 
                     return {
-                        id: g.id, 
+                        id: g.id,
                         purchaseId: g.id,
                         title: g.name,
                         amount: formattedCuota,
@@ -171,8 +170,6 @@ export default function Dashboard() {
                 <NewExpenseModal
                     onClose={() => setOpenNewExpense(false)}
                     onSave={(payload) => {
-                        console.log('Nuevo gasto:', payload);
-
                         const titulo = payload.name?.trim() || 'Nuevo gasto / deuda';
                         const monto = Number.isFinite(Number(payload.amount))
                             ? Number(payload.amount)
