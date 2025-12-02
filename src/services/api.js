@@ -11,7 +11,7 @@ const api = axios.create({
 export const register = async (userInfo) => {
     try {
         const { data } = await api.post('/auth/register', userInfo);
-        return data;
+        return data.data;
     } catch (error) {
         console.error('Error registering user:', error);
         throw error;
@@ -21,7 +21,7 @@ export const register = async (userInfo) => {
 export const login = async (credentials) => {
     try {
         const { data } = await api.post('/auth/login', credentials);
-        return data;
+        return data.data;
     } catch (error) {
         console.error('Error creating category:', error);
         throw error;
@@ -31,7 +31,7 @@ export const login = async (credentials) => {
 export const loginWithFirebase = async (firebaseData) => {
     try {
         const { data } = await api.post('/auth/firebase-login', firebaseData);
-        return data;
+        return data.data;
     } catch (error) {
         console.error('Error logging in with Firebase:', error);
         throw error;
@@ -46,7 +46,7 @@ export const fetchDashboardData = async (token) => {
             },
         });
 
-        return data;
+        return data.data;
     } catch (error) {
         console.error('Error fetching dashboard data:', error);
         throw error;
@@ -60,7 +60,7 @@ export const fetchFinancialEntityById = async (entityId, token) => {
                 Authorization: `Bearer ${token}`,
             },
         });
-        return data;
+        return data.data;
     } catch (error) {
         console.error('Error fetching financial entity:', error);
         throw error;

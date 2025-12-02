@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Icon from '../dashboard/components/Icon';
-import NewExpenseModal from '../dashboard/components/modals/NewExpenseCard';
+import NewExpenseModal from '../../components/modals/NewExpenseCard';
 import { fetchFinancialEntityById } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 import { ListContainer } from './components/ListContainer';
@@ -19,15 +19,12 @@ export default function EntidadDetalle() {
     const [entity, setEntity] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    /** =============================
-     *  FETCH DATA
-     *  ============================= */
     useEffect(() => {
         const loadData = async () => {
             try {
                 setLoading(true);
                 const data = await fetchFinancialEntityById(id, token);
-                setEntity(data);
+                setEntity(data); // data = el objeto plano con gastos_activos/gastos_inactivos/logs
             } catch (err) {
                 console.error('Error loading entity:', err);
             } finally {
@@ -39,7 +36,7 @@ export default function EntidadDetalle() {
     }, [id, token]);
 
     /** =============================
-     *  PROCESAR ESTADÍSTICAS (HOOK ANTES DE RETORNS)
+     *  STATS
      *  ============================= */
     const stats = useMemo(() => {
         if (!entity) return { ars: 0, usd: 0, debts: 0 };
@@ -50,9 +47,9 @@ export default function EntidadDetalle() {
         let ars = 0;
         let usd = 0;
 
-        const acumular = (gasto) => {
-            if (gasto.currency_type === '1') ars += Number(gasto.amount);
-            if (gasto.currency_type === '2') usd += Number(gasto.amount);
+        const acumular = (g) => {
+            if (g.currency_type === '1') ars += Number(g.amount);
+            if (g.currency_type === '2') usd += Number(g.amount);
         };
 
         activos.forEach(acumular);
@@ -66,7 +63,7 @@ export default function EntidadDetalle() {
     }, [entity]);
 
     /** =============================
-     *  AHORA SÍ LOS RETURNS CONDICIONALES
+     *  LOADING / ERROR
      *  ============================= */
     if (loading) {
         return (
@@ -80,17 +77,24 @@ export default function EntidadDetalle() {
         return <div className="py-10 text-center text-red-500">Entidad no encontrada.</div>;
     }
 
+    /** =============================
+     *  VALORES DE LA API
+     *  ============================= */
     const activos = entity.gastos_activos || [];
     const finalizados = entity.gastos_inactivos || [];
     const logs = entity.logs || [];
 
+    /** =============================
+     *  RENDER
+     *  ============================= */
     return (
         <>
             {/* Heading */}
             <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
                 <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-900 dark:text-white">
-                    {entity.name}
+                    {entity.name} {/* ← AHORA DIRECTAMENTE */}
                 </h1>
+
                 <button
                     className="flex h-10 min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary/20 px-4 text-sm font-bold text-primary hover:bg-primary/30"
                     onClick={() => setOpenNewExpense(true)}
@@ -104,6 +108,7 @@ export default function EntidadDetalle() {
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
                 <StatCard label="Balance Total (ARS)" value={stats.ars} currency="ARS" />
                 <StatCard label="Balance Total (USD)" value={stats.usd} currency="USD" />
+
                 <div className="flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/50">
                     <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
                         Deudas Activas
@@ -118,7 +123,7 @@ export default function EntidadDetalle() {
             <div className="flex flex-col">
                 <TabHeader tab={tab} setTab={setTab} />
 
-                {/* GASTOS ACTIVOS */}
+                {/* ACTIVOS */}
                 {tab === 'activos' && (
                     <ListContainer empty={activos.length === 0} emptyLabel="Sin gastos activos.">
                         {activos.map((g, i) => (
@@ -127,7 +132,7 @@ export default function EntidadDetalle() {
                     </ListContainer>
                 )}
 
-                {/* GASTOS FINALIZADOS */}
+                {/* FINALIZADOS */}
                 {tab === 'finalizados' && (
                     <ListContainer
                         empty={finalizados.length === 0}
@@ -139,7 +144,7 @@ export default function EntidadDetalle() {
                     </ListContainer>
                 )}
 
-                {/* LOG DE CAMBIOS */}
+                {/* LOG */}
                 {tab === 'log' && (
                     <ListContainer empty={logs.length === 0} emptyLabel="Sin registros de cambios.">
                         {logs.map((l, i) => (
@@ -160,9 +165,7 @@ export default function EntidadDetalle() {
             {openNewExpense && (
                 <NewExpenseModal
                     onClose={() => setOpenNewExpense(false)}
-                    onSave={() => {
-                        setOpenNewExpense(false);
-                    }}
+                    onSave={() => setOpenNewExpense(false)}
                 />
             )}
         </>

@@ -20,7 +20,7 @@ const useAuth = create((set) => ({
         try {
             const response = await login(formData);
 
-            const { user, token } = response.data;
+            const { user, token } = response;
 
             set({ user, token, loading: false });
 
@@ -39,7 +39,7 @@ const useAuth = create((set) => ({
         try {
             const response = await loginWithFirebase(firebaseData);
 
-            const { user, token } = response.data;
+            const { user, token } = response;
 
             set({ user, token, loading: false });
 

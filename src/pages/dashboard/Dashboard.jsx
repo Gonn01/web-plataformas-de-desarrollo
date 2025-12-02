@@ -3,7 +3,7 @@ import Icon from './components/Icon';
 import StatCards from './components/StatCards';
 import CurrencyToggle from './components/CurrencyToggle';
 import ActiveExpenses from './components/ActiveExpenses';
-import NewExpenseModal from './components/modals/NewExpenseCard';
+import NewExpenseModal from '../../components/modals/NewExpenseCard';
 import { agregarDeuda } from '../../services/deudas';
 import { fetchDashboardData } from '@/services/api';
 import useAuth from '@/hooks/use-auth';

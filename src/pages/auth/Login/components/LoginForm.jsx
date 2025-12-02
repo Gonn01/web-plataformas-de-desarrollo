@@ -2,8 +2,8 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import PasswordInput from '../../components/PasswordInput';
 import ErrorMessage from '../../components/ErrorMessage';
-import SubmitButton from '../../components/SubmitButton';
-import TextInput from '../../components/TextInput';
+import SubmitButton from '../../../../components/SubmitButton';
+import TextInput from '../../../../components/TextInput';
 import useAuth from '@/hooks/use-auth';
 
 export default function LoginForm() {
