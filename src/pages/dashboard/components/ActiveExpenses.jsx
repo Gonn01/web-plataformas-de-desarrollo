@@ -2,7 +2,6 @@ import { useMemo, useState, useCallback } from 'react';
 import Icon from './Icon';
 import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal';
 
-
 function parseAmountLabel(label) {
     if (!label) return { currency: 'ARS', amount: 0 };
     const trimmed = String(label).trim();
@@ -31,9 +30,9 @@ function parseTotalLabel(label, fallbackCurrency = 'ARS') {
 export default function ActiveExpenses({
     query,
     groups = [],
-    token,          
-    onQueryChange,   
-    onPaid,         
+    token,
+    onQueryChange,
+    onPaid,
 }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalEntity, setModalEntity] = useState('');
@@ -47,20 +46,24 @@ export default function ActiveExpenses({
         return groups
             .map((g) => ({
                 ...g,
-                items: g.items.filter((it) => it.title.toLowerCase().includes(q)),
+                items: g.items.filter((it) =>
+                    it.title.toLowerCase().includes(q),
+                ),
             }))
             .filter((g) => g.items.length > 0);
     }, [query, groups]);
 
-    
     const openModalForGroup = useCallback((group) => {
         const items = group.items.map((it) => {
             const { currency, amount } = parseAmountLabel(it.amount);
-            const { amount: totalAmount } = parseTotalLabel(it.total, currency);
+            const { amount: totalAmount } = parseTotalLabel(
+                it.total,
+                currency,
+            );
 
             return {
                 id: it.id,
-                purchaseId: it.purchaseId ?? it.id, 
+                purchaseId: it.purchaseId ?? it.id,
                 title: it.title,
                 type:
                     (it.chip?.text || '').toLowerCase() === 'me deben'
@@ -103,61 +106,86 @@ export default function ActiveExpenses({
         setModalOpen(true);
     }, []);
 
-    const handleConfirm = useCallback(async () => {
-        try {
-            if (!modalItems.length) {
+    const handleConfirm = useCallback(
+        async () => {
+            try {
+                if (!modalItems.length) {
+                    setModalOpen(false);
+                    return;
+                }
+
+                const baseUrl =
+                    import.meta.env.VITE_API_URL ||
+                    'http://localhost:3000/api';
+
+                if (modalItems.length === 1) {
+                    const purchaseId = modalItems[0].purchaseId;
+                    const res = await fetch(
+                        `${baseUrl}/dashboard/pagar-cuota`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                ...(token
+                                    ? { Authorization: `Bearer ${token}` }
+                                    : {}),
+                            },
+                            body: JSON.stringify({ purchase_id: purchaseId }),
+                        },
+                    );
+
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        console.error('Error al pagar cuota:', errText);
+                        alert('No se pudo registrar el pago de la cuota.');
+                        return;
+                    }
+                } else {
+                    const purchaseIds = modalItems.map(
+                        (it) => it.purchaseId,
+                    );
+                    const res = await fetch(
+                        `${baseUrl}/dashboard/pagar-cuotas-lote`,
+                        {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                ...(token
+                                    ? { Authorization: `Bearer ${token}` }
+                                    : {}),
+                            },
+                            body: JSON.stringify({
+                                purchase_ids: purchaseIds,
+                            }),
+                        },
+                    );
+
+                    if (!res.ok) {
+                        const errText = await res.text();
+                        console.error(
+                            'Error al pagar cuotas en lote:',
+                            errText,
+                        );
+                        alert('No se pudieron registrar los pagos.');
+                        return;
+                    }
+                }
+
                 setModalOpen(false);
-                return;
-            }
 
-            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
-            if (modalItems.length === 1) {
-                const purchaseId = modalItems[0].purchaseId;
-                const res = await fetch(`${baseUrl}/dashboard/pagar-cuota`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                    },
-                    body: JSON.stringify({ purchase_id: purchaseId }),
-                });
-
-                if (!res.ok) {
-                    const errText = await res.text();
-                    console.error('Error al pagar cuota:', errText);
-                    alert('No se pudo registrar el pago de la cuota.');
-                    return;
+                if (onPaid) {
+                    onPaid(); 
                 }
-            } else {
-                const purchaseIds = modalItems.map((it) => it.purchaseId);
-                const res = await fetch(`${baseUrl}/dashboard/pagar-cuotas-lote`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                    },
-                    body: JSON.stringify({ purchase_ids: purchaseIds }),
-                });
-
-                if (!res.ok) {
-                    const errText = await res.text();
-                    console.error('Error al pagar cuotas en lote:', errText);
-                    alert('No se pudieron registrar los pagos.');
-                    return;
-                }
+            } catch (err) {
+                console.error(
+                    'Error inesperado al pagar cuota(s):',
+                    err,
+                );
+                alert('Ocurrió un error al registrar el pago.');
             }
-
-            setModalOpen(false);
-
-            if (onPaid) {
-                onPaid();
-            }
-        } catch (err) {
-            console.error('Error inesperado al pagar cuota(s):', err);
-            alert('Ocurrió un error al registrar el pago.');
-        }
-    }, [modalItems, token, onPaid]);
+        },
+        [modalItems, token, onPaid],
+    );
 
     return (
         <div className="lg:col-span-2 xl:col-span-2 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5">
@@ -180,7 +208,10 @@ export default function ActiveExpenses({
                 </div>
             </div>
 
-            <div className="flex flex-col gap-4 overflow-y-auto pr-2" style={{ maxHeight: 480 }}>
+            <div
+                className="flex flex-col gap-4 overflow-y-auto pr-2"
+                style={{ maxHeight: 480 }}
+            >
                 {filtered.map((group) => (
                     <div key={group.title} className="flex flex-col gap-3">
                         <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
@@ -209,7 +240,8 @@ export default function ActiveExpenses({
                                                 {it.chip && (
                                                     <span
                                                         className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${
-                                                            it.chip.tone === 'red'
+                                                            it.chip.tone ===
+                                                            'red'
                                                                 ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                                 : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
                                                         }`}
@@ -236,12 +268,20 @@ export default function ActiveExpenses({
                                                         ? 'bg-green-500'
                                                         : 'bg-red-500'
                                                 } h-1.5 rounded-full`}
-                                                style={{ width: `${it.progressPct}%` }}
+                                                style={{
+                                                    width: `${it.progressPct}%`,
+                                                }}
                                             />
                                         </div>
                                         <button
                                             className="text-xs font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors"
-                                            onClick={() => openModalForItem(group, it, idx)}
+                                            onClick={() =>
+                                                openModalForItem(
+                                                    group,
+                                                    it,
+                                                    idx,
+                                                )
+                                            }
                                         >
                                             {it.action}
                                         </button>
@@ -269,3 +309,4 @@ export default function ActiveExpenses({
         </div>
     );
 }
+
