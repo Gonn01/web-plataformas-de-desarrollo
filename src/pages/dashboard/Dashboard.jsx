@@ -23,26 +23,44 @@ export default function Dashboard() {
 
         try {
             const d = await fetchDashboardData(auth.token);
-
-            const entities = d?.data || [];
+            console.log('Dashboard data cargada:', d);
+            const entities = Array.isArray(d?.data)
+                ? d.data
+                : Array.isArray(d?.entities)
+                ? d.entities
+                : [];
 
             // === SUMMARY (StatCards) ===
             let totalDeboARS = 0;
-            let totalMeDebenARS = 0; // por ahora 0
+            let totalMeDebenARS = 0; // por ahora 0, no tenemos me deben
 
             entities.forEach((fe) => {
-                fe.gastos.forEach((g) => {
-                    const currencyType = Number(g.currency_type);
+                const gastos = Array.isArray(fe.gastos) ? fe.gastos : [];
+
+                gastos.forEach((g) => {
                     const numQuotas = Number(g.number_of_quotas) || 0;
                     const payedQuotas = Number(g.payed_quotas) || 0;
-                    const amountPerQuota = Number(g.amount_per_quota) || 0;
+                    const fixed = Boolean(g.fixed_expense);
+                    const amount = Number(g.amount) || 0;
+                    const isActive =
+                        fixed || numQuotas === 0 || payedQuotas < numQuotas;
 
-                    const remainingQuotas = Math.max(numQuotas - payedQuotas, 0);
+                    if (!isActive) return;
+
+                    const amountPerQuota =
+                        numQuotas > 0 ? amount / numQuotas : amount;
+
+                    let remainingQuotas;
+                    if (fixed) {
+                        remainingQuotas = 1;
+                    } else {
+                        remainingQuotas = Math.max(numQuotas - payedQuotas, 0);
+                    }
+
                     const remainingAmount = remainingQuotas * amountPerQuota;
 
-                    if (currencyType === 1) {
-                        totalDeboARS += remainingAmount;
-                    }
+
+                    totalDeboARS += remainingAmount;
                 });
             });
 
@@ -55,63 +73,101 @@ export default function Dashboard() {
             });
 
             // === GROUPS (ActiveExpenses) ===
-            const mappedGroups = entities.map((fe) => {
-                const items = fe.gastos.map((g) => {
-                    const currencyType = Number(g.currency_type);
-                    const currencyLabel = currencyType === 2 ? 'USD' : 'ARS';
+            const mappedGroups = entities
+                .map((fe) => {
+                    const gastos = Array.isArray(fe.gastos) ? fe.gastos : [];
 
-                    const numQuotas = Number(g.number_of_quotas) || 0;
-                    const payedQuotas = Number(g.payed_quotas) || 0;
-                    const amount = Number(g.amount) || 0;
-                    const amountPerQuota = Number(g.amount_per_quota) || 0;
+                    const items = gastos
+                        .filter((g) => {
+                            const numQuotas = Number(g.number_of_quotas) || 0;
+                            const payedQuotas = Number(g.payed_quotas) || 0;
+                            const fixed = Boolean(g.fixed_expense);
 
-                    const progressPct =
-                        numQuotas > 0
-                            ? Math.min(100, Math.round((payedQuotas / numQuotas) * 100))
-                            : 0;
+                            return (
+                                fixed ||
+                                numQuotas === 0 ||
+                                payedQuotas < numQuotas
+                            );
+                        })
+                        .map((g) => {
+                            const numQuotas =
+                                Number(g.number_of_quotas) || 0;
+                            const payedQuotas =
+                                Number(g.payed_quotas) || 0;
+                            const amount = Number(g.amount) || 0;
 
-                    const formattedCuota = `${currencyLabel} $${amountPerQuota.toLocaleString(
-                        'es-AR',
-                        {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                        },
-                    )}`;
+                            const amountPerQuota =
+                                numQuotas > 0
+                                    ? amount / numQuotas
+                                    : amount;
 
-                    const totalLabel = numQuotas
-                        ? `de ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                        })} · ${payedQuotas}/${numQuotas} cuotas`
-                        : `Total ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2,
-                        })}`;
+                            const currencyLabel = 'ARS'; 
+
+                            const formattedCuota = `${currencyLabel} $${amountPerQuota.toLocaleString(
+                                'es-AR',
+                                {
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                },
+                            )}`;
+
+                            const totalLabel = numQuotas
+                                ? `de ${currencyLabel} $${amount.toLocaleString(
+                                      'es-AR',
+                                      {
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                      },
+                                  )} · ${payedQuotas}/${numQuotas} cuotas`
+                                : `Total ${currencyLabel} $${amount.toLocaleString(
+                                      'es-AR',
+                                      {
+                                          minimumFractionDigits: 2,
+                                          maximumFractionDigits: 2,
+                                      },
+                                  )}${
+                                      g.fixed_expense
+                                          ? ' · gasto fijo'
+                                          : ''
+                                  }`;
+
+                            let progressPct = 0;
+                            if (numQuotas > 0) {
+                                progressPct = Math.min(
+                                    100,
+                                    Math.round(
+                                        (payedQuotas / numQuotas) * 100,
+                                    ),
+                                );
+                            } else if (g.fixed_expense) {
+                                progressPct = 50;
+                            }
+
+                            return {
+                                id: g.id,
+                                purchaseId: g.id,
+                                title: g.title || g.name, 
+                                amount: formattedCuota,
+                                total: totalLabel,
+                                chip: {
+                                    text: 'Debo',
+                                    tone: 'red',
+                                },
+                                progressPct,
+                                action: 'Pagar cuota',
+                                payed_quotas: payedQuotas,
+                                number_of_quotas: numQuotas,
+                                currency_type: 1, 
+                            };
+                        });
 
                     return {
-                        id: g.id,
-                        purchaseId: g.id,
-                        title: g.name,
-                        amount: formattedCuota,
-                        total: totalLabel,
-                        chip: {
-                            text: 'Debo',
-                            tone: 'red',
-                        },
-                        progressPct,
-                        action: 'Pagar cuota',
-                        payed_quotas: payedQuotas,
-                        number_of_quotas: numQuotas,
-                        currency_type: currencyType,
+                        title: fe.name,
+                        cta: 'Pagar cuotas',
+                        items,
                     };
-                });
-
-                return {
-                    title: fe.name,
-                    cta: 'Pagar cuotas',
-                    items,
-                };
-            });
+                })
+                .filter((g) => g.items.length > 0);
 
             setGroups(mappedGroups);
         } catch (err) {
@@ -170,8 +226,13 @@ export default function Dashboard() {
                 <NewExpenseModal
                     onClose={() => setOpenNewExpense(false)}
                     onSave={(payload) => {
-                        const titulo = payload.name?.trim() || 'Nuevo gasto / deuda';
-                        const monto = Number.isFinite(Number(payload.amount))
+                        console.log('Nuevo gasto:', payload);
+
+                        const titulo =
+                            payload.name?.trim() || 'Nuevo gasto / deuda';
+                        const monto = Number.isFinite(
+                            Number(payload.amount),
+                        )
                             ? Number(payload.amount)
                             : 0;
 
