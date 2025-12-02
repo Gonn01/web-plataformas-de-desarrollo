@@ -1,5 +1,5 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import Icon from '../pages/dashboard/components/Icon';
+import Icon from './Icon';
 import useAuth from '@/hooks/use-auth';
 
 export default function Sidebar() {

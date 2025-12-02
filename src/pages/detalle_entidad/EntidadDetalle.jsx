@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Icon from '../dashboard/components/Icon';
-import NewExpenseModal from '../../components/modals/NewExpenseCard';
+import Icon from '../../components/Icon';
+import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import { fetchFinancialEntityById } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 import { ListContainer } from './components/ListContainer';

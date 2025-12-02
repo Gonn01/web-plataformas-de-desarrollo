@@ -38,6 +38,36 @@ export const loginWithFirebase = async (firebaseData) => {
     }
 };
 
+export const createEntity = async (entityData, token) => {
+    try {
+        const { data } = await api.post('/entidades-financieras', entityData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return data.data;
+    } catch (error) {
+        console.error('Error creating entity:', error);
+        throw error;
+    }
+};
+
+export const fetchFinancialEntities = async (token) => {
+    try {
+        const { data } = await api.get('/entidades-financieras', {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        return data.data;
+    } catch (error) {
+        console.error('Error fetching financial entities:', error);
+        throw error;
+    }
+};
+
 export const fetchDashboardData = async (token) => {
     try {
         const { data } = await api.get('/dashboard/home', {
