@@ -1,10 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Icon from '../dashboard/components/Icon';
-import { formatMoney } from '../../utils/FormatMoney';
 import NewExpenseModal from '../dashboard/components/modals/NewExpenseCard';
 import { fetchFinancialEntityById } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
+import { ListContainer } from './components/ListContainer';
+import { GastoFinalizadoItem } from './components/GastoFinalizadoItem';
+import { GastoItem } from './components/GastoItem';
+import { TabHeader } from './components/TabHeader';
+import { StatCard } from './components/StatCard';
 
 export default function EntidadDetalle() {
     const { id } = useParams();
@@ -163,92 +167,5 @@ export default function EntidadDetalle() {
                 />
             )}
         </>
-    );
-}
-
-/** =============================
- *  Sub-components
- *  ============================= */
-
-function StatCard({ label, value, currency }) {
-    return (
-        <div className="flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/50">
-            <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">{label}</p>
-            <p
-                className={`text-2xl font-bold tracking-tight ${value < 0 ? 'text-red-500' : 'text-green-500'
-                    }`}
-            >
-                {formatMoney(value, currency)}
-            </p>
-        </div>
-    );
-}
-
-function TabHeader({ tab, setTab }) {
-    return (
-        <div className="border-b border-zinc-200 dark:border-zinc-800 mb-4">
-            <div className="flex gap-6">
-                {['activos', 'finalizados', 'log'].map((t) => (
-                    <button
-                        key={t}
-                        className={`pb-3 pt-2 text-sm ${tab === t
-                                ? 'text-primary font-bold border-b-2 border-b-primary'
-                                : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 border-b-2 border-b-transparent'
-                            }`}
-                        onClick={() => setTab(t)}
-                    >
-                        {t === 'activos'
-                            ? 'Gastos Activos'
-                            : t === 'finalizados'
-                                ? 'Gastos Finalizados'
-                                : 'Log de Cambios'}
-                    </button>
-                ))}
-            </div>
-        </div>
-    );
-}
-
-function ListContainer({ empty, emptyLabel, children }) {
-    return (
-        <div className="flex flex-col divide-y divide-zinc-200 dark:divide-zinc-800">
-            {empty ? (
-                <div className="text-sm text-zinc-500 dark:text-zinc-400 py-6">{emptyLabel}</div>
-            ) : (
-                children
-            )}
-        </div>
-    );
-}
-
-function GastoItem({ gasto }) {
-    return (
-        <div className="flex items-center justify-between py-4">
-            <div>
-                <p className="font-medium text-zinc-900 dark:text-white">{gasto.name}</p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                    Cuotas: {gasto.payed_quotas}/{gasto.number_of_quotas}
-                </p>
-            </div>
-
-            <p className="font-semibold text-primary">
-                {formatMoney(gasto.amount, gasto.currency_type === '1' ? 'ARS' : 'USD')}
-            </p>
-        </div>
-    );
-}
-
-function GastoFinalizadoItem({ gasto }) {
-    return (
-        <div className="flex items-center justify-between py-4">
-            <div>
-                <p className="font-medium text-zinc-900 dark:text-white">{gasto.name}</p>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400">Finalizado</p>
-            </div>
-
-            <p className="font-semibold text-zinc-700 dark:text-zinc-300">
-                {formatMoney(gasto.amount, gasto.currency_type === '1' ? 'ARS' : 'USD')}
-            </p>
-        </div>
     );
 }
