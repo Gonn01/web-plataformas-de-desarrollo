@@ -2,7 +2,6 @@ import { useMemo, useState, useCallback } from 'react';
 import Icon from './Icon';
 import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal';
 
-
 function parseAmountLabel(label) {
     if (!label) return { currency: 'ARS', amount: 0 };
     const trimmed = String(label).trim();
@@ -28,13 +27,7 @@ function parseTotalLabel(label, fallbackCurrency = 'ARS') {
     return { currency: fallbackCurrency, amount };
 }
 
-export default function ActiveExpenses({
-    query,
-    groups = [],
-    token,          
-    onQueryChange,   
-    onPaid,         
-}) {
+export default function ActiveExpenses({ query, groups = [], token, onQueryChange, onPaid }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalEntity, setModalEntity] = useState('');
     const [modalItems, setModalItems] = useState([]);
@@ -52,7 +45,6 @@ export default function ActiveExpenses({
             .filter((g) => g.items.length > 0);
     }, [query, groups]);
 
-    
     const openModalForGroup = useCallback((group) => {
         const items = group.items.map((it) => {
             const { currency, amount } = parseAmountLabel(it.amount);
@@ -60,12 +52,9 @@ export default function ActiveExpenses({
 
             return {
                 id: it.id,
-                purchaseId: it.purchaseId ?? it.id, 
+                purchaseId: it.purchaseId ?? it.id,
                 title: it.title,
-                type:
-                    (it.chip?.text || '').toLowerCase() === 'me deben'
-                        ? 'me_deben'
-                        : 'debo',
+                type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
                 currency,
                 amountToPay: amount,
                 totalAmount,
@@ -87,10 +76,7 @@ export default function ActiveExpenses({
             id: it.id,
             purchaseId: it.purchaseId ?? it.id,
             title: it.title,
-            type:
-                (it.chip?.text || '').toLowerCase() === 'me deben'
-                    ? 'me_deben'
-                    : 'debo',
+            type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
             currency,
             amountToPay: amount,
             totalAmount,
@@ -208,11 +194,10 @@ export default function ActiveExpenses({
                                             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                                                 {it.chip && (
                                                     <span
-                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${
-                                                            it.chip.tone === 'red'
+                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${it.chip.tone === 'red'
                                                                 ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                                 : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {it.chip.text}
                                                     </span>
@@ -231,11 +216,10 @@ export default function ActiveExpenses({
                                     <div className="flex items-center gap-4 mt-2">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
-                                                className={`${
-                                                    it.chip?.tone === 'green'
+                                                className={`${it.chip?.tone === 'green'
                                                         ? 'bg-green-500'
                                                         : 'bg-red-500'
-                                                } h-1.5 rounded-full`}
+                                                    } h-1.5 rounded-full`}
                                                 style={{ width: `${it.progressPct}%` }}
                                             />
                                         </div>
