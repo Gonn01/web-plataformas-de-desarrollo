@@ -52,3 +52,17 @@ export const fetchDashboardData = async (token) => {
         throw error;
     }
 };
+
+export const fetchFinancialEntityById = async (entityId, token) => {
+    try {
+        const { data } = await api.get(`/entidades-financieras/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+        return data;
+    } catch (error) {
+        console.error('Error fetching financial entity:', error);
+        throw error;
+    }
+};

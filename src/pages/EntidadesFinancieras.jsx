@@ -99,10 +99,10 @@ export default function EntidadesFinancieras() {
         };
         setEntities((prev) => [newEntity, ...prev]);
         setOpenNew(false);
-        navigate(`/app/entidades/${newEntity.id}`);
+        navigate(`/app/entidades/4`);
     };
 
-    const handleOpen = (entity) => navigate(`/app/entidades/${entity.id}`);
+    const handleOpen = () => navigate(`/app/entidades/4`);
 
     const showEmpty = filtered.length === 0 && entities.length === 0;
 
