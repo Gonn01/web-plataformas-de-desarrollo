@@ -40,12 +40,12 @@ export const loginWithFirebase = async (firebaseData) => {
 
 export const fetchDashboardData = async (token) => {
     try {
-        console.log('Fetching dashboard data from API...', API_BASE_URL);
         const { data } = await api.get('/dashboard/home', {
             headers: {
                 Authorization: `Bearer ${token}`,
             },
         });
+
         return data;
     } catch (error) {
         console.error('Error fetching dashboard data:', error);

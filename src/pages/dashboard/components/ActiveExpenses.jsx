@@ -65,10 +65,7 @@ export default function ActiveExpenses({
                 id: it.id,
                 purchaseId: it.purchaseId ?? it.id,
                 title: it.title,
-                type:
-                    (it.chip?.text || '').toLowerCase() === 'me deben'
-                        ? 'me_deben'
-                        : 'debo',
+                type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
                 currency,
                 amountToPay: amount,
                 totalAmount,
@@ -90,10 +87,7 @@ export default function ActiveExpenses({
             id: it.id,
             purchaseId: it.purchaseId ?? it.id,
             title: it.title,
-            type:
-                (it.chip?.text || '').toLowerCase() === 'me deben'
-                    ? 'me_deben'
-                    : 'debo',
+            type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
             currency,
             amountToPay: amount,
             totalAmount,
@@ -244,7 +238,7 @@ export default function ActiveExpenses({
                                                             'red'
                                                                 ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                                 : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {it.chip.text}
                                                     </span>
@@ -263,8 +257,7 @@ export default function ActiveExpenses({
                                     <div className="flex items-center gap-4 mt-2">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
-                                                className={`${
-                                                    it.chip?.tone === 'green'
+                                                className={`${it.chip?.tone === 'green'
                                                         ? 'bg-green-500'
                                                         : 'bg-red-500'
                                                 } h-1.5 rounded-full`}

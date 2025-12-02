@@ -14,7 +14,6 @@ export default function GoogleButton() {
             setLoading(true);
 
             const result = await signInWithPopup(auth, googleProvider);
-            console.log(result);
             const firebaseUser = result.user;
 
             const res = await loginWithFirebase({

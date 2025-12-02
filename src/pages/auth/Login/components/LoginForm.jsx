@@ -29,7 +29,6 @@ export default function LoginForm() {
             setCargando(true);
             setError('');
             await auth.login({ email, password: clave });
-            console.log('Usuario autenticado');
             nav('/app/dashboard', { replace: true });
         } catch (err) {
             setError(err.message || 'Error de autenticación');
