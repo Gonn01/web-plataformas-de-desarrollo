@@ -35,7 +35,7 @@ export default function Sidebar() {
                         <h1 className="text-slate-900 dark:text-white text-base font-medium leading-normal">
                             {nombreVisible}
                         </h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal">
+                        <p className="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal truncate max-w-40">
                             {email}
                         </p>
                     </div>
