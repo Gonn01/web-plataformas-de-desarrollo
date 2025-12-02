@@ -168,7 +168,7 @@ export default function ActiveExpenses({
                 setModalOpen(false);
 
                 if (onPaid) {
-                    onPaid(); 
+                    onPaid();
                 }
             } catch (err) {
                 console.error(
@@ -233,9 +233,8 @@ export default function ActiveExpenses({
                                             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                                                 {it.chip && (
                                                     <span
-                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${
-                                                            it.chip.tone ===
-                                                            'red'
+                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${it.chip.tone ===
+                                                                'red'
                                                                 ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                                 : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
                                                             }`}
@@ -258,9 +257,9 @@ export default function ActiveExpenses({
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
                                                 className={`${it.chip?.tone === 'green'
-                                                        ? 'bg-green-500'
-                                                        : 'bg-red-500'
-                                                } h-1.5 rounded-full`}
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500'
+                                                    } h-1.5 rounded-full`}
                                                 style={{
                                                     width: `${it.progressPct}%`,
                                                 }}

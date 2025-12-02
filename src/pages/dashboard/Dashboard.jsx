@@ -22,19 +22,14 @@ export default function Dashboard() {
         if (!auth?.token) return;
 
         try {
-            const d = await fetchDashboardData(auth.token);
-            console.log('Dashboard data cargada:', d);
-            const entities = Array.isArray(d?.data)
-                ? d.data
-                : Array.isArray(d?.entities)
-                    ? d.entities
-                    : [];
+            const entities = await fetchDashboardData(auth.token);
 
             // === SUMMARY (StatCards) ===
             let totalDeboARS = 0;
             let totalMeDebenARS = 0; // por ahora 0, no tenemos me deben
 
             entities.forEach((fe) => {
+                console.log('Procesando entidad:', fe);
                 const gastos = Array.isArray(fe.gastos) ? fe.gastos : [];
 
                 gastos.forEach((g) => {
@@ -69,7 +64,6 @@ export default function Dashboard() {
                 total_me_deben_ars: totalMeDebenARS,
             });
 
-            // === GROUPS (ActiveExpenses) ===
             const mappedGroups = entities
                 .map((fe) => {
                     const gastos = Array.isArray(fe.gastos) ? fe.gastos : [];
