@@ -1,4 +1,5 @@
 import { useMemo, useState, useCallback } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Icon from '../../../components/Icon';
 import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal';
 
@@ -37,6 +38,7 @@ export default function ActiveExpenses({
     const [modalOpen, setModalOpen] = useState(false);
     const [modalEntity, setModalEntity] = useState('');
     const [modalItems, setModalItems] = useState([]);
+    const navigate = useNavigate();
 
     // Filtro por texto
     const filtered = useMemo(() => {
@@ -46,9 +48,7 @@ export default function ActiveExpenses({
         return groups
             .map((g) => ({
                 ...g,
-                items: g.items.filter((it) =>
-                    it.title.toLowerCase().includes(q),
-                ),
+                items: g.items.filter((it) => it.title.toLowerCase().includes(q)),
             }))
             .filter((g) => g.items.length > 0);
     }, [query, groups]);
@@ -56,16 +56,16 @@ export default function ActiveExpenses({
     const openModalForGroup = useCallback((group) => {
         const items = group.items.map((it) => {
             const { currency, amount } = parseAmountLabel(it.amount);
-            const { amount: totalAmount } = parseTotalLabel(
-                it.total,
-                currency,
-            );
+            const { amount: totalAmount } = parseTotalLabel(it.total, currency);
 
             return {
                 id: it.id,
                 purchaseId: it.purchaseId ?? it.id,
                 title: it.title,
-                type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
+                type:
+                    (it.chip?.text || '').toLowerCase() === 'me deben'
+                        ? 'me_deben'
+                        : 'debo',
                 currency,
                 amountToPay: amount,
                 totalAmount,
@@ -87,7 +87,10 @@ export default function ActiveExpenses({
             id: it.id,
             purchaseId: it.purchaseId ?? it.id,
             title: it.title,
-            type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
+            type:
+                (it.chip?.text || '').toLowerCase() === 'me deben'
+                    ? 'me_deben'
+                    : 'debo',
             currency,
             amountToPay: amount,
             totalAmount,
@@ -109,24 +112,18 @@ export default function ActiveExpenses({
                 }
 
                 const baseUrl =
-                    import.meta.env.VITE_API_URL ||
-                    'http://localhost:3000/api';
+                    import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
                 if (modalItems.length === 1) {
                     const purchaseId = modalItems[0].purchaseId;
-                    const res = await fetch(
-                        `${baseUrl}/dashboard/pagar-cuota`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                ...(token
-                                    ? { Authorization: `Bearer ${token}` }
-                                    : {}),
-                            },
-                            body: JSON.stringify({ purchase_id: purchaseId }),
+                    const res = await fetch(`${baseUrl}/dashboard/pagar-cuota`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { Authorization: `Bearer ${token}` } : {}),
                         },
-                    );
+                        body: JSON.stringify({ purchase_id: purchaseId }),
+                    });
 
                     if (!res.ok) {
                         const errText = await res.text();
@@ -135,31 +132,19 @@ export default function ActiveExpenses({
                         return;
                     }
                 } else {
-                    const purchaseIds = modalItems.map(
-                        (it) => it.purchaseId,
-                    );
-                    const res = await fetch(
-                        `${baseUrl}/dashboard/pagar-cuotas-lote`,
-                        {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json',
-                                ...(token
-                                    ? { Authorization: `Bearer ${token}` }
-                                    : {}),
-                            },
-                            body: JSON.stringify({
-                                purchase_ids: purchaseIds,
-                            }),
+                    const purchaseIds = modalItems.map((it) => it.purchaseId);
+                    const res = await fetch(`${baseUrl}/dashboard/pagar-cuotas-lote`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            ...(token ? { Authorization: `Bearer ${token}` } : {}),
                         },
-                    );
+                        body: JSON.stringify({ purchase_ids: purchaseIds }),
+                    });
 
                     if (!res.ok) {
                         const errText = await res.text();
-                        console.error(
-                            'Error al pagar cuotas en lote:',
-                            errText,
-                        );
+                        console.error('Error al pagar cuotas en lote:', errText);
                         alert('No se pudieron registrar los pagos.');
                         return;
                     }
@@ -171,10 +156,7 @@ export default function ActiveExpenses({
                     onPaid();
                 }
             } catch (err) {
-                console.error(
-                    'Error inesperado al pagar cuota(s):',
-                    err,
-                );
+                console.error('Error inesperado al pagar cuota(s):', err);
                 alert('Ocurrió un error al registrar el pago.');
             }
         },
@@ -209,7 +191,10 @@ export default function ActiveExpenses({
                 {filtered.map((group) => (
                     <div key={group.title} className="flex flex-col gap-3">
                         <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
-                            <h4 className="text-base font-semibold text-slate-800 dark:text-slate-100">
+                            <h4
+                                className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
+                                onClick={() => navigate(`/entidades/${group.id}`)} 
+                            >
                                 {group.title}
                             </h4>
                             <button
@@ -223,7 +208,7 @@ export default function ActiveExpenses({
                             {group.items.map((it, idx) => (
                                 <li
                                     key={`${group.title}-${idx}`}
-                                    className="flex flex-col gap-3 rounded-lg p-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
+                                    className="flex flex-col gap-3 rounded-lg p-3 transition-colors hover:bg-black/5 dark:hover:bg_white/5"
                                 >
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex flex-col gap-1.5 flex-1">
@@ -233,11 +218,11 @@ export default function ActiveExpenses({
                                             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                                                 {it.chip && (
                                                     <span
-                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${it.chip.tone ===
-                                                            'red'
-                                                            ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
-                                                            : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                            }`}
+                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${
+                                                            it.chip.tone === 'red'
+                                                                ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                                                                : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                        }`}
                                                     >
                                                         {it.chip.text}
                                                     </span>
@@ -256,10 +241,11 @@ export default function ActiveExpenses({
                                     <div className="flex items-center gap-4 mt-2">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
-                                                className={`${it.chip?.tone === 'green'
-                                                    ? 'bg-green-500'
-                                                    : 'bg-red-500'
-                                                    } h-1.5 rounded-full`}
+                                                className={`${
+                                                    it.chip?.tone === 'green'
+                                                        ? 'bg-green-500'
+                                                        : 'bg-red-500'
+                                                } h-1.5 rounded-full`}
                                                 style={{
                                                     width: `${it.progressPct}%`,
                                                 }}
@@ -267,13 +253,7 @@ export default function ActiveExpenses({
                                         </div>
                                         <button
                                             className="text-xs font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors"
-                                            onClick={() =>
-                                                openModalForItem(
-                                                    group,
-                                                    it,
-                                                    idx,
-                                                )
-                                            }
+                                            onClick={() => openModalForItem(group, it, idx)}
                                         >
                                             {it.action}
                                         </button>
@@ -301,4 +281,5 @@ export default function ActiveExpenses({
         </div>
     );
 }
+
 
