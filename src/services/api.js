@@ -96,3 +96,12 @@ export const fetchFinancialEntityById = async (entityId, token) => {
         throw error;
     }
 };
+export const createExpense = async (payload, token) => {
+    const { data } = await api.post('/dashboard/gastos', payload, {
+        headers: {
+            Authorization: `Bearer ${token}`,
+        },
+    });
+
+    return data.data;
+};

@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
-import { fetchFinancialEntityById } from '@/services/api';
+import { createExpense, fetchFinancialEntityById } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 import { ListContainer } from './components/ListContainer';
 import { GastoFinalizadoItem } from './components/GastoFinalizadoItem';
@@ -164,8 +164,34 @@ export default function EntidadDetalle() {
             {/* Modal */}
             {openNewExpense && (
                 <NewExpenseModal
+                    defaultEntityId={entity.id}
                     onClose={() => setOpenNewExpense(false)}
-                    onSave={() => setOpenNewExpense(false)}
+                    onSave={async (payload) => {
+                        try {
+                            // 1) crear gasto
+                            const nuevoGasto = await createExpense(payload, token);
+
+                            // 2) decidir si va activo o finalizado
+                            const isFinalizado =
+                                Number(nuevoGasto.payed_quotas) >=
+                                Number(nuevoGasto.number_of_quotas);
+
+                            setEntity((prev) => ({
+                                ...prev,
+                                gastos_activos: isFinalizado
+                                    ? prev.gastos_activos
+                                    : [...prev.gastos_activos, nuevoGasto],
+                                gastos_inactivos: isFinalizado
+                                    ? [...prev.gastos_inactivos, nuevoGasto]
+                                    : prev.gastos_inactivos,
+                            }));
+
+                            // 3) cerrar modal
+                            setOpenNewExpense(false);
+                        } catch (err) {
+                            console.error('Error guardando gasto:', err);
+                        }
+                    }}
                 />
             )}
         </>
