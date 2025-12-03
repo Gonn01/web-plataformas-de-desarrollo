@@ -9,7 +9,6 @@ import useAuth from '@/hooks/use-auth';
 
 function normalizeType(type) {
     const raw = (type || 'debo').toString().trim().toLowerCase();
-    // soporta "me_deben", "me-deben", "me deben"
     const norm = raw.replace(/[_-]+/g, ' ');
     return norm === 'me deben' ? 'me_deben' : 'debo';
 }
@@ -91,9 +90,9 @@ export default function Dashboard() {
 
                             const totalLabel = numQuotas
                                 ? `de ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                  })} · ${payedQuotas}/${numQuotas} cuotas`
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                })} · ${payedQuotas}/${numQuotas} cuotas`
                                 : `Total ${currencyLabel} $${amount.toLocaleString('es-AR', {
                                       minimumFractionDigits: 2,
                                       maximumFractionDigits: 2,
@@ -273,4 +272,3 @@ export default function Dashboard() {
         </>
     );
 }
-

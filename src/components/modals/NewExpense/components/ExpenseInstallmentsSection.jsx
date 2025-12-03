@@ -8,6 +8,7 @@ export default function ExpenseInstallmentsSection({
     paid,
     totalInstallments,
     progressPct,
+    setPaidInstallments,
 }) {
     return (
         <>
@@ -19,14 +20,23 @@ export default function ExpenseInstallmentsSection({
                     onChange={(e) => setInstallments(e.target.value)}
                 />
 
-                <div>
-                    <label className="text-sm font-medium text-gray-500">Cuotas pagadas</label>
-                    <input
-                        disabled
-                        className="h-12 w-full rounded-lg bg-[#29382f] px-3 text-gray-500"
-                        value={paidInstallments}
-                    />
-                </div>
+                <TextInput
+                    label="Cuotas pagadas"
+                    type="number"
+                    value={paidInstallments}
+                    onChange={(e) => {
+                        const value = Number(e.target.value);
+                        const max = Number(installments) || 0;
+
+                        // evitar negativos
+                        if (value < 0) return setPaidInstallments('0');
+
+                        // limitar a total
+                        if (value > max) return setPaidInstallments(String(max));
+
+                        setPaidInstallments(e.target.value);
+                    }}
+                />
             </div>
 
             <div>
