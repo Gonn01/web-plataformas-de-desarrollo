@@ -51,9 +51,7 @@ export default function Dashboard() {
                     const remainingAmount = remainingQuotas * amountPerQuota;
 
                     const isMeDeben =
-                        rawType === 'me_deben' ||
-                        rawType === 'me deben' ||
-                        rawType === 'me-deben';
+                        rawType === 'me_deben' || rawType === 'me deben' || rawType === 'me-deben';
 
                     if (isMeDeben) {
                         totalMeDebenARS += remainingAmount;
@@ -100,13 +98,13 @@ export default function Dashboard() {
 
                             const totalLabel = numQuotas
                                 ? `de ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                  })} · ${payedQuotas}/${numQuotas} cuotas`
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                })} · ${payedQuotas}/${numQuotas} cuotas`
                                 : `Total ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                                      minimumFractionDigits: 2,
-                                      maximumFractionDigits: 2,
-                                  })}${g.fixed_expense ? ' · gasto fijo' : ''}`;
+                                    minimumFractionDigits: 2,
+                                    maximumFractionDigits: 2,
+                                })}${g.fixed_expense ? ' · gasto fijo' : ''}`;
 
                             let progressPct = 0;
                             if (numQuotas > 0) {
@@ -192,8 +190,8 @@ export default function Dashboard() {
                 <div className="lg:col-span-1 xl:col-span-1 flex flex-col gap-6">
                     <StatCards summary={summary} currency={currency} />
                     <h3 className="text-slate-900 dark:text-white text-lg font-bold pt-4">
-                            Resumen Mensual
-                        </h3>
+                        Resumen Mensual
+                    </h3>
                     <CurrencyToggle currency={currency} onChange={setCurrency} />
                 </div>
 
@@ -210,64 +208,62 @@ export default function Dashboard() {
             {/* Modal nuevo gasto (por ahora sigue usando localstorage) */}
             {openNewExpense && (
                 <NewExpenseModal
-                onClose={() => setOpenNewExpense(false)}
-                onSave={async (payload) => {
-                    try {
-                        console.log('Nuevo gasto (payload modal):', payload);
-                        const baseUrl =
-                        import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-                        const currencyTypeMap = {
-                            ARS: 1,
-                            USD: 2,
-                        };
-                        const currency_type =
-                        currencyTypeMap[payload.currency] || 1;
-                        const rawType = (payload.type || 'Debo').toString().toLowerCase();
-                        const type =
-                            rawType.includes('me') && rawType.includes('deben')
-                            ? 'me_deben'
-                            : 'debo';
-                        const number_of_quotas = Number(payload.installments) || 0;
-                        const fixed_expense = number_of_quotas === 0;
+                    onClose={() => setOpenNewExpense(false)}
+                    onSave={async (payload) => {
+                        try {
+                            console.log('Nuevo gasto (payload modal):', payload);
+                            const baseUrl =
+                                import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+                            const currencyTypeMap = {
+                                ARS: 1,
+                                USD: 2,
+                            };
+                            const currency_type = currencyTypeMap[payload.currency] || 1;
+                            const rawType = (payload.type || 'Debo').toString().toLowerCase();
+                            const type =
+                                rawType.includes('me') && rawType.includes('deben')
+                                    ? 'me_deben'
+                                    : 'debo';
+                            const number_of_quotas = Number(payload.installments) || 0;
+                            const fixed_expense = number_of_quotas === 0;
 
-                        const body = {
-                            financial_entity_id: payload.financial_entity_id,
-                            name: payload.name,
-                            amount: Number(payload.amount),
-                            number_of_quotas,
-                            currency_type,
-                            first_quota_date: null, 
-                            fixed_expense,
-                            image: null, 
-                            type,
-                        };
+                            const body = {
+                                financial_entity_id: payload.financial_entity_id,
+                                name: payload.name,
+                                amount: Number(payload.amount),
+                                number_of_quotas,
+                                currency_type,
+                                first_quota_date: null,
+                                fixed_expense,
+                                image: null,
+                                type,
+                            };
 
-                const res = await fetch(`${baseUrl}/dashboard/gastos`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(auth?.token
-                            ? { Authorization: `Bearer ${auth.token}` }
-                            : {}),
-                    },
-                    body: JSON.stringify(body),
-                });
-                if (!res.ok) {
-                    const errorText = await res.text();
-                    console.error('Error al crear gasto:', errorText);
-                    alert('No se pudo crear el gasto.');
-                    return;
-                }
-                setOpenNewExpense(false);
-                await loadDashboard();
-            } catch (err) {
-                console.error('Error inesperado al crear gasto:', err);
-                alert('Ocurrió un error al crear el gasto.');
-            }
-        }}
-    />
-    )}
+                            const res = await fetch(`${baseUrl}/dashboard/gastos`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                    ...(auth?.token
+                                        ? { Authorization: `Bearer ${auth.token}` }
+                                        : {}),
+                                },
+                                body: JSON.stringify(body),
+                            });
+                            if (!res.ok) {
+                                const errorText = await res.text();
+                                console.error('Error al crear gasto:', errorText);
+                                alert('No se pudo crear el gasto.');
+                                return;
+                            }
+                            setOpenNewExpense(false);
+                            await loadDashboard();
+                        } catch (err) {
+                            console.error('Error inesperado al crear gasto:', err);
+                            alert('Ocurrió un error al crear el gasto.');
+                        }
+                    }}
+                />
+            )}
         </>
     );
 }
-

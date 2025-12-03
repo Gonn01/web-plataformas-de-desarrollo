@@ -23,7 +23,7 @@ export default function EntitySelector({
                     <option value="">Seleccionar...</option>
 
                     {entities.map((e) => (
-                        <option key={e.id} value={e.id}>
+                        <option key={`entity-${e.id}`} value={e.id}>
                             {e.name}
                         </option>
                     ))}

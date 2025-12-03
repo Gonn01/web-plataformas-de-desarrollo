@@ -26,12 +26,14 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
     const [currency, setCurrency] = useState('ARS');
 
     const [installments, setInstallments] = useState('');
-    const [paidInstallments] = useState('0');
 
     const [files, setFiles] = useState(null);
 
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
+    const [isFixed, setIsFixed] = useState(false);
+    const [isInstallment, setIsInstallment] = useState(false);
+    const [paidInstallments, setPaidInstallments] = useState('0');
 
     const totalInstallments = Number(installments) || 0;
     const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
@@ -66,9 +68,8 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
         if (!newEntityName.trim()) return;
 
         try {
-            const { data } = await createEntity({ name: newEntityName.trim() }, token);
-
-            const created = data.data;
+            const [created] = await createEntity({ name: newEntityName.trim() }, token);
+            console.log('Entidad creada', created);
             setEntities((prev) => [...prev, created]);
             setEntity(created.id);
             setShowNewEntity(false);
@@ -102,8 +103,10 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
             financial_entity_id: entity,
             amount: Number(amount),
             currency,
-            installments: totalInstallments,
-            paidInstallments: paid,
+            is_fixed_expense: isFixed,
+            is_installment: isInstallment,
+            installments: isInstallment ? totalInstallments : 0,
+            paidInstallments: isInstallment ? Number(paidInstallments) : 0,
             files,
         });
     };
@@ -139,6 +142,40 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
                 {/* BODY */}
                 <div className="p-6 space-y-6">
                     <ExpenseTypeSelector type={type} setType={setType} />
+                    {/* CHECKBOXES */}
+                    <div className="flex items-center gap-6 text-white">
+                        {/* CUOTAS */}
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                className="w-4 h-4"
+                                checked={isInstallment}
+                                onChange={(e) => {
+                                    setIsInstallment(e.target.checked);
+                                    if (e.target.checked) setIsFixed(false); // no puede ser ambas cosas
+                                }}
+                            />
+                            <span>Es por cuotas</span>
+                        </label>
+
+                        {/* GASTO FIJO */}
+                        <label className="flex items-center gap-2 cursor-pointer">
+                            <input
+                                type="checkbox"
+                                className="w-4 h-4"
+                                checked={isFixed}
+                                onChange={(e) => {
+                                    setIsFixed(e.target.checked);
+                                    if (e.target.checked) {
+                                        setIsInstallment(false);
+                                        setInstallments('');
+                                        setPaidInstallments('0');
+                                    }
+                                }}
+                            />
+                            <span>Gasto fijo</span>
+                        </label>
+                    </div>
 
                     <EntitySelector
                         entity={entity}
@@ -165,14 +202,17 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
                         setCurrency={setCurrency}
                     />
 
-                    <ExpenseInstallmentsSection
-                        installments={installments}
-                        setInstallments={setInstallments}
-                        paidInstallments={paidInstallments}
-                        paid={paid}
-                        totalInstallments={totalInstallments}
-                        progressPct={progressPct}
-                    />
+                    {isInstallment && (
+                        <ExpenseInstallmentsSection
+                            installments={installments}
+                            setInstallments={setInstallments}
+                            paidInstallments={paidInstallments}
+                            setPaidInstallments={setPaidInstallments}
+                            paid={paid}
+                            totalInstallments={totalInstallments}
+                            progressPct={progressPct}
+                        />
+                    )}
 
                     <ExpenseFilesUpload setFiles={setFiles} />
                 </div>
