@@ -1,55 +1,42 @@
-// src/pages/dashboard/components/StatCards.jsx
-import BalancePill from './BalancePill';
 import { formatMoney } from '../../../utils/FormatMoney';
 
-const USD_RATE = 1000; 
+export default function StatCards({ summary, currency = 'ARS', usdRate }) {
+    if (!summary) return null;
 
-function convertAmount(amount, currency) {
-    const base = Number(amount || 0);
-    if (currency === 'USD') {
-        return base / USD_RATE;
-    }
-    return base;
-}
+    const {
+        total_balance_ars = 0,
+        total_debo_ars = 0,
+        total_me_deben_ars = 0,
+    } = summary;
 
-export default function StatCards({ summary, currency = 'ARS' }) {
-    // Loading skeleton
-    if (!summary) {
-        return (
-            <div className="flex flex-col gap-4">
-                <div className="h-24 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
-                <div className="h-24 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
-                <div className="h-24 rounded-xl bg-slate-100 dark:bg-slate-800 animate-pulse" />
-            </div>
-        );
-    }
+    const convert = (value) => {
+        if (currency === 'ARS') return value;
+        if (!usdRate) return 0; // si todavía no cargó la cotización, evita NaN
+        return value / usdRate;
+    };
 
-    const totalDeboARS = Number(summary.total_debo_ars || 0);
-    const totalMeDebenARS = Number(summary.total_me_deben_ars || 0);
-    const balanceARS =
-        typeof summary.total_balance_ars === 'number'
-            ? summary.total_balance_ars
-            : totalMeDebenARS - totalDeboARS;
-
-    const totalDebo = convertAmount(totalDeboARS, currency);
-    const totalMeDeben = convertAmount(totalMeDebenARS, currency);
-    const balance = convertAmount(balanceARS, currency);
+    const balance = convert(total_balance_ars);
+    const debo = convert(total_debo_ars);
+    const meDeben = convert(total_me_deben_ars);
 
     const cards = [
         {
-            label: `Balance Neto (${currency})`,
+            label: `Balance general (${currency})`,
             value: formatMoney(balance, currency),
-            tone: balance >= 0 ? 'text-emerald-500' : 'text-red-500',
+            tone:
+                balance >= 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-red-500 dark:text-red-400',
         },
         {
             label: `Total Debo (${currency})`,
-            value: formatMoney(totalDebo, currency),
-            tone: 'text-red-500',
+            value: formatMoney(debo, currency),
+            tone: 'text-red-500 dark:text-red-400',
         },
         {
-            label: `Total Me Deben (${currency})`,
-            value: formatMoney(totalMeDeben, currency),
-            tone: 'text-emerald-500',
+            label: `Total Me deben (${currency})`,
+            value: formatMoney(meDeben, currency),
+            tone: 'text-emerald-600 dark:text-emerald-400',
         },
     ];
 
@@ -68,9 +55,6 @@ export default function StatCards({ summary, currency = 'ARS' }) {
                     </p>
                 </div>
             ))}
-
-            {/* Pastillita de balance neto */}
-            <BalancePill amount={balance} currency={currency} />
         </div>
     );
 }
