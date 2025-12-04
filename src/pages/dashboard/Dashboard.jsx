@@ -1,42 +1,19 @@
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Icon from '../../components/Icon';
 import StatCards from './components/StatCards';
-import CurrencyToggle from './components/CurrencyToggle';
 import ActiveExpenses from './components/ActiveExpenses';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import { fetchDashboardData } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 
-function normalizeType(type) {
-    const raw = (type || 'debo').toString().trim().toLowerCase();
-    const norm = raw.replace(/[_-]+/g, ' ');
-    return norm === 'me deben' ? 'me_deben' : 'debo';
-}
-
 export default function Dashboard() {
     const [currency, setCurrency] = useState('ARS');
     const [query, setQuery] = useState('');
     const [openNewExpense, setOpenNewExpense] = useState(false);
-    const [summary, setSummary] = useState(null);
+    const [summaryByCurrency, setSummaryByCurrency] = useState(null);
     const [groups, setGroups] = useState([]);
-    const [usdRate, setUsdRate] = useState(null);
+
     const auth = useAuth();
-
-    useEffect(() => {
-        const loadUsdRate = async () => {
-            try {
-                const res = await fetch('https://dolarapi.com/v1/dolares/oficial');
-                if (!res.ok) return;
-                const data = await res.json();
-                const price = data.venta || data.promedio || data.compra;
-                setUsdRate(Number(price) || null);
-            } catch (err) {
-                console.error('Error al consultar DolarApi:', err);
-            }
-        };
-
-        loadUsdRate();
-    }, []);
 
     const loadDashboard = useCallback(async () => {
         if (!auth?.token) return;
@@ -44,8 +21,12 @@ export default function Dashboard() {
         try {
             const entities = await fetchDashboardData(auth.token);
 
-            let totalDeboARS = 0;
-            let totalMeDebenARS = 0;
+            // Totales por moneda
+            const totals = {
+                ARS: { debo: 0, meDeben: 0 },
+                USD: { debo: 0, meDeben: 0 },
+                EUR: { debo: 0, meDeben: 0 },
+            };
 
             const mappedGroups = entities
                 .map((fe) => {
@@ -56,30 +37,71 @@ export default function Dashboard() {
                             const numQuotas = Number(g.number_of_quotas) || 0;
                             const payedQuotas = Number(g.payed_quotas) || 0;
                             const fixed = Boolean(g.fixed_expense);
-                            return fixed || numQuotas === 0 || payedQuotas < numQuotas;
+
+
+                            if (fixed) {
+                                return payedQuotas === 0;
+                            }
+
+   
+                            if (numQuotas > 0) {
+                                return payedQuotas < numQuotas;
+                            }
+
+ 
+                            return payedQuotas === 0;
                         })
                         .map((g) => {
                             const numQuotas = Number(g.number_of_quotas) || 0;
                             const payedQuotas = Number(g.payed_quotas) || 0;
                             const amount = Number(g.amount) || 0;
-                            const fixed = Boolean(g.fixed_expense);
 
-                            const amountPerQuota = numQuotas > 0 ? amount / numQuotas : amount;
-                            const currencyLabel = 'ARS'; 
-                            const kind = normalizeType(g.type);
-                            const isMeDeben = kind === 'me_deben';
+                            const rawCurrencyType = Number(g.currency_type) || 1;
+                            const currencyLabel =
+                                rawCurrencyType === 2
+                                    ? 'USD'
+                                    : rawCurrencyType === 3
+                                        ? 'EUR'
+                                        : 'ARS';
+                            const amountPerQuota =
+                                numQuotas > 0
+                                    ? Number(g.amount_per_quota) || amount / numQuotas
+                                    : amount;
 
-                            const chipTone = isMeDeben ? 'green' : 'red';
-                            const chipText = isMeDeben ? 'Me deben' : 'Debo';
-                            let progressPct = 0;
-                            if (numQuotas > 0) {
-                                progressPct = Math.min(
-                                    100,
-                                    Math.round((payedQuotas / numQuotas) * 100),
-                                );
-                            } else if (fixed) {
-                                progressPct = 50;
+                            const rawType = (g.type || 'DEBO').toString().toLowerCase();
+                            const isMeDeben =
+                                rawType === 'me_deben' || rawType === 'me deben';
+
+                            // Cuántas cuotas quedan / monto restante
+                            let remainingQuotas;
+
+                            if (g.fixed_expense) {
+                                remainingQuotas = payedQuotas === 0 ? 1 : 0;
+                            } else if (numQuotas === 0) {
+                                remainingQuotas = payedQuotas === 0 ? 1 : 0;
+                            } else {
+                                remainingQuotas = Math.max(numQuotas - payedQuotas, 0);
                             }
+
+                            const remainingAmount = remainingQuotas * amountPerQuota;
+
+                            // Sumamos a totales por moneda
+                            if (isMeDeben) {
+                                totals[currencyLabel].meDeben += remainingAmount;
+                            } else {
+                                totals[currencyLabel].debo += remainingAmount;
+                            }
+
+                            const progressPct =
+                                numQuotas > 0
+                                    ? Math.min(
+                                          100,
+                                          Math.round((payedQuotas / numQuotas) * 100),
+                                      )
+                                    : g.fixed_expense
+                                        ? 100
+                                        : 0;
+
                             const formattedCuota = `${currencyLabel} $${amountPerQuota.toLocaleString(
                                 'es-AR',
                                 {
@@ -90,30 +112,13 @@ export default function Dashboard() {
 
                             const totalLabel = numQuotas
                                 ? `de ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                })} · ${payedQuotas}/${numQuotas} cuotas`
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                  })} · ${payedQuotas}/${numQuotas} cuotas`
                                 : `Total ${currencyLabel} $${amount.toLocaleString('es-AR', {
                                       minimumFractionDigits: 2,
                                       maximumFractionDigits: 2,
-                                  })}${fixed ? ' · gasto fijo' : ''}`;
-                            const amountPerQuotaRemaining =
-                                numQuotas > 0 ? amount / numQuotas : amount;
-
-                            let remainingQuotas;
-                            if (fixed) {
-                                remainingQuotas = 1;
-                            } else {
-                                remainingQuotas = Math.max(numQuotas - payedQuotas, 0);
-                            }
-
-                            const remainingAmount = remainingQuotas * amountPerQuotaRemaining;
-
-                            if (isMeDeben) {
-                                totalMeDebenARS += remainingAmount;
-                            } else {
-                                totalDeboARS += remainingAmount;
-                            }
+                                  })}${g.fixed_expense ? ' · gasto fijo' : ''}`;
 
                             return {
                                 id: g.id,
@@ -122,35 +127,46 @@ export default function Dashboard() {
                                 amount: formattedCuota,
                                 total: totalLabel,
                                 chip: {
-                                    text: chipText,
-                                    tone: chipTone,
+                                    text: isMeDeben ? 'Me deben' : 'Debo',
+                                    tone: isMeDeben ? 'green' : 'red',
                                 },
                                 progressPct,
                                 action: isMeDeben ? 'Registrar cobro' : 'Pagar cuota',
                                 payed_quotas: payedQuotas,
                                 number_of_quotas: numQuotas,
-                                currency_type: 1,
-                                type: kind,
+                                currency_type: rawCurrencyType,
+                                currency_label: currencyLabel,
                             };
                         });
+
+                    if (items.length === 0) {
+                        return null;
+                    }
 
                     return {
                         id: fe.id,
                         title: fe.name,
-                        cta: 'Pagar / Cobrar',
+                        cta: 'Pagar cuotas',
                         items,
                     };
                 })
-                .filter((g) => g.items.length > 0);
+                .filter(Boolean);
 
-            const balanceARS = totalMeDebenARS - totalDeboARS;
+            const summaryByCurrencyComputed = ['ARS', 'USD', 'EUR'].reduce(
+                (acc, cur) => {
+                    const deb = totals[cur].debo;
+                    const md = totals[cur].meDeben;
+                    acc[cur] = {
+                        total_debo: deb,
+                        total_me_deben: md,
+                        total_balance: md - deb,
+                    };
+                    return acc;
+                },
+                {},
+            );
 
-            setSummary({
-                total_balance_ars: balanceARS,
-                total_debo_ars: totalDeboARS,
-                total_me_deben_ars: totalMeDebenARS,
-            });
-
+            setSummaryByCurrency(summaryByCurrencyComputed);
             setGroups(mappedGroups);
         } catch (err) {
             console.error('Error al cargar dashboard:', err);
@@ -161,69 +177,80 @@ export default function Dashboard() {
         loadDashboard();
     }, [loadDashboard]);
 
+    const summary = useMemo(() => {
+        if (!summaryByCurrency) return null;
+        return summaryByCurrency[currency] || null;
+    }, [summaryByCurrency, currency]);
 
-    const handleNewExpenseSave = useCallback(
-        async (payload) => {
-            try {
-                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const handleSaveExpense = useCallback(
+    async (payload) => {
+        try {
+            const baseUrl =
+                import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-                const {
-                    type,
-                    name,
-                    financial_entity_id,
-                    amount,
-                    currency,
-                    installments,
-                } = payload;
+            const {
+                type,
+                name,
+                financial_entity_id,
+                amount,
+                currency_type,    
+                is_fixed_expense,
+                is_installment,
+                installments,
+            } = payload;
 
-                const number_of_quotas =
-                    Number(installments) && Number(installments) > 0
-                        ? Number(installments)
-                        : 1;
+            const normalizedType =
+                (type || '').toLowerCase() === 'me deben'
+                    ? 'ME_DEBEN'
+                    : 'DEBO';
 
-                const normalizedType = normalizeType(type);
-                const currency_type = currency === 'USD' ? 2 : 1;
+            const body = {
+                financial_entity_id,
+                name,
+                amount,
+                number_of_quotas: is_installment ? Number(installments) || 0 : 0,
+                currency_type,
+                first_quota_date: null,
+                fixed_expense: is_fixed_expense,
+                image: null,
+                type: normalizedType,
+            };
 
-                const res = await fetch(`${baseUrl}/dashboard/gastos`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
-                    },
-                    body: JSON.stringify({
-                        financial_entity_id,
-                        name,
-                        amount: Number(amount),
-                        number_of_quotas,
-                        currency_type,
-                        first_quota_date: null,
-                        fixed_expense: false,
-                        image: null,
-                        type: normalizedType === 'me_deben' ? 'me deben' : 'debo',
-                    }),
-                });
+            console.log('Crear Gasto - body enviado al backend:', body);
 
-                if (!res.ok) {
-                    const txt = await res.text();
-                    console.error('Error al crear gasto:', txt);
-                    alert('No se pudo crear el gasto.');
-                    return;
-                }
+            const res = await fetch(`${baseUrl}/dashboard/gastos`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    ...(auth?.token
+                        ? { Authorization: `Bearer ${auth.token}` }
+                        : {}),
+                },
+                body: JSON.stringify(body),
+            });
 
-                await loadDashboard();
-                setOpenNewExpense(false);
-            } catch (err) {
-                console.error('Error inesperado al crear gasto:', err);
-                alert('Ocurrió un error al crear el gasto.');
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error('Error creando gasto:', errText);
+                alert('No se pudo crear el gasto.');
+                return;
             }
-        },
-        [auth?.token, loadDashboard],
-    );
+
+            setOpenNewExpense(false);
+            await loadDashboard();
+        } catch (error) {
+            console.error('Error inesperado creando gasto:', error);
+            alert('Ocurrió un error al crear el gasto.');
+        }
+    },
+    [auth?.token, loadDashboard],
+);
+
 
     return (
         <>
             {/* Header */}
-            <div className="flex flex-wrap items-start justify-between gap-4">
+            <div className="flex flex-wrap items-start justify-between gap-4 mb-6">
                 <div className="flex min-w-72 flex-col gap-2">
                     <p className="text-slate-900 dark:text-white text-4xl font-black leading-tight tracking-[-0.033em]">
                         Dashboard
@@ -241,22 +268,17 @@ export default function Dashboard() {
                 </button>
             </div>
 
-            {/* Grid principal */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 xl:grid-cols-4 gap-6 lg:gap-8 mt-8">
-                {/* Columna izquierda */}
-                <div className="lg:col-span-1 xl:col-span-1 flex flex-col gap-6">
-                    <StatCards summary={summary} currency={currency} usdRate={usdRate} />
-                    <h3 className="text-slate-900 dark:text-white text-lg font-bold pt-4">
-                        Resumen Mensual
-                    </h3>
-                    <CurrencyToggle currency={currency} onChange={setCurrency} />
-                </div>
+            {/* BALANCE HORIZONTAL ARRIBA */}
+            <StatCards summary={summary} currency={currency} />
 
-                {/* Gastos activos */}
+            {/* GASTOS ACTIVOS */}
+            <div className="mt-6">
                 <ActiveExpenses
                     query={query}
                     groups={groups}
                     token={auth?.token}
+                    currency={currency}
+                    onCurrencyChange={setCurrency}
                     onQueryChange={setQuery}
                     onPaid={loadDashboard}
                 />
@@ -266,7 +288,7 @@ export default function Dashboard() {
             {openNewExpense && (
                 <NewExpenseModal
                     onClose={() => setOpenNewExpense(false)}
-                    onSave={handleNewExpenseSave}
+                    onSave={handleSaveExpense}
                 />
             )}
         </>

@@ -95,21 +95,24 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
 
     // === SAVE ===
     const handleSubmit = () => {
-        if (!canSave) return;
-        console.log(type === 'Debo' ? 'DEBO' : 'ME_DEBEN');
-        onSave?.({
-            type: type === 'Debo' ? 'DEBO' : 'ME_DEBEN',
-            name: name.trim(),
-            financial_entity_id: entity,
-            amount: Number(amount),
-            currency_type: currency === 'ARS' ? '1' : '2',
-            fixed_expense: isFixed,
-            is_installment: isInstallment,
-            number_of_quotas: isInstallment ? totalInstallments : 1,
-            payed_quotas: isInstallment ? Number(paidInstallments) : 0,
-            files,
-        });
-    };
+    if (!canSave) return;
+    const currency_type =
+        currency === 'USD' ? 2 : currency === 'EUR' ? 3 : 1;
+
+    onSave?.({
+        type,
+        name: name.trim(),
+        financial_entity_id: entity,
+        amount: Number(amount),
+        currency,
+        currency_type,
+        is_fixed_expense: isFixed,
+        is_installment: isInstallment,
+        installments: isInstallment ? totalInstallments : 0,
+        paidInstallments: isInstallment ? Number(paidInstallments) : 0,
+        files,
+    });
+};
 
     // === MODAL ===
     const modal = (

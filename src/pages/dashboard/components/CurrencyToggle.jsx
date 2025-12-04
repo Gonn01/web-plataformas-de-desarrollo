@@ -1,5 +1,7 @@
+// src/pages/dashboard/components/CurrencyToggle.jsx
 export default function CurrencyToggle({ currency, onChange }) {
-    const options = ['ARS', 'USD'];
+    const options = ['ARS', 'USD', 'EUR'];
+
     return (
         <div className="flex">
             <div className="flex h-10 flex-1 items-center justify-center rounded-lg bg-black/5 dark:bg-white/10 p-1">
@@ -23,3 +25,4 @@ export default function CurrencyToggle({ currency, onChange }) {
         </div>
     );
 }
+

@@ -32,6 +32,8 @@ export default function ActiveExpenses({
     query,
     groups = [],
     token,
+    currency = 'ARS',
+    onCurrencyChange,
     onQueryChange,
     onPaid,
 }) {
@@ -40,23 +42,40 @@ export default function ActiveExpenses({
     const [modalItems, setModalItems] = useState([]);
     const navigate = useNavigate();
 
-    // Filtro por texto
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return groups;
 
-        return groups
+        let baseGroups = groups;
+
+        if (q) {
+            baseGroups = baseGroups
+                .map((g) => ({
+                    ...g,
+                    items: g.items.filter((it) =>
+                        it.title.toLowerCase().includes(q),
+                    ),
+                }))
+                .filter((g) => g.items.length > 0);
+        }
+        const cur = currency || 'ARS';
+
+        const byCurrency = baseGroups
             .map((g) => ({
                 ...g,
-                items: g.items.filter((it) => it.title.toLowerCase().includes(q)),
+                items: g.items.filter((it) => {
+                    const label = it.currency_label || parseAmountLabel(it.amount).currency;
+                    return label === cur;
+                }),
             }))
             .filter((g) => g.items.length > 0);
-    }, [query, groups]);
+
+        return byCurrency;
+    }, [query, groups, currency]);
 
     const openModalForGroup = useCallback((group) => {
         const items = group.items.map((it) => {
-            const { currency, amount } = parseAmountLabel(it.amount);
-            const { amount: totalAmount } = parseTotalLabel(it.total, currency);
+            const { currency: ccy, amount } = parseAmountLabel(it.amount);
+            const { amount: totalAmount } = parseTotalLabel(it.total, ccy);
 
             return {
                 id: it.id,
@@ -66,7 +85,7 @@ export default function ActiveExpenses({
                     (it.chip?.text || '').toLowerCase() === 'me deben'
                         ? 'me_deben'
                         : 'debo',
-                currency,
+                currency: ccy,
                 amountToPay: amount,
                 totalAmount,
                 paidInstallments: it.payed_quotas,
@@ -80,8 +99,8 @@ export default function ActiveExpenses({
     }, []);
 
     const openModalForItem = useCallback((group, it) => {
-        const { currency, amount } = parseAmountLabel(it.amount);
-        const { amount: totalAmount } = parseTotalLabel(it.total, currency);
+        const { currency: ccy, amount } = parseAmountLabel(it.amount);
+        const { amount: totalAmount } = parseTotalLabel(it.total, ccy);
 
         const item = {
             id: it.id,
@@ -91,7 +110,7 @@ export default function ActiveExpenses({
                 (it.chip?.text || '').toLowerCase() === 'me deben'
                     ? 'me_deben'
                     : 'debo',
-            currency,
+            currency: ccy,
             amountToPay: amount,
             totalAmount,
             paidInstallments: it.payed_quotas,
@@ -153,7 +172,7 @@ export default function ActiveExpenses({
                 setModalOpen(false);
 
                 if (onPaid) {
-                    onPaid();
+                    await onPaid();
                 }
             } catch (err) {
                 console.error('Error inesperado al pagar cuota(s):', err);
@@ -164,11 +183,32 @@ export default function ActiveExpenses({
     );
 
     return (
-        <div className="lg:col-span-2 xl:col-span-2 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5">
+        <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
-                    Gastos Activos
-                </h3>
+                <div className="flex flex-col gap-2">
+                    <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+                        Gastos Activos
+                    </h3>
+                    {/* Botones de moneda dentro de Gastos Activos */}
+                    <div className="flex flex-wrap gap-2">
+                        {['ARS', 'USD', 'EUR'].map((cur) => (
+                            <button
+                                key={cur}
+                                type="button"
+                                className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                                    currency === cur
+                                        ? 'bg-primary text-black border-primary'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
+                                }`}
+                                onClick={() => onCurrencyChange?.(cur)}
+                            >
+                                {cur}
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {/* Buscador */}
                 <div className="relative w-full sm:max-w-xs">
                     <Icon
                         name="search"
@@ -186,20 +226,21 @@ export default function ActiveExpenses({
 
             <div
                 className="flex flex-col gap-4 overflow-y-auto pr-2"
-                style={{ maxHeight: 480 }}
+                style={{ maxHeight: 550 }} 
             >
                 {filtered.map((group) => (
                     <div key={group.title} className="flex flex-col gap-3">
                         <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
                             <h4
                                 className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
-                                onClick={() => navigate(`/entidades/${group.id}`)} 
+                                onClick={() => navigate(`/entidades/${group.id}`)}
                             >
                                 {group.title}
                             </h4>
                             <button
                                 className="shrink-0 text-xs font-bold leading-normal tracking-wide text-primary hover:text-primary/80 transition-colors"
                                 onClick={() => openModalForGroup(group)}
+                                type="button"
                             >
                                 {group.cta}
                             </button>
@@ -208,7 +249,7 @@ export default function ActiveExpenses({
                             {group.items.map((it, idx) => (
                                 <li
                                     key={`${group.title}-${idx}`}
-                                    className="flex flex-col gap-3 rounded-lg p-3 transition-colors hover:bg-black/5 dark:hover:bg_white/5"
+                                    className="flex flex-col gap-3 rounded-lg p-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
                                 >
                                     <div className="flex items-start justify-between gap-4">
                                         <div className="flex flex-col gap-1.5 flex-1">
@@ -254,6 +295,7 @@ export default function ActiveExpenses({
                                         <button
                                             className="text-xs font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors"
                                             onClick={() => openModalForItem(group, it, idx)}
+                                            type="button"
                                         >
                                             {it.action}
                                         </button>
