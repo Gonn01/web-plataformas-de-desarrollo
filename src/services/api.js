@@ -8,6 +8,13 @@ const api = axios.create({
     },
 });
 
+/* const api = axios.create({
+    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
+    withCredentials: true,
+});
+
+export default api; */
+
 export const register = async (userInfo) => {
     try {
         const { data } = await api.post('/auth/register', userInfo);
