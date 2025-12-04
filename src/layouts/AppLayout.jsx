@@ -10,7 +10,7 @@ export default function AppLayout() {
                 <Sidebar className="h-full shrink-0" />
 
                 {/* Contenido con scroll independiente */}
-                <main className="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8">
+                <main className="flex-1 overflow-y-auto p-1 sm:p-2 md:p-5">
                     <div className="mx-auto max-w-7xl">
                         <Outlet />
                     </div>
