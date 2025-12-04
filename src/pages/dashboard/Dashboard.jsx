@@ -65,7 +65,7 @@ export default function Dashboard() {
                             const fixed = Boolean(g.fixed_expense);
 
                             const amountPerQuota = numQuotas > 0 ? amount / numQuotas : amount;
-                            const currencyLabel = 'ARS'; 
+                            const currencyLabel = 'ARS';
                             const kind = normalizeType(g.type);
                             const isMeDeben = kind === 'me_deben';
 
@@ -90,9 +90,9 @@ export default function Dashboard() {
 
                             const totalLabel = numQuotas
                                 ? `de ${currencyLabel} $${amount.toLocaleString('es-AR', {
-                                    minimumFractionDigits: 2,
-                                    maximumFractionDigits: 2,
-                                })} · ${payedQuotas}/${numQuotas} cuotas`
+                                      minimumFractionDigits: 2,
+                                      maximumFractionDigits: 2,
+                                  })} · ${payedQuotas}/${numQuotas} cuotas`
                                 : `Total ${currencyLabel} $${amount.toLocaleString('es-AR', {
                                       minimumFractionDigits: 2,
                                       maximumFractionDigits: 2,
@@ -161,8 +161,7 @@ export default function Dashboard() {
         loadDashboard();
     }, [loadDashboard]);
 
-
-    const handleNewExpenseSave = useCallback(
+    /* const handleNewExpenseSave = useCallback(
         async (payload) => {
             try {
                 const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
@@ -200,6 +199,63 @@ export default function Dashboard() {
                         fixed_expense: false,
                         image: null,
                         type: normalizedType === 'me_deben' ? 'me deben' : 'debo',
+                    }),
+                });
+
+                if (!res.ok) {
+                    const txt = await res.text();
+                    console.error('Error al crear gasto:', txt);
+                    alert('No se pudo crear el gasto.');
+                    return;
+                }
+
+                await loadDashboard();
+                setOpenNewExpense(false);
+            } catch (err) {
+                console.error('Error inesperado al crear gasto:', err);
+                alert('Ocurrió un error al crear el gasto.');
+            }
+        },
+        [auth?.token, loadDashboard],
+    ); */
+
+    const handleNewExpenseSave = useCallback(
+        async (payload) => {
+            try {
+                const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+                // aca datos del modal
+                const {
+                    type,
+                    name,
+                    financial_entity_id,
+                    amount,
+                    currency_type,
+                    number_of_quotas,
+                    first_quota_date,
+                    fixed_expense,
+                    image,
+                } = payload;
+
+                
+                const normalizedType = normalizeType(type);
+
+                const res = await fetch(`${baseUrl}/dashboard/gastos`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(auth?.token ? { Authorization: `Bearer ${auth.token}` } : {}),
+                    },
+                    body: JSON.stringify({
+                        financial_entity_id,
+                        name,
+                        amount: Number(amount),
+                        number_of_quotas,
+                        currency_type,
+                        first_quota_date: first_quota_date ?? null,
+                        fixed_expense,
+                        image: image ?? null,
+                        type: normalizedType === 'me_deben' ? 'ME_DEBEN' : 'DEBO',
                     }),
                 });
 

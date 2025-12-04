@@ -28,13 +28,7 @@ function parseTotalLabel(label, fallbackCurrency = 'ARS') {
     return { currency: fallbackCurrency, amount };
 }
 
-export default function ActiveExpenses({
-    query,
-    groups = [],
-    token,
-    onQueryChange,
-    onPaid,
-}) {
+export default function ActiveExpenses({ query, groups = [], token, onQueryChange, onPaid }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [modalEntity, setModalEntity] = useState('');
     const [modalItems, setModalItems] = useState([]);
@@ -62,10 +56,7 @@ export default function ActiveExpenses({
                 id: it.id,
                 purchaseId: it.purchaseId ?? it.id,
                 title: it.title,
-                type:
-                    (it.chip?.text || '').toLowerCase() === 'me deben'
-                        ? 'me_deben'
-                        : 'debo',
+                type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
                 currency,
                 amountToPay: amount,
                 totalAmount,
@@ -87,10 +78,7 @@ export default function ActiveExpenses({
             id: it.id,
             purchaseId: it.purchaseId ?? it.id,
             title: it.title,
-            type:
-                (it.chip?.text || '').toLowerCase() === 'me deben'
-                    ? 'me_deben'
-                    : 'debo',
+            type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
             currency,
             amountToPay: amount,
             totalAmount,
@@ -103,65 +91,61 @@ export default function ActiveExpenses({
         setModalOpen(true);
     }, []);
 
-    const handleConfirm = useCallback(
-        async () => {
-            try {
-                if (!modalItems.length) {
-                    setModalOpen(false);
+    const handleConfirm = useCallback(async () => {
+        try {
+            if (!modalItems.length) {
+                setModalOpen(false);
+                return;
+            }
+
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+            if (modalItems.length === 1) {
+                const purchaseId = modalItems[0].purchaseId;
+                const res = await fetch(`${baseUrl}/dashboard/pagar-cuota`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ purchase_id: purchaseId }),
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error('Error al pagar cuota:', errText);
+                    alert('No se pudo registrar el pago de la cuota.');
                     return;
                 }
+            } else {
+                const purchaseIds = modalItems.map((it) => it.purchaseId);
+                const res = await fetch(`${baseUrl}/dashboard/pagar-cuotas-lote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ purchase_ids: purchaseIds }),
+                });
 
-                const baseUrl =
-                    import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
-
-                if (modalItems.length === 1) {
-                    const purchaseId = modalItems[0].purchaseId;
-                    const res = await fetch(`${baseUrl}/dashboard/pagar-cuota`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                        },
-                        body: JSON.stringify({ purchase_id: purchaseId }),
-                    });
-
-                    if (!res.ok) {
-                        const errText = await res.text();
-                        console.error('Error al pagar cuota:', errText);
-                        alert('No se pudo registrar el pago de la cuota.');
-                        return;
-                    }
-                } else {
-                    const purchaseIds = modalItems.map((it) => it.purchaseId);
-                    const res = await fetch(`${baseUrl}/dashboard/pagar-cuotas-lote`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-                        },
-                        body: JSON.stringify({ purchase_ids: purchaseIds }),
-                    });
-
-                    if (!res.ok) {
-                        const errText = await res.text();
-                        console.error('Error al pagar cuotas en lote:', errText);
-                        alert('No se pudieron registrar los pagos.');
-                        return;
-                    }
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error('Error al pagar cuotas en lote:', errText);
+                    alert('No se pudieron registrar los pagos.');
+                    return;
                 }
-
-                setModalOpen(false);
-
-                if (onPaid) {
-                    onPaid();
-                }
-            } catch (err) {
-                console.error('Error inesperado al pagar cuota(s):', err);
-                alert('Ocurrió un error al registrar el pago.');
             }
-        },
-        [modalItems, token, onPaid],
-    );
+
+            setModalOpen(false);
+
+            if (onPaid) {
+                onPaid();
+            }
+        } catch (err) {
+            console.error('Error inesperado al pagar cuota(s):', err);
+            alert('Ocurrió un error al registrar el pago.');
+        }
+    }, [modalItems, token, onPaid]);
 
     return (
         <div className="lg:col-span-2 xl:col-span-2 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5">
@@ -184,16 +168,13 @@ export default function ActiveExpenses({
                 </div>
             </div>
 
-            <div
-                className="flex flex-col gap-4 overflow-y-auto pr-2"
-                style={{ maxHeight: 480 }}
-            >
+            <div className="flex flex-col gap-4 overflow-y-auto pr-2" style={{ maxHeight: 480 }}>
                 {filtered.map((group) => (
                     <div key={group.title} className="flex flex-col gap-3">
                         <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
                             <h4
                                 className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
-                                onClick={() => navigate(`/entidades/${group.id}`)} 
+                                onClick={() => navigate(`/entidades/${group.id}`)}
                             >
                                 {group.title}
                             </h4>
@@ -281,5 +262,3 @@ export default function ActiveExpenses({
         </div>
     );
 }
-
-
