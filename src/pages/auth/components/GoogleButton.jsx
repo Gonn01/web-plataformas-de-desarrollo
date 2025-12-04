@@ -9,21 +9,19 @@ export default function GoogleButton() {
     const { loginWithFirebase } = useAuth();
     const [loading, setLoading] = useState(false);
 
-    const loginWithGoogle = async () => {
+    const login = async () => {
         try {
             setLoading(true);
 
             const result = await signInWithPopup(auth, googleProvider);
             const firebaseUser = result.user;
-
-            const res = await loginWithFirebase({
+            await loginWithFirebase({
                 firebaseId: firebaseUser.uid,
                 email: firebaseUser.email,
                 name: firebaseUser.displayName,
                 avatar: firebaseUser.photoURL,
             });
 
-            loginWithFirebase(res);
             nav('/app/dashboard', { replace: true });
         } catch (err) {
             console.log(err);
@@ -35,7 +33,7 @@ export default function GoogleButton() {
     return (
         <button
             type="button"
-            onClick={loginWithGoogle}
+            onClick={login}
             className="flex w-full justify-center items-center gap-3 rounded-lg border border-gray-700 px-3 py-2.5 text-sm text-gray-300"
         >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">

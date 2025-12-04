@@ -171,9 +171,6 @@ export default function ActiveExpenses({
                 if (onPaid) {
                     await onPaid();
                 }
-            } catch (err) {
-                console.error('Error inesperado al pagar cuota(s):', err);
-                alert('Ocurrió un error al registrar el pago.');
             }
 
             setModalOpen(false);
@@ -200,11 +197,10 @@ export default function ActiveExpenses({
                             <button
                                 key={cur}
                                 type="button"
-                                className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${
-                                    currency === cur
+                                className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === cur
                                         ? 'bg-primary text-black border-primary'
                                         : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
-                                }`}
+                                    }`}
                                 onClick={() => onCurrencyChange?.(cur)}
                             >
                                 {cur}
@@ -231,7 +227,7 @@ export default function ActiveExpenses({
 
             <div
                 className="flex flex-col gap-4 overflow-y-auto pr-2"
-                style={{ maxHeight: 550 }} 
+                style={{ maxHeight: 550 }}
             >
                 {filtered.map((group) => (
                     <div key={group.title} className="flex flex-col gap-3">
@@ -264,11 +260,10 @@ export default function ActiveExpenses({
                                             <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
                                                 {it.chip && (
                                                     <span
-                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${
-                                                            it.chip.tone === 'red'
+                                                        className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${it.chip.tone === 'red'
                                                                 ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                                 : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                        }`}
+                                                            }`}
                                                     >
                                                         {it.chip.text}
                                                     </span>
@@ -287,11 +282,10 @@ export default function ActiveExpenses({
                                     <div className="flex items-center gap-4 mt-2">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
-                                                className={`${
-                                                    it.chip?.tone === 'green'
+                                                className={`${it.chip?.tone === 'green'
                                                         ? 'bg-green-500'
                                                         : 'bg-red-500'
-                                                } h-1.5 rounded-full`}
+                                                    } h-1.5 rounded-full`}
                                                 style={{
                                                     width: `${it.progressPct}%`,
                                                 }}
