@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import { createExpense, fetchFinancialEntityById } from '@/services/api';
@@ -18,6 +18,8 @@ export default function EntidadDetalle() {
     const [openNewExpense, setOpenNewExpense] = useState(false);
     const [entity, setEntity] = useState(null);
     const [loading, setLoading] = useState(true);
+
+    const navigate = useNavigate();
 
     useEffect(() => {
         const loadData = async () => {
@@ -127,7 +129,13 @@ export default function EntidadDetalle() {
                 {tab === 'activos' && (
                     <ListContainer empty={activos.length === 0} emptyLabel="Sin gastos activos.">
                         {activos.map((g, i) => (
-                            <GastoItem key={i} gasto={g} />
+                            <GastoItem
+                                key={i}
+                                gasto={g}
+                                onClick={() => {
+                                    navigate('/app/gastos/2');
+                                }}
+                            />
                         ))}
                     </ListContainer>
                 )}
