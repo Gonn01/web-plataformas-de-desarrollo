@@ -68,7 +68,7 @@ export default function EntidadDetalle() {
         };
     }, [entity]);
 
-    // ============ LOADING ============
+    // ============ Loanding ====
     if (loading) {
         return <div className="text-center p-10 text-zinc-500">Cargando entidad...</div>;
     }

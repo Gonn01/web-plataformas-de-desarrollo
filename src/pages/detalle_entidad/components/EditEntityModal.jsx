@@ -13,7 +13,6 @@ export default function EditEntityModal({ open, entity, onClose, onSave, onDelet
                     <Icon name="edit" /> Editar Entidad
                 </h2>
 
-                {/* INPUT */}
                 <div className="mb-4">
                     <label className="text-sm text-zinc-600 dark:text-zinc-300">Nombre</label>
                     <input
@@ -24,7 +23,6 @@ export default function EditEntityModal({ open, entity, onClose, onSave, onDelet
                     />
                 </div>
 
-                {/* BOTONES */}
                 <div className="flex justify-between mt-6">
                     <button
                         className="px-4 py-2 bg-zinc-300 hover:bg-zinc-400 rounded-lg dark:bg-zinc-700 dark:hover:bg-zinc-600 text-black dark:text-white"

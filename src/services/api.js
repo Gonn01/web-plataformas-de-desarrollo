@@ -9,9 +9,8 @@ const api = axios.create({
     },
 });
 
-// =======================
-// AUTH
-// =======================
+// AUTh
+
 export const register = async (userInfo) => {
     const { data } = await api.post('/auth/register', userInfo);
     return data.data;
@@ -27,9 +26,8 @@ export const loginWithFirebase = async (firebaseData) => {
     return data.data;
 };
 
-// =======================
-// ENTIDADES FINANCIERAS
-// =======================
+// ENTIDADES
+
 export const createEntity = async (entityData, token) => {
     const { data } = await api.post('/entidades-financieras', entityData, {
         headers: { Authorization: `Bearer ${token}` },
@@ -64,9 +62,8 @@ export const fetchFinancialEntityById = async (entityId, token) => {
     };
 };
 
-// =======================
-// EDITAR ENTIDAD
-// =======================
+// Editar entidad
+
 export const updateFinancialEntity = async (id, name, token) => {
     const { data } = await api.put(
         `/entidades-financieras/${id}`,
@@ -76,9 +73,8 @@ export const updateFinancialEntity = async (id, name, token) => {
     return data.data;
 };
 
-// =======================
-// ELIMINAR ENTIDAD
-// =======================
+// Eliminar entidad
+
 export const deleteFinancialEntity = async (id, token) => {
     await api.delete(`/entidades-financieras/${id}`, {
         headers: { Authorization: `Bearer ${token}` },
@@ -86,9 +82,8 @@ export const deleteFinancialEntity = async (id, token) => {
     return true;
 };
 
-// =======================
-// GASTOS
-// =======================
+// Gastos
+
 export const createExpense = async (payload, token) => {
     const { data } = await api.post('/dashboard/gastos', payload, {
         headers: { Authorization: `Bearer ${token}` },
