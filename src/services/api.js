@@ -90,19 +90,19 @@ export const fetchDashboardData = async (token) => {
     }
 };
 
-export const fetchFinancialEntityById = async (entityId, token) => {
-    try {
-        const { data } = await api.get(`/entidades-financieras/${entityId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-        return data.data;
-    } catch (error) {
-        console.error('Error fetching financial entity:', error);
-        throw error;
-    }
-};
+// export const fetchFinancialEntityById = async (entityId, token) => {
+//     try {
+//         const { data } = await api.get(`/entidades-financieras/${entityId}`, {
+//             headers: {
+//                 Authorization: `Bearer ${token}`,
+//             },
+//         });
+//         return data.data;
+//     } catch (error) {
+//         console.error('Error fetching financial entity:', error);
+//         throw error;
+//     }
+// };
 export const createExpense = async (payload, token) => {
     const { data } = await api.post('/dashboard/gastos', payload, {
         headers: {
@@ -111,4 +111,34 @@ export const createExpense = async (payload, token) => {
     });
 
     return data.data;
+};
+
+export const fetchFinancialEntityById = async (entityId, token) => {
+    try {
+        const { data } = await api.get(`/entidades-financieras/${entityId}`, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+            },
+        });
+
+        const raw = data.data;
+
+        // ⭐ NORMALIZACIÓN NECESARIA PARA QUE EL FRONT NO CRASHEE
+        return {
+            id: raw.id,
+            name: raw.name,
+
+            gastos_activos: raw.gastos_activos || [],
+            gastos_inactivos: raw.gastos_inactivos || [],
+            logs: raw.logs || [],
+
+            // valores que EntityCard o StatsCard esperan
+            balances: [{ currency: 'ARS', amount: 0 }],
+            activeExpenses: (raw.gastos_activos || []).length,
+            type: 'bank',
+        };
+    } catch (error) {
+        console.error('Error fetching financial entity:', error);
+        throw error;
+    }
 };

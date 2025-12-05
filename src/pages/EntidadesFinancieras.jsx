@@ -90,7 +90,8 @@ export default function EntidadesFinancieras() {
 
             setOpenNew(false);
 
-            navigate(`/entidades/${newEntity.id}`);
+            // navigate(`/entidades/${newEntity.id}`); haciendo una prueba
+            navigate(`/app/entidades/${newEntity.id}`);
         } catch (err) {
             console.error('Error creating entity:', err);
             alert('No se pudo crear la entidad.');
@@ -138,7 +139,8 @@ export default function EntidadesFinancieras() {
                     <EntityCard
                         key={e.id}
                         entity={e}
-                        onClick={() => navigate(`/entidades/${e.id}`)}
+                        // onClick={() => navigate(`/entidades/${e.id}`)} quiero probar algo
+                        onClick={() => navigate(`/app/entidades/${e.id}`)}
                     />
                 ))}
 

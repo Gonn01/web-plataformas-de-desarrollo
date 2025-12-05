@@ -1,195 +1,163 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Icon from '../../components/Icon';
-import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
-import { createExpense, fetchFinancialEntityById } from '@/services/api';
+
 import useAuth from '@/hooks/use-auth';
-import { ListContainer } from './components/ListContainer';
-import { GastoFinalizadoItem } from './components/GastoFinalizadoItem';
-import { GastoItem } from './components/GastoItem';
+import { fetchFinancialEntityById, createExpense } from '@/services/api';
+
 import { TabHeader } from './components/TabHeader';
+import { ListContainer } from './components/ListContainer';
+import { GastoItem } from './components/GastoItem';
+import { GastoFinalizadoItem } from './components/GastoFinalizadoItem';
 import { StatCard } from './components/StatCard';
+import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
+import Icon from '../../components/Icon';
 
 export default function EntidadDetalle() {
     const { id } = useParams();
     const { token } = useAuth();
 
+    const [entity, setEntity] = useState(null);
     const [tab, setTab] = useState('activos');
     const [openNewExpense, setOpenNewExpense] = useState(false);
-    const [entity, setEntity] = useState(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const loadData = async () => {
+        const load = async () => {
             try {
                 setLoading(true);
                 const data = await fetchFinancialEntityById(id, token);
-                setEntity(data); // data = el objeto plano con gastos_activos/gastos_inactivos/logs
+                setEntity(data);
             } catch (err) {
-                console.error('Error loading entity:', err);
+                console.error('Error cargando entidad', err);
             } finally {
                 setLoading(false);
             }
         };
 
-        loadData();
+        load();
     }, [id, token]);
 
-    /** =============================
-     *  STATS
-     *  ============================= */
+    // ================= STATS ===================
     const stats = useMemo(() => {
         if (!entity) return { ars: 0, usd: 0, debts: 0 };
-
-        const activos = entity.gastos_activos || [];
-        const finalizados = entity.gastos_inactivos || [];
 
         let ars = 0;
         let usd = 0;
 
-        const acumular = (g) => {
-            if (g.currency_type === '1') ars += Number(g.amount);
-            if (g.currency_type === '2') usd += Number(g.amount);
+        const sumar = (g) => {
+            const amount = Number(g.amount || 0);
+            if (g.currency_type === '1') ars += amount;
+            if (g.currency_type === '2') usd += amount;
         };
 
-        activos.forEach(acumular);
-        finalizados.forEach(acumular);
+        entity.gastos_activos.forEach(sumar);
+        entity.gastos_inactivos.forEach(sumar);
 
         return {
             ars,
             usd,
-            debts: activos.length,
+            debts: entity.gastos_activos.length,
         };
     }, [entity]);
 
-    /** =============================
-     *  LOADING / ERROR
-     *  ============================= */
+    // ============ LOADING ============
     if (loading) {
-        return (
-            <div className="py-10 text-center text-zinc-500 dark:text-zinc-400">
-                Cargando entidad financiera...
-            </div>
-        );
+        return <div className="text-center p-10 text-zinc-500">Cargando entidad...</div>;
     }
 
     if (!entity) {
-        return <div className="py-10 text-center text-red-500">Entidad no encontrada.</div>;
+        return <div className="text-center p-10 text-red-500">Entidad no encontrada</div>;
     }
 
-    /** =============================
-     *  VALORES DE LA API
-     *  ============================= */
-    const activos = entity.gastos_activos || [];
-    const finalizados = entity.gastos_inactivos || [];
-    const logs = entity.logs || [];
+    const activos = entity.gastos_activos;
+    const finalizados = entity.gastos_inactivos;
+    const logs = entity.logs;
 
-    /** =============================
-     *  RENDER
-     *  ============================= */
     return (
         <>
-            {/* Heading */}
-            <div className="flex flex-wrap items-center justify-between gap-4 mb-4">
-                <h1 className="text-3xl sm:text-4xl font-black tracking-tight text-zinc-900 dark:text-white">
-                    {entity.name} {/* ← AHORA DIRECTAMENTE */}
-                </h1>
+            {/* Header */}
+            <div className="flex flex-wrap items-center justify-between mb-6">
+                <h1 className="text-3xl sm:text-4xl font-black dark:text-white">{entity.name}</h1>
 
                 <button
-                    className="flex h-10 min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg bg-primary/20 px-4 text-sm font-bold text-primary hover:bg-primary/30"
+                    className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold"
                     onClick={() => setOpenNewExpense(true)}
                 >
-                    <Icon name="add" className="text-base" />
-                    <span>Agregar Gasto</span>
+                    <Icon name="add" /> Agregar Gasto
                 </button>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 mb-6">
+            {/* STATS */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 <StatCard label="Balance Total (ARS)" value={stats.ars} currency="ARS" />
                 <StatCard label="Balance Total (USD)" value={stats.usd} currency="USD" />
-
-                <div className="flex flex-col gap-2 rounded-xl border border-zinc-200 bg-white p-5 dark:border-zinc-800 dark:bg-zinc-900/50">
-                    <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400">
-                        Deudas Activas
-                    </p>
-                    <p className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-white">
-                        {stats.debts}
-                    </p>
-                </div>
+                <StatCard label="Deudas Activas" value={stats.debts} />
             </div>
 
-            {/* Tabs */}
-            <div className="flex flex-col">
-                <TabHeader tab={tab} setTab={setTab} />
+            {/* TABS */}
+            <TabHeader tab={tab} setTab={setTab} />
 
-                {/* ACTIVOS */}
-                {tab === 'activos' && (
-                    <ListContainer empty={activos.length === 0} emptyLabel="Sin gastos activos.">
-                        {activos.map((g, i) => (
-                            <GastoItem key={i} gasto={g} />
-                        ))}
-                    </ListContainer>
-                )}
+            {/* ACTIVOS */}
+            {tab === 'activos' && (
+                <ListContainer empty={activos.length === 0} emptyLabel="Sin gastos activos.">
+                    {activos.map((gasto, i) => (
+                        <GastoItem key={i} gasto={gasto} />
+                    ))}
+                </ListContainer>
+            )}
 
-                {/* FINALIZADOS */}
-                {tab === 'finalizados' && (
-                    <ListContainer
-                        empty={finalizados.length === 0}
-                        emptyLabel="Sin gastos finalizados."
-                    >
-                        {finalizados.map((g, i) => (
-                            <GastoFinalizadoItem key={i} gasto={g} />
-                        ))}
-                    </ListContainer>
-                )}
+            {/* FINALIZADOS */}
+            {tab === 'finalizados' && (
+                <ListContainer
+                    empty={finalizados.length === 0}
+                    emptyLabel="Sin gastos finalizados."
+                >
+                    {finalizados.map((gasto, i) => (
+                        <GastoFinalizadoItem key={i} gasto={gasto} />
+                    ))}
+                </ListContainer>
+            )}
 
-                {/* LOG */}
-                {tab === 'log' && (
-                    <ListContainer empty={logs.length === 0} emptyLabel="Sin registros de cambios.">
-                        {logs.map((l, i) => (
-                            <div key={i} className="flex items-center justify-between py-3">
-                                <p className="text-sm text-zinc-600 dark:text-zinc-400">
-                                    {l.content}
-                                </p>
-                                <span className="text-xs text-zinc-500 dark:text-zinc-400">
-                                    {new Date(l.created_at).toLocaleString()}
-                                </span>
-                            </div>
-                        ))}
-                    </ListContainer>
-                )}
-            </div>
+            {/* LOG */}
+            {tab === 'log' && (
+                <ListContainer empty={logs.length === 0} emptyLabel="Sin registros.">
+                    {logs.map((l, i) => (
+                        <div key={i} className="flex justify-between py-3">
+                            <p className="text-sm text-zinc-600">{l.content}</p>
+                            <span className="text-xs text-zinc-500">
+                                {new Date(l.created_at).toLocaleString()}
+                            </span>
+                        </div>
+                    ))}
+                </ListContainer>
+            )}
 
-            {/* Modal */}
+            {/* MODAL NUEVO GASTO */}
             {openNewExpense && (
                 <NewExpenseModal
                     defaultEntityId={entity.id}
                     onClose={() => setOpenNewExpense(false)}
                     onSave={async (payload) => {
                         try {
-                            // 1) crear gasto
-                            const nuevoGasto = await createExpense(payload, token);
+                            const nuevo = await createExpense(payload, token);
 
-                            // 2) decidir si va activo o finalizado
+                            // decidir si va en activos o finalizados
                             const isFinalizado =
-                                Number(nuevoGasto.payed_quotas) >=
-                                Number(nuevoGasto.number_of_quotas);
+                                Number(nuevo.payed_quotas) >= Number(nuevo.number_of_quotas);
 
                             setEntity((prev) => ({
                                 ...prev,
                                 gastos_activos: isFinalizado
                                     ? prev.gastos_activos
-                                    : [...prev.gastos_activos, nuevoGasto],
+                                    : [...prev.gastos_activos, nuevo],
                                 gastos_inactivos: isFinalizado
-                                    ? [...prev.gastos_inactivos, nuevoGasto]
+                                    ? [...prev.gastos_inactivos, nuevo]
                                     : prev.gastos_inactivos,
                             }));
 
-                            // 3) cerrar modal
                             setOpenNewExpense(false);
                         } catch (err) {
-                            console.error('Error guardando gasto:', err);
+                            console.error('Error guardando gasto', err);
                         }
                     }}
                 />
