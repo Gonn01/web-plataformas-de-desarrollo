@@ -2,13 +2,20 @@ import { useEffect, useMemo, useState } from 'react';
 import { useParams } from 'react-router-dom';
 
 import useAuth from '@/hooks/use-auth';
-import { fetchFinancialEntityById, createExpense } from '@/services/api';
+import {
+    fetchFinancialEntityById,
+    createExpense,
+    updateFinancialEntity,
+    deleteFinancialEntity,
+} from '@/services/api';
 
+// COMPONENTES
 import { TabHeader } from './components/TabHeader';
 import { ListContainer } from './components/ListContainer';
 import { GastoItem } from './components/GastoItem';
 import { GastoFinalizadoItem } from './components/GastoFinalizadoItem';
 import { StatCard } from './components/StatCard';
+import EditEntityModal from './components/EditEntityModal';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import Icon from '../../components/Icon';
 
@@ -19,6 +26,7 @@ export default function EntidadDetalle() {
     const [entity, setEntity] = useState(null);
     const [tab, setTab] = useState('activos');
     const [openNewExpense, setOpenNewExpense] = useState(false);
+    const [openEditEntity, setOpenEditEntity] = useState(false);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -56,7 +64,7 @@ export default function EntidadDetalle() {
         return {
             ars,
             usd,
-            debts: entity.gastos_activos.length,
+            debts: entity.gastos_activos.length, // SIN $
         };
     }, [entity]);
 
@@ -81,9 +89,9 @@ export default function EntidadDetalle() {
 
                 <button
                     className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold"
-                    onClick={() => setOpenNewExpense(true)}
+                    onClick={() => setOpenEditEntity(true)}
                 >
-                    <Icon name="add" /> Agregar Gasto
+                    <Icon name="edit" /> Editar Entidad
                 </button>
             </div>
 
@@ -91,7 +99,7 @@ export default function EntidadDetalle() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 <StatCard label="Balance Total (ARS)" value={stats.ars} currency="ARS" />
                 <StatCard label="Balance Total (USD)" value={stats.usd} currency="USD" />
-                <StatCard label="Deudas Activas" value={stats.debts} />
+                <StatCard label="Deudas Activas" value={stats.debts} /> {/* Sin signo $ */}
             </div>
 
             {/* TABS */}
@@ -132,6 +140,33 @@ export default function EntidadDetalle() {
                 </ListContainer>
             )}
 
+            {/* MODAL EDITAR ENTIDAD */}
+            {openEditEntity && (
+                <EditEntityModal
+                    open={openEditEntity}
+                    entity={entity}
+                    onClose={() => setOpenEditEntity(false)}
+                    onSave={async (newName) => {
+                        try {
+                            await updateFinancialEntity(entity.id, newName, token);
+
+                            setEntity((prev) => ({ ...prev, name: newName }));
+                            setOpenEditEntity(false);
+                        } catch (err) {
+                            console.error('Error actualizando entidad', err);
+                        }
+                    }}
+                    onDelete={async () => {
+                        try {
+                            await deleteFinancialEntity(entity.id, token);
+                            window.location.href = '/app/entidades';
+                        } catch (err) {
+                            console.error('Error eliminando entidad', err);
+                        }
+                    }}
+                />
+            )}
+
             {/* MODAL NUEVO GASTO */}
             {openNewExpense && (
                 <NewExpenseModal
@@ -141,7 +176,6 @@ export default function EntidadDetalle() {
                         try {
                             const nuevo = await createExpense(payload, token);
 
-                            // decidir si va en activos o finalizados
                             const isFinalizado =
                                 Number(nuevo.payed_quotas) >= Number(nuevo.number_of_quotas);
 

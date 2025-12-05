@@ -1,4 +1,5 @@
 import axios from 'axios';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const api = axios.create({
@@ -8,137 +9,98 @@ const api = axios.create({
     },
 });
 
-/* const api = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:3000/api',
-    withCredentials: true,
-});
-
-export default api; */
-
+// =======================
+// AUTH
+// =======================
 export const register = async (userInfo) => {
-    try {
-        const { data } = await api.post('/auth/register', userInfo);
-        return data.data;
-    } catch (error) {
-        console.error('Error registering user:', error);
-        throw error;
-    }
+    const { data } = await api.post('/auth/register', userInfo);
+    return data.data;
 };
 
 export const login = async (credentials) => {
-    try {
-        const { data } = await api.post('/auth/login', credentials);
-        return data.data;
-    } catch (error) {
-        console.error('Error creating category:', error);
-        throw error;
-    }
+    const { data } = await api.post('/auth/login', credentials);
+    return data.data;
 };
 
 export const loginWithFirebase = async (firebaseData) => {
-    try {
-        const { data } = await api.post('/auth/firebase-login', firebaseData);
-        return data.data;
-    } catch (error) {
-        console.error('Error logging in with Firebase:', error);
-        throw error;
-    }
+    const { data } = await api.post('/auth/firebase-login', firebaseData);
+    return data.data;
 };
 
+// =======================
+// ENTIDADES FINANCIERAS
+// =======================
 export const createEntity = async (entityData, token) => {
-    try {
-        const { data } = await api.post('/entidades-financieras', entityData, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        return data.data;
-    } catch (error) {
-        console.error('Error creating entity:', error);
-        throw error;
-    }
+    const { data } = await api.post('/entidades-financieras', entityData, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
 };
 
 export const fetchFinancialEntities = async (token) => {
-    try {
-        const { data } = await api.get('/entidades-financieras', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
-
-        return data.data;
-    } catch (error) {
-        console.error('Error fetching financial entities:', error);
-        throw error;
-    }
+    const { data } = await api.get('/entidades-financieras', {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
 };
 
-export const fetchDashboardData = async (token) => {
-    try {
-        const { data } = await api.get('/dashboard/home', {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+export const fetchFinancialEntityById = async (entityId, token) => {
+    const { data } = await api.get(`/entidades-financieras/${entityId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
 
-        return data.data;
-    } catch (error) {
-        console.error('Error fetching dashboard data:', error);
-        throw error;
-    }
+    const raw = data.data;
+
+    return {
+        id: raw.id,
+        name: raw.name,
+        gastos_activos: raw.gastos_activos || [],
+        gastos_inactivos: raw.gastos_inactivos || [],
+        logs: raw.logs || [],
+
+        balances: [{ currency: 'ARS', amount: 0 }],
+        activeExpenses: (raw.gastos_activos || []).length,
+        type: 'bank',
+    };
 };
 
-// export const fetchFinancialEntityById = async (entityId, token) => {
-//     try {
-//         const { data } = await api.get(`/entidades-financieras/${entityId}`, {
-//             headers: {
-//                 Authorization: `Bearer ${token}`,
-//             },
-//         });
-//         return data.data;
-//     } catch (error) {
-//         console.error('Error fetching financial entity:', error);
-//         throw error;
-//     }
-// };
+// =======================
+// EDITAR ENTIDAD
+// =======================
+export const updateFinancialEntity = async (id, name, token) => {
+    const { data } = await api.put(
+        `/entidades-financieras/${id}`,
+        { name },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+// =======================
+// ELIMINAR ENTIDAD
+// =======================
+export const deleteFinancialEntity = async (id, token) => {
+    await api.delete(`/entidades-financieras/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return true;
+};
+
+// =======================
+// GASTOS
+// =======================
 export const createExpense = async (payload, token) => {
     const { data } = await api.post('/dashboard/gastos', payload, {
-        headers: {
-            Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
     });
 
     return data.data;
 };
 
-export const fetchFinancialEntityById = async (entityId, token) => {
-    try {
-        const { data } = await api.get(`/entidades-financieras/${entityId}`, {
-            headers: {
-                Authorization: `Bearer ${token}`,
-            },
-        });
+export const fetchDashboardData = async (token) => {
+    const { data } = await api.get('/dashboard/home', {
+        headers: { Authorization: `Bearer ${token}` },
+    });
 
-        const raw = data.data;
-
-        // ⭐ NORMALIZACIÓN NECESARIA PARA QUE EL FRONT NO CRASHEE
-        return {
-            id: raw.id,
-            name: raw.name,
-
-            gastos_activos: raw.gastos_activos || [],
-            gastos_inactivos: raw.gastos_inactivos || [],
-            logs: raw.logs || [],
-
-            // valores que EntityCard o StatsCard esperan
-            balances: [{ currency: 'ARS', amount: 0 }],
-            activeExpenses: (raw.gastos_activos || []).length,
-            type: 'bank',
-        };
-    } catch (error) {
-        console.error('Error fetching financial entity:', error);
-        throw error;
-    }
+    return data.data;
 };
