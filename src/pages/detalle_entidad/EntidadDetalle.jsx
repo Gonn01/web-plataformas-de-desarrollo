@@ -1,6 +1,4 @@
 import { useEffect, useMemo, useState } from 'react';
-import { useParams } from 'react-router-dom';
-
 import useAuth from '@/hooks/use-auth';
 import {
     fetchFinancialEntityById,
@@ -9,7 +7,6 @@ import {
     deleteFinancialEntity,
 } from '@/services/api';
 
-// COMPONENTES
 import { TabHeader } from './components/TabHeader';
 import { ListContainer } from './components/ListContainer';
 import { GastoItem } from './components/GastoItem';
@@ -18,6 +15,7 @@ import { StatCard } from './components/StatCard';
 import EditEntityModal from './components/EditEntityModal';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import Icon from '../../components/Icon';
+import { useParams } from 'react-router-dom';
 
 export default function EntidadDetalle() {
     const { id } = useParams();
@@ -28,6 +26,8 @@ export default function EntidadDetalle() {
     const [openNewExpense, setOpenNewExpense] = useState(false);
     const [openEditEntity, setOpenEditEntity] = useState(false);
     const [loading, setLoading] = useState(true);
+
+    // const navigate = useNavigate(); // Comentado porque no se usa
 
     useEffect(() => {
         const load = async () => {
@@ -64,11 +64,11 @@ export default function EntidadDetalle() {
         return {
             ars,
             usd,
-            debts: entity.gastos_activos.length, // SIN $
+            debts: entity.gastos_activos.length,
         };
     }, [entity]);
 
-    // ============ Loanding ====
+    // ============ LOADING ============
     if (loading) {
         return <div className="text-center p-10 text-zinc-500">Cargando entidad...</div>;
     }
@@ -99,7 +99,7 @@ export default function EntidadDetalle() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 <StatCard label="Balance Total (ARS)" value={stats.ars} currency="ARS" />
                 <StatCard label="Balance Total (USD)" value={stats.usd} currency="USD" />
-                <StatCard label="Deudas Activas" value={stats.debts} /> {/* Sin signo $ */}
+                <StatCard label="Deudas Activas" value={stats.debts} />
             </div>
 
             {/* TABS */}
@@ -149,7 +149,6 @@ export default function EntidadDetalle() {
                     onSave={async (newName) => {
                         try {
                             await updateFinancialEntity(entity.id, newName, token);
-
                             setEntity((prev) => ({ ...prev, name: newName }));
                             setOpenEditEntity(false);
                         } catch (err) {
@@ -174,8 +173,13 @@ export default function EntidadDetalle() {
                     onClose={() => setOpenNewExpense(false)}
                     onSave={async (payload) => {
                         try {
-                            const nuevo = await createExpense(payload, token);
+                            await createExpense(payload, token);
 
+                            // 🔥 Solución: actualizar el listado de entidades al crear un gasto
+                            window.location.href = '/app/entidades';
+
+                            // Mantengo tu código original por si lo necesitás después
+                            /*
                             const isFinalizado =
                                 Number(nuevo.payed_quotas) >= Number(nuevo.number_of_quotas);
 
@@ -188,7 +192,7 @@ export default function EntidadDetalle() {
                                     ? [...prev.gastos_inactivos, nuevo]
                                     : prev.gastos_inactivos,
                             }));
-
+                            */
                             setOpenNewExpense(false);
                         } catch (err) {
                             console.error('Error guardando gasto', err);

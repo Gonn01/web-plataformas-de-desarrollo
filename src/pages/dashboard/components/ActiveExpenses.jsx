@@ -163,9 +163,6 @@ export default function ActiveExpenses({
                 if (onPaid) {
                     await onPaid();
                 }
-            } catch (err) {
-                console.error('Error inesperado al pagar cuota(s):', err);
-                alert('Ocurrió un error al registrar el pago.');
             }
 
             setModalOpen(false);

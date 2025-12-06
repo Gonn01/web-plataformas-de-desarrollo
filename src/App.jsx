@@ -30,7 +30,7 @@ export default function App() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
-                <Route path="deuda/:id" element={<CompraDetalle />} />
+                <Route path="gastos/:id" element={<CompraDetalle />} />
                 <Route path="configuracion" element={<Configuracion />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
             </Route>
