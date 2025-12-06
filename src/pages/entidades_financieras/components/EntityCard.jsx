@@ -1,6 +1,4 @@
-// src/components/entities/EntityCard.jsx
 import EntityIcon from './EntityIcon';
-import BalancePill from '../../dashboard/components/BalancePill';
 
 export default function EntityCard({ entity, onClick, onDelete }) {
     return (
@@ -19,19 +17,8 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                         {entity.name}
                     </p>
 
-                    <div className="flex flex-col sm:flex-row sm:gap-4">
-                        {entity.balances.map((b) => (
-                            <BalancePill
-                                key={`${entity.id}-${b.currency}`}
-                                amount={b.amount}
-                                currency={b.currency}
-                            />
-                        ))}
-                    </div>
-
                     <p className="mt-1 text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal">
-                        {entity.activeExpenses} gasto
-                        {entity.activeExpenses === 1 ? ' activo' : 's activos'}
+                        {entity.cantidad} gasto{entity.cantidad === 1 ? ' activo' : 's activos'}
                     </p>
                 </div>
             </div>
