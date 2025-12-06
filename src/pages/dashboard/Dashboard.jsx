@@ -4,7 +4,7 @@ import ActiveExpenses from './components/ActiveExpenses';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
-import { useNewExpense } from '../../hooks/use-new-expense';
+import { useNewExpense } from './hooks/use-new-expense';
 
 export default function Dashboard() {
     const ui = useDashboardUI();
