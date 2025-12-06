@@ -111,6 +111,7 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
             fixed_expense: isFixed,
             image: null,
             type: type === 'Me deben' ? 'ME_DEBEN' : 'DEBO',
+            payed_quotas: isInstallment ? Number(paidInstallments) : 0,
         };
 
         onSave?.(payload);

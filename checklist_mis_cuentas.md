@@ -22,8 +22,8 @@
 - [x] Click en StatCards cambia el tab.
 - [ ] En finalizados, mostrar fecha de finalización en lugar del valor por cuota.
 - [x] Ordenar categorías.
-- [ ] Añadir botón “Agregar gasto”.
-- [ ] Añadir botón “Eliminar entidad”.
+- [x] Añadir botón “Agregar gasto”.
+- [x] Añadir botón “Eliminar entidad”.
 
 ## DETALLE DE GASTO
 
@@ -49,3 +49,4 @@
 - [ ] Añadir logs.
 - [ ] Momentos de carga globales.
 - [ ] Optimizar imágenes y fallbacks.
+- [ ] Los horarios los toma 3h mas.

@@ -1,3 +1,4 @@
+import { formatDate } from '@/utils/FormatDate';
 import { formatMoney } from '@/utils/FormatMoney';
 
 export default function GastoItem({ gasto, variant = 'activo', onClick }) {
@@ -21,7 +22,7 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
     }
 
     const currency = gasto.currency_type === '1' ? 'ARS' : 'USD';
-
+    console.log(gasto);
     return (
         <div
             onClick={onClick}
@@ -32,7 +33,11 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>
             </div>
 
-            <p className="font-semibold text-primary">{formatMoney(gasto.amount, currency)}</p>
+            <p className="font-semibold text-primary">
+                {variant == 'finalizado'
+                    ? formatDate(gasto.finalization_date)
+                    : formatMoney(gasto.amount, currency)}
+            </p>
         </div>
     );
 }
