@@ -9,6 +9,7 @@ import { StatCard } from './components/StatCard';
 import EditEntityModal from './components/EditEntityModal';
 
 import { useEntidadUI } from './hooks/use-entidad-ui';
+import { GastoFijoItem } from './components/GastoFijo';
 
 export default function EntidadDetalle() {
     const {
@@ -50,10 +51,11 @@ export default function EntidadDetalle() {
             </div>
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
-                <StatCard label="Balance Total (ARS)" value={stats.ars} currency="ARS" />
-                <StatCard label="Balance Total (USD)" value={stats.usd} currency="USD" />
-                <StatCard label="Deudas Activas" value={stats.debts} />
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+                <StatCard label="Balance Total (ARS)" value={stats.amount} currency="ARS" />
+                <StatCard label="Gastos fijos" value={stats.fixed} />
+                <StatCard label="Gastos activos" value={stats.debts} />
+                <StatCard label="Gastos finalizados" value={stats.finalized} />
             </div>
 
             {/* Tabs */}
@@ -67,6 +69,21 @@ export default function EntidadDetalle() {
                 >
                     {entity.gastos_activos.map((g) => (
                         <GastoItem
+                            key={g.id}
+                            gasto={g}
+                            onClick={() => navigate(`/app/gastos/${g.id}`)}
+                        />
+                    ))}
+                </ListContainer>
+            )}
+
+            {tab === 'fijos' && (
+                <ListContainer
+                    empty={!entity.gastos_fijos || entity.gastos_fijos.length === 0}
+                    emptyLabel="Sin gastos fijos."
+                >
+                    {entity.gastos_fijos?.map((g) => (
+                        <GastoFijoItem
                             key={g.id}
                             gasto={g}
                             onClick={() => navigate(`/app/gastos/${g.id}`)}

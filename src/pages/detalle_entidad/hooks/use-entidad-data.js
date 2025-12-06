@@ -42,24 +42,28 @@ export function useEntidadData() {
     // STATS (solo lectura)
     // ------------------------------
     const stats = useMemo(() => {
-        if (!entity) return { ars: 0, usd: 0, debts: 0 };
+        if (!entity) return { amount: 0, debts: 0, fixed: 0, finalized: 0 };
 
-        let ars = 0;
-        let usd = 0;
+        let totalAmount = 0;
+        let fixedCount = 0;
 
         const sumar = (g) => {
             const amount = Number(g.amount || 0);
-            if (String(g.currency_type) === '1') ars += amount;
-            if (String(g.currency_type) === '2') usd += amount;
+
+            if (g.fixed_expense) fixedCount += 1;
+
+            totalAmount += amount;
         };
 
         entity.gastos_activos.forEach(sumar);
         entity.gastos_inactivos.forEach(sumar);
+        entity.gastos_fijos?.forEach(sumar);
 
         return {
-            ars,
-            usd,
+            amount: totalAmount,
             debts: entity.gastos_activos.length,
+            fixed: fixedCount,
+            finalized: entity.gastos_inactivos.length,
         };
     }, [entity]);
 

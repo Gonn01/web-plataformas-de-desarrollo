@@ -1,13 +1,15 @@
 export function TabHeader({ tab, setTab }) {
+    const tabs = ['activos', 'finalizados', 'fijos', 'log'];
+
     return (
         <div className="border-b border-zinc-200 dark:border-zinc-800 mb-4">
             <div className="flex gap-6">
-                {['activos', 'finalizados', 'log'].map((t) => (
+                {tabs.map((t) => (
                     <button
                         key={t}
                         className={`pb-3 pt-2 text-sm ${tab === t
-                                ? 'text-primary font-bold border-b-2 border-b-primary'
-                                : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 border-b-2 border-b-transparent'
+                            ? 'text-primary font-bold border-b-2 border-b-primary'
+                            : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 dark:hover:text-zinc-200 border-b-2 border-b-transparent'
                             }`}
                         onClick={() => setTab(t)}
                     >
@@ -15,7 +17,9 @@ export function TabHeader({ tab, setTab }) {
                             ? 'Gastos Activos'
                             : t === 'finalizados'
                                 ? 'Gastos Finalizados'
-                                : 'Log de Cambios'}
+                                : t === 'fijos'
+                                    ? 'Gastos Fijos'
+                                    : 'Log de Cambios'}
                     </button>
                 ))}
             </div>

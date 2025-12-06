@@ -79,7 +79,7 @@ export const deleteFinancialEntity = async (id, token) => {
 };
 
 /* ===============================
-   GASTOS (RESTFULL)
+   GASTOS
 =============================== */
 
 export const createGasto = async (payload, token) => {
@@ -109,10 +109,6 @@ export const deleteGasto = async (gastoId, token) => {
     });
     return true;
 };
-
-/* ===============================
-   GASTOS → Acciones (cuotas)
-=============================== */
 
 export const pagarCuota = async (gastoId, token) => {
     const { data } = await api.post(

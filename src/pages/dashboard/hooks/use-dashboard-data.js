@@ -29,7 +29,7 @@ export function useDashboardData() {
                         const paid = Number(g.payed_quotas) || 0;
                         const fixed = Boolean(g.fixed_expense);
 
-                        if (fixed) return paid === 0;
+                        if (fixed) return true;
                         if (num > 0) return paid < num;
                         return paid === 0;
                     })
@@ -110,10 +110,12 @@ export function useDashboardData() {
             console.error('Error cargando dashboard:', err);
         }
     }, [token]);
+
     const getSummaryForCurrency = useCallback(
         (currency) => summaryByCurrency?.[currency] || null,
         [summaryByCurrency],
     );
+
     useEffect(() => {
         loadDashboard();
     }, [loadDashboard]);
