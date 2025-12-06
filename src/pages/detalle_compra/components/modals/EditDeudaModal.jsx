@@ -1,11 +1,11 @@
 import { useState } from 'react';
 
-export default function EditDeudaModal({ detalle, onCancel, onSave }) {
-    const [titulo, setTitulo] = useState(detalle.titulo);
-    const [entidad, setEntidad] = useState(detalle.entidad);
-    const [total, setTotal] = useState(detalle.total);
-    const [moneda, setMoneda] = useState(detalle.moneda);
-    const [cantCuotas, setCantCuotas] = useState(detalle.cuotas.length);
+export default function EditDeudaModal({ gasto, onCancel, onSave }) {
+    const [titulo, setTitulo] = useState(gasto.titulo);
+    const [entidad, setEntidad] = useState(gasto.entidad);
+    const [total, setTotal] = useState(gasto.total);
+    const [moneda, setMoneda] = useState(gasto.moneda);
+    const [cantCuotas, setCantCuotas] = useState(gasto.cuotas.length);
 
     const handleSubmit = (e) => {
         e.preventDefault();

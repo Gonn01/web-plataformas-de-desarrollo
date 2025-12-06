@@ -1,4 +1,4 @@
-export default function Cuota({ icon, title, venc, monto, paid, next }) {
+export default function Cuota({ icon, title, monto, paid, next }) {
     const base = 'flex items-center justify-between p-4 rounded-lg shadow-sm bg-[#111714]';
     const mods = paid ? 'opacity-60' : next ? 'border border-primary/50' : '';
 
@@ -15,7 +15,9 @@ export default function Cuota({ icon, title, venc, monto, paid, next }) {
                     <p className={`font-medium ${paid ? 'line-through text-white' : 'text-white'}`}>
                         {title}
                     </p>
-                    <p className="text-sm text-[#9eb7a8]">Pagada: {venc}</p>
+                    <p className="text-sm text-[#9eb7a8]">
+                        {paid ? 'Pagada' : next ? 'Proxima' : 'Pendiente'}
+                    </p>
                 </div>
             </div>
 

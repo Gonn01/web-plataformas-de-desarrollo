@@ -12,27 +12,27 @@ import { useGastoData } from './use-gasto-data';
 export function useGastoUI() {
     const nav = useNavigate();
 
-    const { detalle, setDetalle, actualizar, pagarCuota, eliminar } = useGastoData();
+    const { gasto, setGasto, actualizar, pagarCuota, eliminar, loading } = useGastoData();
 
     // -------------------------
     // CALCULOS DERIVADOS
     // -------------------------
     const totalPagado = useMemo(() => {
-        if (!detalle) return 0;
-        return detalle.cuotas.filter((c) => c.pagada).reduce((a, c) => a + c.monto, 0);
-    }, [detalle]);
+        if (!gasto) return 0;
+        return gasto.cuotas.filter((c) => c.pagada).reduce((a, c) => a + c.monto, 0);
+    }, [gasto]);
 
     const porcentaje = useMemo(() => {
-        if (!detalle?.total) return 0;
-        return Math.min(100, (totalPagado / detalle.total) * 100);
-    }, [detalle, totalPagado]);
+        if (!gasto?.total) return 0;
+        return Math.min(100, (totalPagado / gasto.total) * 100);
+    }, [gasto, totalPagado]);
 
     // -------------------------
     // NAVEGACIÓN
     // -------------------------
     const volverALista = () => {
-        if (!detalle) return;
-        nav(detalle.tipo === 'ME_DEBEN' ? '/app/medeben' : '/app/debo');
+        if (!gasto) return;
+        nav(`/app/entidades-financieras/${gasto.financial_entity_id}/compras`);
     };
 
     // -------------------------
@@ -47,15 +47,15 @@ export function useGastoUI() {
             url: URL.createObjectURL(f),
         }));
 
-        setDetalle((prev) => ({ ...prev, adjuntos: [...prev.adjuntos, ...nuevos] }));
+        setGasto((prev) => ({ ...prev, adjuntos: [...prev.adjuntos, ...nuevos] }));
     };
 
     return {
         // DATA
-        detalle,
+        gasto,
         totalPagado,
         porcentaje,
-
+        loading,
         // ACCIONES
         actualizar,
         pagarCuota,

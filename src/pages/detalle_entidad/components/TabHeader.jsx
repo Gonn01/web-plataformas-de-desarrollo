@@ -1,5 +1,5 @@
 export function TabHeader({ tab, setTab }) {
-    const tabs = ['activos', 'finalizados', 'fijos', 'log'];
+    const tabs = ['activos', 'finalizados', 'log'];
 
     return (
         <div className="border-b border-zinc-200 dark:border-zinc-800 mb-4">
