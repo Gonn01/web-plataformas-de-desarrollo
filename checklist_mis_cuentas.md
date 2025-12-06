@@ -40,8 +40,8 @@
 
 ## CONFIGURACIÓN
 
-- [ ] Traer foto, nombre, email del usuario.
-- [ ] Manejar moneda de preferencia del usuario.
+- [x] Traer foto, nombre, email del usuario.
+- [x] Manejar moneda de preferencia del usuario.
 
 ## GENERAL
 
