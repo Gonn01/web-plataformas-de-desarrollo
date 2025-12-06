@@ -73,18 +73,42 @@ export function useEntidadData() {
     const crearGastoEntidad = useCallback(
         async (payload) => {
             const nuevo = await createGasto(payload, token);
+            console.log(nuevo);
+            const isFixed = nuevo.fixed_expense === true;
+            const paid = Number(nuevo.payed_quotas || 0);
+            const total = Number(nuevo.number_of_quotas || 0);
+            console.log({ isFixed, paid, total });
+            setEntity((prev) => {
+                // === GASTO FIJO ===
+                if (isFixed) {
+                    return {
+                        ...prev,
+                        gastos_fijos: [...prev.gastos_fijos, nuevo],
+                    };
+                }
 
-            const isFinalizado = Number(nuevo.payed_quotas) >= Number(nuevo.number_of_quotas);
+                // === GASTO CON CUOTAS ===
+                if (total > 0) {
+                    const isFinished = paid >= total;
 
-            setEntity((prev) => ({
-                ...prev,
-                gastos_activos: isFinalizado
-                    ? prev.gastos_activos
-                    : [...prev.gastos_activos, nuevo],
-                gastos_inactivos: isFinalizado
-                    ? [...prev.gastos_inactivos, nuevo]
-                    : prev.gastos_inactivos,
-            }));
+                    return {
+                        ...prev,
+                        gastos_activos: isFinished
+                            ? prev.gastos_activos
+                            : [...prev.gastos_activos, nuevo],
+
+                        gastos_inactivos: isFinished
+                            ? [...prev.gastos_inactivos, nuevo]
+                            : prev.gastos_inactivos,
+                    };
+                }
+
+                // === GASTO SIN CUOTAS (one-shot) ===
+                return {
+                    ...prev,
+                    gastos_activos: [...prev.gastos_activos, nuevo],
+                };
+            });
 
             return nuevo;
         },

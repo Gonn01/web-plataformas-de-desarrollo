@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import Icon from '../../../components/Icon';
 
-export default function EditEntityModal({ open, entity, onClose, onSave, onDelete }) {
+export default function EditEntityModal({ open, entity, onClose, onSave }) {
     const [name, setName] = useState(entity?.name || '');
 
     if (!open) return null;
@@ -29,13 +29,6 @@ export default function EditEntityModal({ open, entity, onClose, onSave, onDelet
                         onClick={onClose}
                     >
                         Cancelar
-                    </button>
-
-                    <button
-                        className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white"
-                        onClick={() => onDelete()}
-                    >
-                        Eliminar
                     </button>
 
                     <button

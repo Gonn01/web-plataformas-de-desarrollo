@@ -14,15 +14,16 @@
 
 ## DETALLE DE ENTIDAD
 
-- [ ] Añadir loader mejorado al entrar.
-- [ ] Poner cursor pointer en gastos clickeables.
-- [ ] Quitar botón eliminar del modal actualizar.
-- [ ] Añadir zona de peligro igual que detalle de gasto.
+- [x] Añadir loader mejorado al entrar.
+- [x] Poner cursor pointer en gastos clickeables.
+- [x] Quitar botón eliminar del modal actualizar.
+- [x] Añadir zona de peligro igual que detalle de gasto.
 - [ ] Actualizar logs cuando se actualiza el nombre.
-- [ ] Click en StatCards cambia el tab.
+- [x] Click en StatCards cambia el tab.
 - [ ] En finalizados, mostrar fecha de finalización en lugar del valor por cuota.
-- [ ] Ordenar categorías.
+- [x] Ordenar categorías.
 - [ ] Añadir botón “Agregar gasto”.
+- [ ] Añadir botón “Eliminar entidad”.
 
 ## DETALLE DE GASTO
 

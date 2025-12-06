@@ -5,7 +5,7 @@ import InfoItem from './components/InfoItem';
 import ProgresoPago from './components/ProgresoPago';
 import CuotasSection from './components/CuotasSection';
 import AdjuntosSection from './components/AdjuntosSection';
-import PeligroEliminar from './components/PeligroEliminar';
+import PeligroEliminar from '../../components/PeligroEliminar';
 import EditDeudaModal from './components/modals/EditDeudaModal';
 import Breadcrumb from './components/Breadcrumb';
 import { useGastoUI } from './hooks/use-gasto-ui';
