@@ -2,9 +2,9 @@
 
 ## DASHBOARD
 
-- [ Listo ] Al crear un gasto con cuotas pagas, las cuotas pagadas deben guardarse correctamente.
-- [ Listo ] Los gastos fijos no deben aparecer como “Debo”.
-- [ Listo ] En el modal de pagar cuotas, no se muestran los nombres de los gastos en la confirmación.
+- [x] Al crear un gasto con cuotas pagas, las cuotas pagadas deben guardarse correctamente.
+- [x] Los gastos fijos no deben aparecer como “Debo”.
+- [x] En el modal de pagar cuotas, no se muestran los nombres de los gastos en la confirmación.
 
 ## ENTIDADES FINANCIERAS
 
