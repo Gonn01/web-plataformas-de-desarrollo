@@ -1,53 +1,13 @@
 // src/pages/EntidadesFinancieras.jsx
-import { useMemo, useState } from 'react';
+
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+
 import NewEntityModal from './dashboard/components/modals/NewEntityModal';
 import EntityCard from '@/components/EntityCard';
 
-// Mocks
-const MOCK_ENTITIES = [
-    {
-        id: 'ent-bna',
-        name: 'Banco Nación',
-        type: 'bank',
-        balances: [
-            { currency: 'ARS', amount: -150000 },
-            { currency: 'USD', amount: -200 },
-        ],
-        activeExpenses: 3,
-    },
-    {
-        id: 'ent-galicia',
-        name: 'Banco Galicia',
-        type: 'bank',
-        balances: [{ currency: 'ARS', amount: -25000 }],
-        activeExpenses: 2,
-    },
-    {
-        id: 'ent-juan',
-        name: 'Juan Pérez',
-        type: 'person',
-        balances: [{ currency: 'ARS', amount: 75000 }],
-        activeExpenses: 1,
-    },
-    {
-        id: 'ent-inmo',
-        name: 'Inmobiliaria G.',
-        type: 'wallet',
-        balances: [{ currency: 'ARS', amount: -40000 }],
-        activeExpenses: 1,
-    },
-    {
-        id: 'ent-efectivo',
-        name: 'Efectivo',
-        type: 'wallet',
-        balances: [
-            { currency: 'ARS', amount: 20000 },
-            { currency: 'USD', amount: 50 },
-        ],
-        activeExpenses: 0,
-    },
-];
+import { fetchFinancialEntities, createEntity } from '@/services/api';
+import useAuth from '@/hooks/use-auth';
 
 function EmptyState({ onCreate }) {
     return (
@@ -77,32 +37,66 @@ function EmptyState({ onCreate }) {
 
 export default function EntidadesFinancieras() {
     const navigate = useNavigate();
+    const auth = useAuth();
+
     const [query, setQuery] = useState('');
-    const [entities, setEntities] = useState(MOCK_ENTITIES);
+    const [entities, setEntities] = useState([]);
     const [openNew, setOpenNew] = useState(false);
 
+    // ============================
+    // 🚀 Cargar entidades REALES
+    // ============================
+    useEffect(() => {
+        if (!auth?.token) return;
+
+        const loadEntities = async () => {
+            try {
+                const data = await fetchFinancialEntities(auth.token);
+
+                // 🌟 Adaptamos entidades para que EntityCard NO falle
+                const normalized = data.map((e) => ({
+                    ...e,
+                    balances: [{ currency: 'ARS', amount: 0 }], // placeholder mínimo
+                    activeExpenses: 0, // evitar crash
+                    type: 'bank', // valor por defecto
+                }));
+
+                setEntities(normalized);
+            } catch (err) {
+                console.error('Error fetching entities:', err);
+            }
+        };
+
+        loadEntities();
+    }, [auth?.token]);
+
+    // ============================
+    // 🔍 Filtrar entidades
+    // ============================
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return entities;
         return entities.filter((e) => e.name.toLowerCase().includes(q));
     }, [query, entities]);
 
-    const openCreateModal = () => setOpenNew(true);
+    // ============================
+    // ➕ Crear entidad REAL
+    // ============================
+    const handleSaveNew = async ({ name }) => {
+        try {
+            const newEntity = await createEntity({ name }, auth.token);
 
-    const handleSaveNew = ({ name }) => {
-        const newEntity = {
-            id: crypto.randomUUID(),
-            name,
-            type: 'bank',
-            balances: [{ currency: 'ARS', amount: 0 }],
-            activeExpenses: 0,
-        };
-        setEntities((prev) => [newEntity, ...prev]);
-        setOpenNew(false);
-        navigate(`/app/entidades/2`);
+            setEntities((prev) => [newEntity, ...prev]);
+
+            setOpenNew(false);
+
+            // navigate(`/entidades/${newEntity.id}`); haciendo una prueba
+            navigate(`/app/entidades/${newEntity.id}`);
+        } catch (err) {
+            console.error('Error creating entity:', err);
+            alert('No se pudo crear la entidad.');
+        }
     };
-
-    const handleOpen = () => navigate(`/app/entidades/2`);
 
     const showEmpty = filtered.length === 0 && entities.length === 0;
 
@@ -114,7 +108,7 @@ export default function EntidadesFinancieras() {
                     Mis Entidades
                 </h1>
                 <button
-                    onClick={openCreateModal}
+                    onClick={() => setOpenNew(true)}
                     className="flex min-w-[84px] items-center justify-center gap-2 overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold tracking-wide shadow-sm hover:opacity-90 transition-opacity"
                 >
                     <span className="material-symbols-outlined text-lg">add</span>
@@ -142,7 +136,12 @@ export default function EntidadesFinancieras() {
             {/* List */}
             <div className="flex flex-col gap-4">
                 {filtered.map((e) => (
-                    <EntityCard key={e.id} entity={e} onClick={handleOpen} />
+                    <EntityCard
+                        key={e.id}
+                        entity={e}
+                        // onClick={() => navigate(`/entidades/${e.id}`)} quiero probar algo
+                        onClick={() => navigate(`/app/entidades/${e.id}`)}
+                    />
                 ))}
 
                 {filtered.length === 0 && entities.length > 0 && (
@@ -151,7 +150,7 @@ export default function EntidadesFinancieras() {
                     </div>
                 )}
 
-                {showEmpty && <EmptyState onCreate={openCreateModal} />}
+                {showEmpty && <EmptyState onCreate={() => setOpenNew(true)} />}
             </div>
 
             <NewEntityModal

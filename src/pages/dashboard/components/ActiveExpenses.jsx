@@ -51,9 +51,7 @@ export default function ActiveExpenses({
             baseGroups = baseGroups
                 .map((g) => ({
                     ...g,
-                    items: g.items.filter((it) =>
-                        it.title.toLowerCase().includes(q),
-                    ),
+                    items: g.items.filter((it) => it.title.toLowerCase().includes(q)),
                 }))
                 .filter((g) => g.items.length > 0);
         }
@@ -81,10 +79,7 @@ export default function ActiveExpenses({
                 id: it.id,
                 purchaseId: it.purchaseId ?? it.id,
                 title: it.title,
-                type:
-                    (it.chip?.text || '').toLowerCase() === 'me deben'
-                        ? 'me_deben'
-                        : 'debo',
+                type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
                 currency: ccy,
                 amountToPay: amount,
                 totalAmount,
@@ -106,10 +101,7 @@ export default function ActiveExpenses({
             id: it.id,
             purchaseId: it.purchaseId ?? it.id,
             title: it.title,
-            type:
-                (it.chip?.text || '').toLowerCase() === 'me deben'
-                    ? 'me_deben'
-                    : 'debo',
+            type: (it.chip?.text || '').toLowerCase() === 'me deben' ? 'me_deben' : 'debo',
             currency: ccy,
             amountToPay: amount,
             totalAmount,
@@ -122,7 +114,7 @@ export default function ActiveExpenses({
         setModalOpen(true);
     }, []);
 
-    const handleConfirm = useCallback(async () => {
+    /* const handleConfirm = useCallback(async () => {
         try {
             if (!modalItems.length) {
                 setModalOpen(false);
@@ -183,6 +175,68 @@ export default function ActiveExpenses({
             alert('Ocurrió un error al registrar el pago.');
         }
     }, [modalItems, token, onPaid]);
+ */
+    const handleConfirm = useCallback(async () => {
+        try {
+            if (!modalItems.length) {
+                setModalOpen(false);
+                return;
+            }
+
+            const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+
+            if (modalItems.length === 1) {
+                const purchaseId = modalItems[0].purchaseId;
+                const res = await fetch(`${baseUrl}/dashboard/pagar-cuota`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ purchase_id: purchaseId }),
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error('Error al pagar cuota:', errText);
+                    alert('No se pudo registrar el pago de la cuota.');
+                    return;
+                }
+            } else {
+                const purchaseIds = modalItems.map((it) => it.purchaseId);
+                const res = await fetch(`${baseUrl}/dashboard/pagar-cuotas-lote`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+                    },
+                    body: JSON.stringify({ purchase_ids: purchaseIds }),
+                });
+
+                if (!res.ok) {
+                    const errText = await res.text();
+                    console.error('Error al pagar cuotas en lote:', errText);
+                    alert('No se pudieron registrar los pagos.');
+                    return;
+                }
+
+                setModalOpen(false);
+
+                if (onPaid) {
+                    await onPaid();
+                }
+            }
+
+            setModalOpen(false);
+
+            if (onPaid) {
+                await onPaid();
+            }
+        } catch (err) {
+            console.error('Error inesperado al pagar cuota(s):', err);
+            alert('Ocurrió un error al registrar el pago.');
+        }
+    }, [modalItems, token, onPaid]);
 
     return (
         <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5">
@@ -198,8 +252,8 @@ export default function ActiveExpenses({
                                 key={cur}
                                 type="button"
                                 className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === cur
-                                        ? 'bg-primary text-black border-primary'
-                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
+                                    ? 'bg-primary text-black border-primary'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
                                     }`}
                                 onClick={() => onCurrencyChange?.(cur)}
                             >
@@ -261,8 +315,8 @@ export default function ActiveExpenses({
                                                 {it.chip && (
                                                     <span
                                                         className={`inline-flex items-center rounded-md px-1.5 py-0.5 font-medium ${it.chip.tone === 'red'
-                                                                ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
-                                                                : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                            ? 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                                                            : 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
                                                             }`}
                                                     >
                                                         {it.chip.text}
@@ -283,8 +337,8 @@ export default function ActiveExpenses({
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
                                                 className={`${it.chip?.tone === 'green'
-                                                        ? 'bg-green-500'
-                                                        : 'bg-red-500'
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500'
                                                     } h-1.5 rounded-full`}
                                                 style={{
                                                     width: `${it.progressPct}%`,
