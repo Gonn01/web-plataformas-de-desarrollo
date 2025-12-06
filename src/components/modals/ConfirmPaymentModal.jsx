@@ -1,9 +1,6 @@
 import { useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-
-function Icon({ name, className = '' }) {
-    return <span className={`material-symbols-outlined ${className}`}>{name}</span>;
-}
+import Icon from '../Icon';
 
 function formatMoney(amount, currency) {
     try {
@@ -154,11 +151,10 @@ export default function ConfirmInstallmentPaymentModal({
                                     <div className="mt-1">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
                                             <div
-                                                className={`h-1.5 rounded-full ${
-                                                    single.type === 'debo'
+                                                className={`h-1.5 rounded-full ${single.type === 'debo'
                                                         ? 'bg-red-500'
                                                         : 'bg-green-500'
-                                                }`}
+                                                    }`}
                                                 style={{
                                                     width: `${Math.min(
                                                         100,
@@ -166,7 +162,7 @@ export default function ConfirmInstallmentPaymentModal({
                                                             0,
                                                             (single.paidInstallments /
                                                                 single.totalInstallments) *
-                                                                100,
+                                                            100,
                                                         ),
                                                     )}%`,
                                                 }}

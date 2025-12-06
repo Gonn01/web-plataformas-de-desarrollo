@@ -6,7 +6,7 @@ import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import useAuth from '@/hooks/use-auth';
 import {
     fetchFinancialEntityById,
-    createExpense,
+    createGasto,
     updateFinancialEntity,
     deleteFinancialEntity,
 } from '@/services/api';
@@ -181,7 +181,7 @@ export default function EntidadDetalle() {
                     onClose={() => setOpenNewExpense(false)}
                     onSave={async (payload) => {
                         try {
-                            const nuevo = await createExpense(payload, token);
+                            const nuevo = await createGasto(payload, token);
 
                             const isFinalizado =
                                 Number(nuevo.payed_quotas) >= Number(nuevo.number_of_quotas);

@@ -2,10 +2,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/auth/Login/Login';
 import AppLayout from './layouts/AppLayout';
-import EntidadesFinancieras from './pages/EntidadesFinancieras';
-import EntidadDetalle from './pages/detalle_entidad/EntidadDetalle';
+import EntidadesFinancieras from './pages/entidades_financieras/EntidadesFinancieras';
+import EntidadDetalle from './pages/detalle_entidad/DetalleEntidad';
 import ProtectedRoute from './guards/ProtectedRoute';
-import CompraDetalle from './pages/CompraDetalle';
+import CompraDetalle from './pages/detalle_compra/DetalleCompra';
 import Configuracion from './pages/Configuracion';
 import Register from './pages/auth/Register/Register';
 import Dashboard from './pages/dashboard/Dashboard';
