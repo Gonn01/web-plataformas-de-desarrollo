@@ -3,7 +3,7 @@ import StatCards from './components/StatCards';
 import ActiveExpenses from './components/ActiveExpenses';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
-import { useDashboardData } from './hooks/use-dashboar-data';
+import { useDashboardData } from './hooks/use-dashboard-data';
 import { useNewExpense } from '../../hooks/use-new-expense';
 
 export default function Dashboard() {

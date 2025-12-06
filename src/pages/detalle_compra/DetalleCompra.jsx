@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import HeaderDetalle from './components/HeaderDetalle';
 import InfoItem from './components/InfoItem';
 import ProgresoPago from './components/ProgresoPago';
@@ -6,22 +8,22 @@ import AdjuntosSection from './components/AdjuntosSection';
 import PeligroEliminar from './components/PeligroEliminar';
 import EditDeudaModal from './components/modals/EditDeudaModal';
 import Breadcrumb from './components/Breadcrumb';
-
-import { useCompraDetalle } from './hooks/use-compra-detalle';
+import { useGastoUI } from './hooks/use-gasto-ui';
 
 export default function CompraDetalle() {
     const {
         detalle,
-        editOpen,
-        setEditOpen,
         porcentaje,
         totalPagado,
+        pagarCuota,
+        actualizar,
+        eliminar,
         volverALista,
-        marcarProximaComoPagada,
-        guardarEdicion,
         onSeleccionAdjuntos,
-        eliminarDeuda,
-    } = useCompraDetalle();
+    } = useGastoUI();
+
+    // ➜ ESTE ESTADO ES DE UI Y VA ACÁ
+    const [editOpen, setEditOpen] = useState(false);
 
     if (!detalle) return null;
 
@@ -33,7 +35,7 @@ export default function CompraDetalle() {
 
                     <HeaderDetalle
                         detalle={detalle}
-                        marcarProxima={marcarProximaComoPagada}
+                        marcarProxima={pagarCuota}
                         abrirEditar={() => setEditOpen(true)}
                     />
 
@@ -61,7 +63,7 @@ export default function CompraDetalle() {
 
                     <PeligroEliminar
                         onDelete={() => {
-                            eliminarDeuda(detalle.id);
+                            eliminar();
                             volverALista();
                         }}
                     />
@@ -71,17 +73,21 @@ export default function CompraDetalle() {
                             onClick={volverALista}
                             className="h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all"
                         >
-                            ← Volver a {detalle.tipo === 'Me deben' ? 'Me deben' : 'Debo'}
+                            ← Volver a {detalle.tipo === 'ME_DEBEN' ? 'Me deben' : 'Debo'}
                         </button>
                     </div>
                 </div>
             </div>
 
+            {/* MODAL EDITAR */}
             {editOpen && (
                 <EditDeudaModal
                     detalle={detalle}
                     onCancel={() => setEditOpen(false)}
-                    onSave={guardarEdicion}
+                    onSave={(payload) => {
+                        actualizar(payload);
+                        setEditOpen(false);
+                    }}
                 />
             )}
         </div>

@@ -1,75 +1,32 @@
-import { useEffect, useMemo, useState } from 'react';
-import { useNavigate, useParams } from 'react-router-dom';
 import Icon from '../../components/Icon';
 import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
 
-import useAuth from '@/hooks/use-auth';
-import {
-    fetchFinancialEntityById,
-    createGasto,
-    updateFinancialEntity,
-    deleteFinancialEntity,
-} from '@/services/api';
-
-// COMPONENTES
 import { TabHeader } from './components/TabHeader';
 import { ListContainer } from './components/ListContainer';
 import { GastoItem } from './components/GastoItem';
 import { GastoFinalizadoItem } from './components/GastoFinalizadoItem';
 import { StatCard } from './components/StatCard';
 import EditEntityModal from './components/EditEntityModal';
+
+import { useEntidadUI } from './hooks/use-entidad-ui';
+
 export default function EntidadDetalle() {
-    const { id } = useParams();
-    const { token } = useAuth();
+    const {
+        entity,
+        stats,
+        loading,
+        tab,
+        setTab,
+        openNewExpense,
+        setOpenNewExpense,
+        openEditEntity,
+        setOpenEditEntity,
+        onCreateExpense,
+        onUpdateEntity,
+        onDeleteEntity,
+        navigate,
+    } = useEntidadUI();
 
-    const [entity, setEntity] = useState(null);
-    const [tab, setTab] = useState('activos');
-    const [openNewExpense, setOpenNewExpense] = useState(false);
-    const [openEditEntity, setOpenEditEntity] = useState(false);
-    const [loading, setLoading] = useState(true);
-
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        const load = async () => {
-            try {
-                setLoading(true);
-                const data = await fetchFinancialEntityById(id, token);
-                setEntity(data);
-            } catch (err) {
-                console.error('Error cargando entidad', err);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        load();
-    }, [id, token]);
-
-    // ================= STATS ===================
-    const stats = useMemo(() => {
-        if (!entity) return { ars: 0, usd: 0, debts: 0 };
-
-        let ars = 0;
-        let usd = 0;
-
-        const sumar = (g) => {
-            const amount = Number(g.amount || 0);
-            if (g.currency_type === '1') ars += amount;
-            if (g.currency_type === '2') usd += amount;
-        };
-
-        entity.gastos_activos.forEach(sumar);
-        entity.gastos_inactivos.forEach(sumar);
-
-        return {
-            ars,
-            usd,
-            debts: entity.gastos_activos.length, // SIN $
-        };
-    }, [entity]);
-
-    // ============ Loanding ====
     if (loading) {
         return <div className="text-center p-10 text-zinc-500">Cargando entidad...</div>;
     }
@@ -77,10 +34,6 @@ export default function EntidadDetalle() {
     if (!entity) {
         return <div className="text-center p-10 text-red-500">Entidad no encontrada</div>;
     }
-
-    const activos = entity.gastos_activos;
-    const finalizados = entity.gastos_inactivos;
-    const logs = entity.logs;
 
     return (
         <>
@@ -96,47 +49,46 @@ export default function EntidadDetalle() {
                 </button>
             </div>
 
-            {/* STATS */}
+            {/* Stats */}
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
                 <StatCard label="Balance Total (ARS)" value={stats.ars} currency="ARS" />
                 <StatCard label="Balance Total (USD)" value={stats.usd} currency="USD" />
-                <StatCard label="Deudas Activas" value={stats.debts} /> {/* Sin signo $ */}
+                <StatCard label="Deudas Activas" value={stats.debts} />
             </div>
 
-            {/* TABS */}
+            {/* Tabs */}
             <TabHeader tab={tab} setTab={setTab} />
 
-            {/* ACTIVOS */}
+            {/* LISTAS */}
             {tab === 'activos' && (
-                <ListContainer empty={activos.length === 0} emptyLabel="Sin gastos activos.">
-                    {activos.map((g, i) => (
+                <ListContainer
+                    empty={entity.gastos_activos.length === 0}
+                    emptyLabel="Sin gastos activos."
+                >
+                    {entity.gastos_activos.map((g) => (
                         <GastoItem
-                            key={i}
+                            key={g.id}
                             gasto={g}
-                            onClick={() => {
-                                navigate('/app/gastos/2');
-                            }}
+                            onClick={() => navigate(`/app/gastos/${g.id}`)}
                         />
                     ))}
                 </ListContainer>
             )}
 
-            {/* FINALIZADOS */}
             {tab === 'finalizados' && (
                 <ListContainer
-                    empty={finalizados.length === 0}
+                    empty={entity.gastos_inactivos.length === 0}
                     emptyLabel="Sin gastos finalizados."
                 >
-                    {finalizados.map((gasto, i) => (
-                        <GastoFinalizadoItem key={i} gasto={gasto} />
+                    {entity.gastos_inactivos.map((g) => (
+                        <GastoFinalizadoItem key={g.id} gasto={g} />
                     ))}
                 </ListContainer>
             )}
 
-            {/* LOG */}
             {tab === 'log' && (
-                <ListContainer empty={logs.length === 0} emptyLabel="Sin registros.">
-                    {logs.map((l, i) => (
+                <ListContainer empty={entity.logs.length === 0} emptyLabel="Sin registros.">
+                    {entity.logs.map((l, i) => (
                         <div key={i} className="flex justify-between py-3">
                             <p className="text-sm text-zinc-600">{l.content}</p>
                             <span className="text-xs text-zinc-500">
@@ -147,30 +99,14 @@ export default function EntidadDetalle() {
                 </ListContainer>
             )}
 
-            {/* MODAL EDITAR ENTIDAD */}
+            {/* MODAL EDITAR */}
             {openEditEntity && (
                 <EditEntityModal
                     open={openEditEntity}
                     entity={entity}
                     onClose={() => setOpenEditEntity(false)}
-                    onSave={async (newName) => {
-                        try {
-                            await updateFinancialEntity(entity.id, newName, token);
-
-                            setEntity((prev) => ({ ...prev, name: newName }));
-                            setOpenEditEntity(false);
-                        } catch (err) {
-                            console.error('Error actualizando entidad', err);
-                        }
-                    }}
-                    onDelete={async () => {
-                        try {
-                            await deleteFinancialEntity(entity.id, token);
-                            window.location.href = '/app/entidades';
-                        } catch (err) {
-                            console.error('Error eliminando entidad', err);
-                        }
-                    }}
+                    onSave={onUpdateEntity}
+                    onDelete={onDeleteEntity}
                 />
             )}
 
@@ -179,28 +115,7 @@ export default function EntidadDetalle() {
                 <NewExpenseModal
                     defaultEntityId={entity.id}
                     onClose={() => setOpenNewExpense(false)}
-                    onSave={async (payload) => {
-                        try {
-                            const nuevo = await createGasto(payload, token);
-
-                            const isFinalizado =
-                                Number(nuevo.payed_quotas) >= Number(nuevo.number_of_quotas);
-
-                            setEntity((prev) => ({
-                                ...prev,
-                                gastos_activos: isFinalizado
-                                    ? prev.gastos_activos
-                                    : [...prev.gastos_activos, nuevo],
-                                gastos_inactivos: isFinalizado
-                                    ? [...prev.gastos_inactivos, nuevo]
-                                    : prev.gastos_inactivos,
-                            }));
-
-                            setOpenNewExpense(false);
-                        } catch (err) {
-                            console.error('Error guardando gasto', err);
-                        }
-                    }}
+                    onSave={onCreateExpense}
                 />
             )}
         </>

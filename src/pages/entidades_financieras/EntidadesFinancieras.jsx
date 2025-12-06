@@ -2,10 +2,9 @@ import Heading from './components/Heading';
 import SearchBox from './components/SearchBox';
 import EntitiesList from './components/EntitiesList';
 import EmptyState from './components/EmptyState';
-
 import NewEntityModal from '../../components/modals/NewEntityModal';
 
-import { useEntidadesFinancieras } from './hooks/use-entidades-financieras';
+import { useEntidadesUI } from './hooks/use-entidades-ui';
 
 export default function EntidadesFinancieras() {
     const {
@@ -18,7 +17,7 @@ export default function EntidadesFinancieras() {
         handleSaveNew,
         handleDelete,
         navigate,
-    } = useEntidadesFinancieras();
+    } = useEntidadesUI();
 
     return (
         <>
