@@ -50,3 +50,8 @@
 - [ ] Momentos de carga globales.
 - [ ] Optimizar imágenes y fallbacks.
 - [ ] Los horarios los toma 3h mas.
+
+## EXTRAS
+
+- [ ] Entidad como tarjeta para saber cuando vencen
+- [ ] Agrupar gastos por grupos
