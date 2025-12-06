@@ -1,52 +1,64 @@
-// src/components/modals/NewExpenseCard/NewExpenseCard.jsx
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import useAuth from '@/hooks/use-auth';
-import { createEntity } from '@/services/api';
-
-// COMPONENTES
-import ExpenseTypeSelector from './components/ExpenseTypeSelector';
-import EntitySelector from './components/EntitySelector';
-import ExpenseAmountSection from './components/ExpenseAmountSection';
-import ExpenseInstallmentsSection from './components/ExpenseInstallmentsSection';
-// import ExpenseFilesUpload from './components/ExpenseFilesUpload';
+import { useEntitiesStore } from '@/store/use-entities-store';
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
-import { useEntitiesStore } from '@/store/use-entities-store';
+import { createEntity } from '@/services/api';
+import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
+import EntitySelector from '../components/EntitySelector';
+import ExpenseAmountSection from '../components/ExpenseAmountSection';
+import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
 
-export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null }) {
+export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const { token } = useAuth();
+    const { entities, setEntities } = useEntitiesStore();
 
-    // === STATES ===
-    const [type, setType] = useState('Debo');
-    const [name, setName] = useState('');
-    const [entity, setEntity] = useState(defaultEntityId || '');
+    const containerRef = useRef(null);
 
-    const [amount, setAmount] = useState('');
-    const [currency, setCurrency] = useState('ARS');
+    // =========================
+    // INITIAL STATE FROM GASTO
+    // =========================
+    const [type, setType] = useState(gasto.type === 'ME_DEBEN' ? 'Me deben' : 'Debo');
+    const [name, setName] = useState(gasto.name);
+    const [entity, setEntity] = useState(gasto.financial_entity_id);
 
-    const [installments, setInstallments] = useState('');
+    const [amount, setAmount] = useState(String(gasto.amount));
+    const [currency, setCurrency] = useState(
+        gasto.currency_type === '2' ? 'USD' : gasto.currency_type === '3' ? 'EUR' : 'ARS',
+    );
 
-    // const [files, setFiles] = useState(null);
+    const [isFixed, setIsFixed] = useState(Boolean(gasto.fixed_expense));
+    const [isInstallment, setIsInstallment] = useState(gasto.number_of_quotas > 0);
+
+    const [installments, setInstallments] = useState(
+        gasto.number_of_quotas ? String(gasto.number_of_quotas) : '',
+    );
+
+    const [paidInstallments, setPaidInstallments] = useState(
+        gasto.payed_quotas ? String(gasto.payed_quotas) : '0',
+    );
 
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
-    const [isFixed, setIsFixed] = useState(false);
-    const [isInstallment, setIsInstallment] = useState(false);
-    const [paidInstallments, setPaidInstallments] = useState('0');
-    const { entities, setEntities } = useEntitiesStore();
+
+    // =============================
+    // PROGRESS
+    // =============================
     const totalInstallments = Number(installments) || 0;
     const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
     const progressPct = totalInstallments > 0 ? Math.min(100, (paid / totalInstallments) * 100) : 0;
 
-    const containerRef = useRef(null);
+    // =============================
+    // VALIDATION
+    // =============================
+    const canSave = useMemo(() => {
+        return name?.trim() && entity && Number(amount) > 0 && currency;
+    }, [name, entity, amount, currency]);
 
-    const canSave = useMemo(
-        () => name.trim() && entity && Number(amount) > 0 && currency,
-        [name, entity, amount, currency],
-    );
-
-    // === CREATE ENTITY ===
+    // =============================
+    // CREATE ENTITY (inline)
+    // =============================
     const handleCreateEntity = async () => {
         if (!newEntityName.trim()) return;
 
@@ -61,7 +73,9 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
         }
     };
 
-    // === ESCAPE + SCROLL LOCK ===
+    // =============================
+    // ESC + SCROLL LOCK
+    // =============================
     useEffect(() => {
         const onKey = (e) => e.key === 'Escape' && onClose?.();
         document.addEventListener('keydown', onKey);
@@ -75,7 +89,9 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
         };
     }, [onClose]);
 
-    // === SAVE ===
+    // =============================
+    // SAVE EDITED GASTO
+    // =============================
     const handleSubmit = () => {
         if (!canSave) return;
 
@@ -87,9 +103,9 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
             amount: Number(amount),
             number_of_quotas: isInstallment ? Number(installments) : 0,
             currency_type,
-            first_quota_date: null,
+            first_quota_date: gasto.first_quota_date,
             fixed_expense: isFixed,
-            image: null,
+            image: gasto.image ?? null,
             type: type === 'Me deben' ? 'ME_DEBEN' : 'DEBO',
             payed_quotas: isInstallment ? Number(paidInstallments) : 0,
         };
@@ -97,32 +113,28 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
         onSave?.(payload);
     };
 
-    // ============================
-    // 🎨 MODAL COMPLETO
-    // ============================
-    const modalContent = (
+    // =============================
+    // MODAL CONTENT
+    // =============================
+    const modal = (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center"
             onMouseDown={(e) => e.target === e.currentTarget && onClose?.()}
         >
-            {/* Background */}
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
-
-            {/* SOLO se muestra cuando YA cargó */}
 
             <div
                 ref={containerRef}
                 className="
-                        relative z-10 w-[92vw] max-w-2xl max-h-[85vh] overflow-y-auto 
-                        rounded-2xl shadow-xl bg-[#111714] border border-[#29382f]
-                        transition-all duration-150 opacity-100 scale-100
-                    "
+                    relative z-10 w-[92vw] max-w-2xl max-h-[85vh] overflow-y-auto
+                    rounded-2xl shadow-xl bg-[#111714] border border-[#29382f]
+                "
             >
                 {/* HEADER */}
                 <header className="sticky top-0 flex items-center justify-between border-b border-[#29382f] px-6 py-4 bg-[#111714]">
                     <div className="flex items-center gap-3 text-white">
-                        <Icon name="add_circle" className="text-primary" />
-                        <h2 className="text-white text-lg font-bold">Nuevo Gasto</h2>
+                        <Icon name="edit" className="text-primary" />
+                        <h2 className="text-white text-lg font-bold">Editar Gasto</h2>
                     </div>
 
                     <button
@@ -206,8 +218,6 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
                             progressPct={progressPct}
                         />
                     )}
-
-                    {/* <ExpenseFilesUpload setFiles={setFiles} /> */}
                 </div>
 
                 {/* FOOTER */}
@@ -223,15 +233,15 @@ export default function NewExpenseCard({ onClose, onSave, defaultEntityId = null
                         disabled={!canSave}
                         onClick={handleSubmit}
                         className="h-11 px-4 text-sm font-bold flex items-center gap-2 rounded-lg 
-                               bg-primary text-black disabled:opacity-60"
+                            bg-primary text-black disabled:opacity-60"
                     >
                         <Icon name="save" />
-                        Guardar gasto
+                        Guardar cambios
                     </button>
                 </footer>
             </div>
         </div>
     );
 
-    return createPortal(modalContent, document.body);
+    return createPortal(modal, document.body);
 }

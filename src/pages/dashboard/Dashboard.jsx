@@ -1,7 +1,7 @@
 import Icon from '../../components/Icon';
 import StatCards from './components/StatCards';
 import ActiveExpenses from './components/ActiveExpenses';
-import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
+import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useNewExpense } from './hooks/use-new-expense';

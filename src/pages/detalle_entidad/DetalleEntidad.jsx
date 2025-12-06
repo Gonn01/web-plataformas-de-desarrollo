@@ -1,5 +1,5 @@
 import Icon from '../../components/Icon';
-import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
+import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
 
 import { TabHeader } from './components/TabHeader';
 import { ListContainer } from './components/ListContainer';

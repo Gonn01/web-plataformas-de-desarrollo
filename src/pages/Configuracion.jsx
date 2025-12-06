@@ -25,7 +25,7 @@ function currencyLabelToCode(label) {
         case 'EUR':
             return 3;
         default:
-            return 1; 
+            return 1;
     }
 }
 
@@ -45,9 +45,7 @@ export default function Configuracion() {
         setNombreVisible(user.name || user.nombre || 'Usuario');
 
         const pref =
-            user.preferred_currency !== undefined
-                ? user.preferred_currency
-                : user.monedaPreferida;
+            user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
 
         const label = pref ? currencyCodeToLabel(pref) : 'ARS';
         setMoneda(label);
@@ -92,7 +90,7 @@ export default function Configuracion() {
             if (typeof updateUser === 'function') {
                 updateUser({
                     ...updatedFromApi,
-                    monedaPreferida: moneda, 
+                    monedaPreferida: moneda,
                 });
             }
 
@@ -138,17 +136,16 @@ export default function Configuracion() {
                                     }}
                                 />
 
-                                <span className="text-xs text-slate-500 dark:text-slate-400">
-                                </span>
+                                <span className="text-xs text-slate-500 dark:text-slate-400"></span>
                             </div>
                         </div>
 
                         {/* NOMBRE VISIBLE (solo lectura) */}
- 
-                            <p className="text-slate-600 dark:text-slate-300 mt-3">
-                                <span className="font-medium">Nombre: </span>
-                                {nombreVisible}
-                            </p>
+
+                        <p className="text-slate-600 dark:text-slate-300 mt-3">
+                            <span className="font-medium">Nombre: </span>
+                            {nombreVisible}
+                        </p>
 
                         {/* EMAIL (solo lectura) */}
                         <p className="text-slate-600 dark:text-slate-300 mt-3">
@@ -194,4 +191,3 @@ export default function Configuracion() {
         </div>
     );
 }
-

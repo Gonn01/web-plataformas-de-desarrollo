@@ -4,9 +4,6 @@ import useAuth from '@/hooks/use-auth';
 import { pagarCuota as pagarCuota2 } from '@/services/api';
 import { fetchGastoById, updateGasto, deleteGasto } from '@/services/api';
 
-/**
- * Hook de dominio adaptado EXACTAMENTE a la API REAL
- */
 export function useGastoData() {
     const { id } = useParams();
     const { token } = useAuth();
