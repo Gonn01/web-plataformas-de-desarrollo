@@ -22,18 +22,22 @@ export default function EntidadDetalle() {
     const { token } = useAuth();
 
     const [entity, setEntity] = useState(null);
-    const [tab, setTab] = useState('activos');
+    const [tab, setTab] = useState('activos'); // ⬅️ luego agregamos "fijos"
     const [openNewExpense, setOpenNewExpense] = useState(false);
     const [openEditEntity, setOpenEditEntity] = useState(false);
     const [loading, setLoading] = useState(true);
-
-    // const navigate = useNavigate(); // Comentado porque no se usa
 
     useEffect(() => {
         const load = async () => {
             try {
                 setLoading(true);
                 const data = await fetchFinancialEntityById(id, token);
+
+                console.log("DATA COMPLETA ENTIDAD:", data); // 🟩 DEBUG PARA LOG
+
+                // 🔥 FIX LOG — si viene null, lo forzamos a []
+                data.logs = Array.isArray(data.logs) ? data.logs : [];
+
                 setEntity(data);
             } catch (err) {
                 console.error('Error cargando entidad', err);
@@ -77,9 +81,26 @@ export default function EntidadDetalle() {
         return <div className="text-center p-10 text-red-500">Entidad no encontrada</div>;
     }
 
+    // ============================
+    // CLASIFICACIÓN DE GASTOS 👇
+    // ============================
+
     const activos = entity.gastos_activos;
+
     const finalizados = entity.gastos_inactivos;
-    const logs = entity.logs;
+
+    // ⭐ NUEVO: detección de GASTOS FIJOS
+    // Ajustá "is_fixed" si tu backend usa otro campo
+    const fijos = [
+        ...entity.gastos_activos.filter((g) => g.is_fixed === true),
+        ...entity.gastos_inactivos.filter((g) => g.is_fixed === true),
+    ];
+
+    // ⛔ Evitar que los fijos aparezcan doble
+    const activos_limpios = activos.filter((g) => !g.is_fixed);
+    const finalizados_limpios = finalizados.filter((g) => !g.is_fixed);
+
+    const logs = entity.logs ?? [];
 
     return (
         <>
@@ -102,13 +123,13 @@ export default function EntidadDetalle() {
                 <StatCard label="Deudas Activas" value={stats.debts} />
             </div>
 
-            {/* TABS */}
-            <TabHeader tab={tab} setTab={setTab} />
+            {/* ⭐ ACTUALIZAMOS LOS TABS PARA INCLUIR GASTOS FIJOS */}
+            <TabHeader tab={tab} setTab={setTab} includeFijos />
 
             {/* ACTIVOS */}
             {tab === 'activos' && (
-                <ListContainer empty={activos.length === 0} emptyLabel="Sin gastos activos.">
-                    {activos.map((gasto, i) => (
+                <ListContainer empty={activos_limpios.length === 0} emptyLabel="Sin gastos activos.">
+                    {activos_limpios.map((gasto, i) => (
                         <GastoItem key={i} gasto={gasto} />
                     ))}
                 </ListContainer>
@@ -117,11 +138,20 @@ export default function EntidadDetalle() {
             {/* FINALIZADOS */}
             {tab === 'finalizados' && (
                 <ListContainer
-                    empty={finalizados.length === 0}
+                    empty={finalizados_limpios.length === 0}
                     emptyLabel="Sin gastos finalizados."
                 >
-                    {finalizados.map((gasto, i) => (
+                    {finalizados_limpios.map((gasto, i) => (
                         <GastoFinalizadoItem key={i} gasto={gasto} />
+                    ))}
+                </ListContainer>
+            )}
+
+            {/* ⭐ NUEVO TAB: GASTOS FIJOS */}
+            {tab === 'fijos' && (
+                <ListContainer empty={fijos.length === 0} emptyLabel="Sin gastos fijos.">
+                    {fijos.map((gasto, i) => (
+                        <GastoItem key={i} gasto={gasto} isFixed />
                     ))}
                 </ListContainer>
             )}
@@ -131,7 +161,7 @@ export default function EntidadDetalle() {
                 <ListContainer empty={logs.length === 0} emptyLabel="Sin registros.">
                     {logs.map((l, i) => (
                         <div key={i} className="flex justify-between py-3">
-                            <p className="text-sm text-zinc-600">{l.content}</p>
+                            <p className="text-sm text-zinc-300">{l.content}</p>
                             <span className="text-xs text-zinc-500">
                                 {new Date(l.created_at).toLocaleString()}
                             </span>
@@ -140,7 +170,7 @@ export default function EntidadDetalle() {
                 </ListContainer>
             )}
 
-            {/* MODAL EDITAR ENTIDAD */}
+            {/* MODALES */}
             {openEditEntity && (
                 <EditEntityModal
                     open={openEditEntity}
@@ -166,7 +196,6 @@ export default function EntidadDetalle() {
                 />
             )}
 
-            {/* MODAL NUEVO GASTO */}
             {openNewExpense && (
                 <NewExpenseModal
                     defaultEntityId={entity.id}
@@ -174,26 +203,7 @@ export default function EntidadDetalle() {
                     onSave={async (payload) => {
                         try {
                             await createExpense(payload, token);
-
-                            // 🔥 Solución: actualizar el listado de entidades al crear un gasto
                             window.location.href = '/app/entidades';
-
-                            // Mantengo tu código original por si lo necesitás después
-                            /*
-                            const isFinalizado =
-                                Number(nuevo.payed_quotas) >= Number(nuevo.number_of_quotas);
-
-                            setEntity((prev) => ({
-                                ...prev,
-                                gastos_activos: isFinalizado
-                                    ? prev.gastos_activos
-                                    : [...prev.gastos_activos, nuevo],
-                                gastos_inactivos: isFinalizado
-                                    ? [...prev.gastos_inactivos, nuevo]
-                                    : prev.gastos_inactivos,
-                            }));
-                            */
-                            setOpenNewExpense(false);
                         } catch (err) {
                             console.error('Error guardando gasto', err);
                         }
