@@ -1,4 +1,4 @@
-export default function ProgresoPago({ detalle, porcentaje, totalPagado }) {
+export default function ProgresoPago({ gasto, porcentaje, totalPagado }) {
     return (
         <div className="flex flex-col gap-3">
             <div className="flex justify-between">
@@ -10,7 +10,7 @@ export default function ProgresoPago({ detalle, porcentaje, totalPagado }) {
             </div>
 
             <p className="text-sm text-[#9eb7a8]">
-                {`${detalle.cuotas.filter((c) => c.pagada).length} de ${detalle.cuotas.length} cuotas pagadas ($${totalPagado.toFixed(2)} / $${detalle.total})`}
+                {`${gasto.cuotas.filter((c) => c.pagada).length} de ${gasto.cuotas.length} cuotas pagadas ($${totalPagado.toFixed(2)} / $${gasto.total.toFixed(2)})`}
             </p>
         </div>
     );

@@ -1,0 +1,41 @@
+import { create } from 'zustand';
+import { fetchFinancialEntities } from '@/services/api';
+
+export const useEntitiesStore = create((set, get) => ({
+    entities: [],
+    loading: false,
+
+    loadEntities: async (token) => {
+        set({ loading: true });
+        try {
+            const data = await fetchFinancialEntities(token);
+            set({ entities: data });
+        } catch (err) {
+            console.error('Error loading entities', err);
+        } finally {
+            set({ loading: false });
+        }
+    },
+
+    getEntityById: (id) => {
+        return get().entities.find((e) => e.id == id) || null;
+    },
+
+    addEntity: (entity) => {
+        set((state) => ({
+            entities: [...state.entities, entity],
+        }));
+    },
+
+    updateEntity: (id, patch) => {
+        set((state) => ({
+            entities: state.entities.map((e) => (e.id == id ? { ...e, ...patch } : e)),
+        }));
+    },
+
+    removeEntity: (id) => {
+        set((state) => ({
+            entities: state.entities.filter((e) => e.id != id),
+        }));
+    },
+}));

@@ -1,155 +1,140 @@
 import { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
-
+import { pagarCuota as pagarCuota2 } from '@/services/api';
 import { fetchGastoById, updateGasto, deleteGasto } from '@/services/api';
-import { formatDate } from '@/utils/FormatDate';
 
-/**
- * Hook de dominio.
- * Maneja toda la lógica REAL del gasto:
- * - Carga
- * - Transformación del modelo
- * - Actualización
- * - Pago de cuotas
- * - Eliminación
- */
 export function useGastoData() {
     const { id } = useParams();
     const { token } = useAuth();
+    const navigate = useNavigate();
+    const [gasto, setGasto] = useState(null);
+    const [loading, setLoading] = useState(false);
 
-    const [detalle, setDetalle] = useState(null);
-
-    // -------------------------
-    // CARGA DEL GASTO
-    // -------------------------
     useEffect(() => {
-        if (!token) return;
         load();
-    }, [token, id]);
+    }, [id, token]);
 
-    // (si no lo tenés, te lo hago después)
+    // -----------------------------------------
+    // TRANSFORMADOR → convierte API → Modelo UI
+    // -----------------------------------------
+    function mapGasto(g) {
+        const totalCuotas = Number(g.number_of_quotas) || 0;
+        const pagadas = Number(g.payed_quotas) || 0;
+        const amount = Number(g.amount) || 0;
+        const amountPerQuota = Number(g.amount_per_quota) || amount;
+        const isFixed = Boolean(g.fixed_expense);
 
+        let cuotas = [];
+
+        // --------------------------
+        // GASTO FIJO
+        // --------------------------
+        if (isFixed) {
+            cuotas = [
+                {
+                    nro: 1,
+                    monto: amountPerQuota,
+                    pagada: pagadas > 0,
+                    proxima: pagadas === 0,
+                    venc: 'Gasto fijo',
+                },
+            ];
+        }
+        // --------------------------
+        // GASTO CON CUOTAS NORMALES
+        // --------------------------
+        else if (totalCuotas > 0) {
+            cuotas = Array.from({ length: totalCuotas }, (_, i) => ({
+                nro: i + 1,
+                monto: amountPerQuota,
+                pagada: i < pagadas,
+                proxima: i === pagadas,
+            }));
+        }
+        // --------------------------
+        // GASTO ÚNICO (sin cuotas)
+        // --------------------------
+        else {
+            cuotas = [
+                {
+                    nro: 1,
+                    monto: amount,
+                    pagada: pagadas > 0,
+                    proxima: pagadas === 0,
+                },
+            ];
+        }
+
+        return {
+            id: g.id,
+            titulo: g.name,
+            entidad: g.financial_entity_id,
+            total: amount,
+            moneda: g.currency_type === '1' ? 'ARS' : g.currency_type === '2' ? 'USD' : 'EUR',
+            tipo: g.type === 'ME_DEBEN' ? 'Me deben' : 'Debo',
+            cuotas,
+            fijo: isFixed,
+            finalization_date: g.finalization_date,
+            logs: g.logs || [],
+        };
+    }
+
+    // -----------------------------------------
+    // CARGAR GASTO DESDE API
+    // -----------------------------------------
     async function load() {
         try {
-            const gasto = await fetchGastoById(id, token);
-
-            const totalCuotas = Number(gasto.number_of_quotas) || 0;
-            const pagadas = Number(gasto.payed_quotas) || 0;
-
-            // Para gastos por cuota: usar amount_per_quota si viene
-            const montoCuota =
-                totalCuotas > 0 ? Number(gasto.amount_per_quota) : Number(gasto.amount);
-
-            // Fecha de vencimiento formateada si existe
-            const vencimiento = gasto.first_quota_date
-                ? formatDate(gasto.first_quota_date)
-                : 'Sin fecha';
-
-            let cuotas = [];
-
-            if (gasto.fixed_expense) {
-                // 🟦 Gasto fijo → NO tiene cuotas reales
-                cuotas = [
-                    {
-                        nro: 1,
-                        monto: montoCuota,
-                        pagada: pagadas > 0,
-                        proxima: pagadas === 0,
-                        venc: 'Gasto fijo',
-                    },
-                ];
-            } else if (totalCuotas > 0) {
-                // 🟩 Gasto con cuotas
-                cuotas = Array.from({ length: totalCuotas }, (_, i) => ({
-                    nro: i + 1,
-                    monto: montoCuota,
-                    pagada: i < pagadas,
-                    proxima: i === pagadas && pagadas < totalCuotas,
-                    venc: vencimiento,
-                }));
-            } else {
-                // 🟧 Gasto TOTAL sin cuotas
-                cuotas = [
-                    {
-                        nro: 1,
-                        monto: Number(gasto.amount),
-                        pagada: pagadas > 0,
-                        proxima: pagadas === 0,
-                        venc: vencimiento,
-                    },
-                ];
-            }
-
-            setDetalle({
-                id: gasto.id,
-                titulo: gasto.name,
-                entidad: gasto.financial_entity_id,
-                total: Number(gasto.amount),
-                moneda:
-                    gasto.currency_type === '1'
-                        ? 'ARS'
-                        : gasto.currency_type === '2'
-                            ? 'USD'
-                            : 'EUR',
-                tipo: gasto.type === 'ME_DEBEN' ? 'Me deben' : 'Debo',
-                cuotas,
-                fijo: gasto.fixed_expense,
-                logs: gasto.logs || [],
-                adjuntos: [],
-            });
+            setLoading(true);
+            const res = await fetchGastoById(id, token);
+            setGasto(mapGasto(res));
         } catch (err) {
             console.error('Error cargando gasto', err);
+            navigate(`/app/entidades-financieras/${gasto.financial_entity_id}/gastos`);
+        } finally {
+            setLoading(false);
         }
     }
 
-    // -------------------------
-    // ACTUALIZAR
-    // -------------------------
-    async function actualizar(data) {
-        await updateGasto(detalle.id, data, token);
-        await load(); // recargar para mantener consistencia
+    // -----------------------------------------
+    // ACTUALIZAR GASTO
+    // -----------------------------------------
+    async function actualizar(payload) {
+        if (!gasto) return;
+        setLoading(true);
+        await updateGasto(gasto.id, payload, token);
+        await load();
+        setLoading(false);
     }
 
-    // -------------------------
-    // PAGO DE CUOTA
-    // -------------------------
+    // -----------------------------------------
+    // PAGAR CUOTA
+    // -----------------------------------------
     async function pagarCuota() {
-        if (!detalle) return;
-
-        const idx = detalle.cuotas.findIndex((c) => c.proxima && !c.pagada);
-        if (idx === -1) return;
-
-        const nuevas = detalle.cuotas.map((c, i) => ({
-            ...c,
-            pagada: i === idx ? true : c.pagada,
-            proxima: false,
-        }));
-
-        const siguiente = nuevas.findIndex((c) => !c.pagada);
-        if (siguiente !== -1) {
-            nuevas[siguiente] = { ...nuevas[siguiente], proxima: true };
-        }
-
-        const pagadas = nuevas.filter((c) => c.pagada).length;
-
-        await updateGasto(detalle.id, { payed_quotas: pagadas }, token);
-
-        setDetalle((prev) => ({ ...prev, cuotas: nuevas }));
+        if (!gasto) return;
+        setLoading(true);
+        await pagarCuota2(gasto.id, token);
+        await load();
+        setLoading(false);
     }
 
-    // -------------------------
-    // ELIMINAR
-    // -------------------------
+    // -----------------------------------------
+    // ELIMINAR GASTO
+    // -----------------------------------------
     async function eliminar() {
-        await deleteGasto(detalle.id, token);
+        if (!gasto) return;
+        setLoading(true);
+        await deleteGasto(gasto.id, token);
+        navigate(`/app/entidades-financieras/${gasto.financial_entity_id}/gastos`);
+        setLoading(false);
     }
 
     return {
-        detalle,
-        setDetalle, // útil para UI
+        gasto,
         actualizar,
         pagarCuota,
         eliminar,
+        load,
+        loading,
     };
 }

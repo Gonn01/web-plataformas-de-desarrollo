@@ -1,5 +1,5 @@
 import Icon from '../../components/Icon';
-import NewExpenseModal from '../../components/modals/NewExpense/NewExpenseCard';
+import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
 
 import { TabHeader } from './components/TabHeader';
 import { ListContainer } from './components/ListContainer';
@@ -64,11 +64,6 @@ export default function EntidadDetalle() {
                     onClick={() => setTab('activos')}
                 />
                 <StatCard
-                    label="Gastos fijos"
-                    value={stats.fixed}
-                    onClick={() => setTab('fijos')}
-                />
-                <StatCard
                     label="Gastos finalizados"
                     value={stats.finalized}
                     onClick={() => setTab('finalizados')}
@@ -89,22 +84,6 @@ export default function EntidadDetalle() {
                             key={g.id}
                             gasto={g}
                             variant="activo"
-                            onClick={() => navigate(`/app/gastos/${g.id}`)}
-                        />
-                    ))}
-                </ListContainer>
-            )}
-
-            {tab === 'fijos' && (
-                <ListContainer
-                    empty={!entity.gastos_fijos || entity.gastos_fijos.length === 0}
-                    emptyLabel="Sin gastos fijos."
-                >
-                    {entity.gastos_fijos?.map((g) => (
-                        <GastoItem
-                            key={g.id}
-                            gasto={g}
-                            variant="fijo"
                             onClick={() => navigate(`/app/gastos/${g.id}`)}
                         />
                     ))}

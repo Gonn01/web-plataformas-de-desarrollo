@@ -3,10 +3,12 @@
 import { useEffect, useState } from 'react';
 import { fetchFinancialEntities, createEntity, deleteFinancialEntity } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
+import { useEntitiesStore } from '@/store/use-entities-store';
 
 export function useEntidadesData() {
     const { token } = useAuth();
     const [entities, setEntities] = useState([]);
+    const { addEntity } = useEntitiesStore();
 
     useEffect(() => {
         if (!token) return;
@@ -34,6 +36,7 @@ export function useEntidadesData() {
     async function crearEntidad({ name }) {
         const newEntity = await createEntity({ name }, token);
         setEntities((prev) => [newEntity, ...prev]);
+        addEntity(newEntity);
         return newEntity;
     }
 

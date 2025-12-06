@@ -4,59 +4,69 @@ import HeaderDetalle from './components/HeaderDetalle';
 import InfoItem from './components/InfoItem';
 import ProgresoPago from './components/ProgresoPago';
 import CuotasSection from './components/CuotasSection';
-import AdjuntosSection from './components/AdjuntosSection';
+// import AdjuntosSection from './components/AdjuntosSection';
 import PeligroEliminar from '../../components/PeligroEliminar';
-import EditDeudaModal from './components/modals/EditDeudaModal';
 import { useGastoUI } from './hooks/use-gasto-ui';
+import Loader from '@/components/Loader';
+import { useEntitiesStore } from '@/store/use-entities-store';
+import UpdateExpenseModal from '@/components/modals/Expenses/UpdateExpense/UpdateExpenseModal';
 
-export default function CompraDetalle() {
+export default function DetalleGasto() {
     const {
-        detalle,
+        gasto,
         porcentaje,
         totalPagado,
         pagarCuota,
         actualizar,
         eliminar,
+        loading,
         volverALista,
-        onSeleccionAdjuntos,
+        // onSeleccionAdjuntos,
     } = useGastoUI();
-
-    // ➜ ESTE ESTADO ES DE UI Y VA ACÁ
+    const { getEntityById } = useEntitiesStore();
     const [editOpen, setEditOpen] = useState(false);
 
-    if (!detalle) return null;
-    console.log('Detalle de compra:', detalle);
+    if (loading) {
+        return <Loader />;
+    }
+
+    if (!gasto) return null;
+
     return (
         <div className="min-h-dvh w-full bg-background-dark text-white font-display">
             <div className="px-4 md:px-10 lg:px-20 xl:px-40 py-6 flex justify-center">
                 <div className="w-full max-w-[960px] flex flex-col gap-8">
-                    <HeaderDetalle
-                        detalle={detalle}
-                        marcarProxima={pagarCuota}
-                        abrirEditar={() => setEditOpen(true)}
-                    />
-
+                    {!loading ? (
+                        <HeaderDetalle
+                            gasto={gasto}
+                            marcarProxima={pagarCuota}
+                            abrirEditar={() => setEditOpen(true)}
+                        />
+                    ) : null}
                     <div className="bg-[#111714] rounded-xl p-6 shadow-sm flex flex-col gap-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-                            <InfoItem label="Entidad" value={detalle.entidad} />
-                            <InfoItem label="Monto Total" value={`$${detalle.total}`} />
-                            <InfoItem label="Tipo" value={detalle.tipo} />
-                            <InfoItem label="Moneda" value={detalle.moneda} />
+                            <InfoItem
+                                label="Entidad"
+                                value={getEntityById(gasto.entidad)?.name || gasto.entidad}
+                            />
+                            <InfoItem label="Monto Total" value={`$${gasto.total}`} />
+                            <InfoItem label="Moneda" value={gasto.moneda} />
                         </div>
 
                         <ProgresoPago
-                            detalle={detalle}
+                            gasto={gasto}
                             porcentaje={porcentaje}
                             totalPagado={totalPagado}
+                            loading={loading}
                         />
                     </div>
 
-                    <CuotasSection cuotas={detalle.cuotas} />
+                    <CuotasSection cuotas={gasto.cuotas} loading={loading} />
 
-                    <AdjuntosSection
+                    {/* <AdjuntosSection
                         adjuntos={detalle.adjuntos}
                         onSeleccionAdjuntos={onSeleccionAdjuntos}
-                    />
+                    /> */}
 
                     <PeligroEliminar
                         onDelete={() => {
@@ -69,11 +79,12 @@ export default function CompraDetalle() {
 
             {/* MODAL EDITAR */}
             {editOpen && (
-                <EditDeudaModal
-                    detalle={detalle}
-                    onCancel={() => setEditOpen(false)}
-                    onSave={(payload) => {
-                        actualizar(payload);
+                <UpdateExpenseModal
+                    gasto={gasto}
+                    open={editOpen}
+                    onClose={() => setEditOpen(false)}
+                    onSave={async (payload) => {
+                        await actualizar(payload);
                         setEditOpen(false);
                     }}
                 />
