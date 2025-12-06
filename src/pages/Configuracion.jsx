@@ -1,43 +1,108 @@
-import { useState } from 'react';
+// src/pages/Configuracion.jsx
+import { useEffect, useState } from 'react';
 import useAuth from '@/hooks/use-auth';
 
+function currencyCodeToLabel(codeOrLabel) {
+    if (typeof codeOrLabel === 'string') {
+        if (['ARS', 'USD', 'EUR'].includes(codeOrLabel)) return codeOrLabel;
+    }
+
+    const code = Number(codeOrLabel);
+    switch (code) {
+        case 2:
+            return 'USD';
+        case 3:
+            return 'EUR';
+        default:
+            return 'ARS';
+    }
+}
+
+function currencyLabelToCode(label) {
+    switch (label) {
+        case 'USD':
+            return 2;
+        case 'EUR':
+            return 3;
+        default:
+            return 1; 
+    }
+}
+
 export default function Configuracion() {
-    const { usuario, setUsuario } = useAuth() || {};
-
-    // estados locales para lo editable
-    const [preview, setPreview] = useState(usuario?.avatar || '');
-    const [nombreVisible, setNombreVisible] = useState(usuario?.nombre || 'Usuario');
+    const { user, token, updateUser } = useAuth();
+    const [preview, setPreview] = useState('');
+    const [nombreVisible, setNombreVisible] = useState('Usuario');
     const [moneda, setMoneda] = useState('ARS');
+    const [loading, setLoading] = useState(false);
 
-    const handlePhotoChange = (e) => {
-        const file = e.target.files[0];
-        if (!file) return;
+    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 
-        const reader = new FileReader();
-        reader.onload = () => {
-            setPreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-    };
+    useEffect(() => {
+        if (!user) return;
 
-    const handleSave = () => {
-        // objeto usuario actualizado
-        const actualizado = {
-            ...usuario,
-            nombre: nombreVisible,
-            avatar: preview,
-            monedaPreferida: moneda,
-        };
+        setPreview(user.avatar || '');
+        setNombreVisible(user.name || user.nombre || 'Usuario');
 
-        // si el contexto expone setUsuario, lo usamos
-        if (typeof setUsuario === 'function') {
-            setUsuario(actualizado);
+        const pref =
+            user.preferred_currency !== undefined
+                ? user.preferred_currency
+                : user.monedaPreferida;
+
+        const label = pref ? currencyCodeToLabel(pref) : 'ARS';
+        setMoneda(label);
+    }, [user]);
+
+    const handleSave = async () => {
+        if (!token) {
+            alert('No hay sesión activa.');
+            return;
         }
 
-        // lo guardo en localStorage
-        localStorage.setItem('auth_usuario', JSON.stringify(actualizado));
+        try {
+            setLoading(true);
 
-        alert('Datos de usuario actualizados.');
+            const preferred_currency = currencyLabelToCode(moneda);
+
+            const res = await fetch(`${baseUrl}/auth/me`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+
+                body: JSON.stringify({
+                    name: nombreVisible,
+                    avatar: preview || null,
+                    preferred_currency,
+                }),
+            });
+
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error('Error actualizando perfil:', res.status, errText);
+                alert('No se pudieron guardar los cambios.');
+                setLoading(false);
+                return;
+            }
+
+            const json = await res.json();
+            const updatedFromApi = json.data || json.user || json;
+
+            if (typeof updateUser === 'function') {
+                updateUser({
+                    ...updatedFromApi,
+                    monedaPreferida: moneda, 
+                });
+            }
+
+            alert('Datos de usuario actualizados.');
+        } catch (err) {
+            console.error('Error guardando configuración:', err);
+            alert('Ocurrió un error al guardar los cambios.');
+        } finally {
+            setLoading(false);
+        }
     };
 
     return (
@@ -52,14 +117,14 @@ export default function Configuracion() {
             </header>
 
             <section className="grid gap-6 md:grid-cols-2">
-                {/* Datos del usuario */}
+                {/* DATOS DEL USUARIO (SOLO LECTURA) */}
                 <div className="rounded-2xl border border-black/10 dark:border-white/10 p-4 bg-white/70 dark:bg-background-dark/70">
                     <h2 className="text-base font-medium mb-3 text-slate-900 dark:text-white">
                         Datos del usuario
                     </h2>
 
                     <div className="space-y-3 text-sm">
-                        {/* FOTO DE PERFIL */}
+                        {/* FOTO DE PERFIL (solo mostrar) */}
                         <div className="flex flex-col gap-2">
                             <p className="text-slate-600 dark:text-slate-300 font-medium">
                                 Foto de perfil
@@ -68,42 +133,32 @@ export default function Configuracion() {
                             <div className="flex items-center gap-4">
                                 <div
                                     className="size-16 rounded-full bg-cover bg-center border border-black/20 dark:border-white/20"
-                                    style={{ backgroundImage: `url(${preview})` }}
+                                    style={{
+                                        backgroundImage: preview ? `url(${preview})` : 'none',
+                                    }}
                                 />
 
-                                <label className="cursor-pointer text-primary hover:underline">
-                                    Cambiar foto
-                                    <input
-                                        type="file"
-                                        className="hidden"
-                                        accept="image/*"
-                                        onChange={handlePhotoChange}
-                                    />
-                                </label>
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                </span>
                             </div>
                         </div>
 
-                        {/* NOMBRE VISIBLE */}
-                        <div className="flex flex-col gap-1 mt-3">
-                            <label className="text-slate-600 dark:text-slate-300 font-medium">
-                                Nombre visible
-                            </label>
-                            <input
-                                type="text"
-                                className="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark px-3 py-2 text-sm text-slate-900 dark:text-white"
-                                value={nombreVisible}
-                                onChange={(e) => setNombreVisible(e.target.value)}
-                            />
-                        </div>
+                        {/* NOMBRE VISIBLE (solo lectura) */}
+ 
+                            <p className="text-slate-600 dark:text-slate-300 mt-3">
+                                <span className="font-medium">Nombre: </span>
+                                {nombreVisible}
+                            </p>
 
-                        <p className="text-slate-600 dark:text-slate-300">
+                        {/* EMAIL (solo lectura) */}
+                        <p className="text-slate-600 dark:text-slate-300 mt-3">
                             <span className="font-medium">Email: </span>
-                            {usuario?.email}
+                            {user?.email || '—'}
                         </p>
                     </div>
                 </div>
 
-                {/* Preferencias */}
+                {/* PREFERENCIAS */}
                 <div className="rounded-2xl border border-black/10 dark:border-white/10 p-4 bg-white/70 dark:bg-background-dark/70">
                     <h2 className="text-base font-medium mb-3 text-slate-900 dark:text-white">
                         Preferencias
@@ -121,15 +176,17 @@ export default function Configuracion() {
                             >
                                 <option value="ARS">ARS (Pesos Argentinos)</option>
                                 <option value="USD">USD (Dólares)</option>
+                                <option value="EUR">EUR (Euros)</option>
                             </select>
                         </div>
 
                         <button
                             type="button"
-                            className="mt-2 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium bg-primary text-white hover:bg-primary/90 transition"
+                            className="mt-2 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium bg-primary text-white hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed"
                             onClick={handleSave}
+                            disabled={loading}
                         >
-                            Guardar cambios
+                            {loading ? 'Guardando...' : 'Guardar cambios'}
                         </button>
                     </form>
                 </div>
@@ -137,3 +194,4 @@ export default function Configuracion() {
         </div>
     );
 }
+

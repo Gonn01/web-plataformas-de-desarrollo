@@ -59,6 +59,15 @@ const useAuth = create((set) => ({
         localStorage.removeItem('user');
         localStorage.removeItem('token');
     },
+
+    updateUser: (partialUser) =>
+        set((state) => {
+            const current = state.user || {};
+            const updated = { ...current, ...partialUser };
+            localStorage.setItem('user', JSON.stringify(updated));
+            return { user: updated };
+        }),
+
 }));
 
 export default useAuth;
