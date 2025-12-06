@@ -9,6 +9,7 @@ import PeligroEliminar from '../../components/PeligroEliminar';
 import EditDeudaModal from './components/modals/EditDeudaModal';
 import { useGastoUI } from './hooks/use-gasto-ui';
 import Loader from '@/components/Loader';
+import { useEntitiesStore } from '@/store/use-entities-store';
 
 export default function DetalleGasto() {
     const {
@@ -22,7 +23,7 @@ export default function DetalleGasto() {
         volverALista,
         // onSeleccionAdjuntos,
     } = useGastoUI();
-
+    const { getEntityById } = useEntitiesStore();
     const [editOpen, setEditOpen] = useState(false);
 
     if (loading) {
@@ -30,7 +31,7 @@ export default function DetalleGasto() {
     }
 
     if (!gasto) return null;
-
+    console.log('Gasto detalle:', gasto);
     return (
         <div className="min-h-dvh w-full bg-background-dark text-white font-display">
             <div className="px-4 md:px-10 lg:px-20 xl:px-40 py-6 flex justify-center">
@@ -44,7 +45,7 @@ export default function DetalleGasto() {
                     ) : null}
                     <div className="bg-[#111714] rounded-xl p-6 shadow-sm flex flex-col gap-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
-                            <InfoItem label="Entidad" value={gasto.entidad} />
+                            <InfoItem label="Entidad" value={getEntityById(gasto.entidad)?.name || gasto.entidad} />
                             <InfoItem label="Monto Total" value={`$${gasto.total}`} />
                             <InfoItem label="Tipo" value={gasto.tipo} />
                             <InfoItem label="Moneda" value={gasto.moneda} />

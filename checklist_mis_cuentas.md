@@ -32,7 +32,7 @@
 - [x] Ocultar “Marcar cuota como pagada” si está finalizada.
 - [x] Marcar cuota como pagada no funciona.
 - [x] El tipo debe representarse por color.
-- [ ] Mostrar el nombre de la entidad, no la ID.
+- [x] Mostrar el nombre de la entidad, no la ID.
 - [x] La moneda no debe ser ID.
 - [x] Formatear montos en cuotas pagadas.
 - [x] Si es gasto fijo, mostrar cuotas pagadas y no vencimiento.

@@ -1,9 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
-
-function Icon({ name, className = '' }) {
-    return <span className={`material-symbols-outlined ${className}`}>{name}</span>;
-}
+import Icon from '../Icon';
 
 /**
  * Modal para crear una nueva entidad (banco, persona o servicio).
