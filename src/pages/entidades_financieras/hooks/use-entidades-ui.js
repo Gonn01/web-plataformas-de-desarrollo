@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { useEntidadesData } from '../../detalle_entidad/hooks/use-entidad-data';
+import { useEntidadesData } from './use-entidades-data';
 
 export function useEntidadesUI() {
     const navigate = useNavigate();
