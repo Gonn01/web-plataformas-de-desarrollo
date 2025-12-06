@@ -18,7 +18,7 @@
 - [x] Poner cursor pointer en gastos clickeables.
 - [x] Quitar botón eliminar del modal actualizar.
 - [x] Añadir zona de peligro igual que detalle de gasto.
-- [ ] Actualizar logs cuando se actualiza el nombre.
+- [x] Actualizar logs cuando se actualiza el nombre.
 - [x] Click en StatCards cambia el tab.
 - [x] En finalizados, mostrar fecha de finalización en lugar del valor por cuota.
 - [x] Ordenar categorías.

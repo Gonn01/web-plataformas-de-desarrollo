@@ -73,11 +73,10 @@ export function useEntidadData() {
     const crearGastoEntidad = useCallback(
         async (payload) => {
             const nuevo = await createGasto(payload, token);
-            console.log(nuevo);
             const isFixed = nuevo.fixed_expense === true;
             const paid = Number(nuevo.payed_quotas || 0);
             const total = Number(nuevo.number_of_quotas || 0);
-            console.log({ isFixed, paid, total });
+
             setEntity((prev) => {
                 // === GASTO FIJO ===
                 if (isFixed) {
@@ -121,7 +120,8 @@ export function useEntidadData() {
     const actualizarEntidad = useCallback(
         async (newName) => {
             await updateFinancialEntity(id, newName, token);
-            setEntity((prev) => ({ ...prev, name: newName }));
+            const data = await fetchFinancialEntityById(id, token);
+            setEntity(data);
         },
         [id, token],
     );
