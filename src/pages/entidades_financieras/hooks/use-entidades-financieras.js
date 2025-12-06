@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { fetchFinancialEntities, createEntity } from '@/services/api';
+import { fetchFinancialEntities, createEntity, deleteFinancialEntity } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 
 export function useEntidadesFinancieras() {
@@ -11,9 +11,9 @@ export function useEntidadesFinancieras() {
     const [entities, setEntities] = useState([]);
     const [openNew, setOpenNew] = useState(false);
 
-    // ============================
-    // 🚀 Cargar entidades REALES
-    // ============================
+    // ============================================================
+    // 🚀 Cargar entidades reales
+    // ============================================================
     useEffect(() => {
         if (!auth?.token) return;
 
@@ -21,11 +21,12 @@ export function useEntidadesFinancieras() {
             try {
                 const data = await fetchFinancialEntities(auth.token);
 
+                // Normalización mínima para que EntityCard no falle
                 const normalized = data.map((e) => ({
                     ...e,
-                    balances: [{ currency: 'ARS', amount: 0 }],
-                    activeExpenses: 0,
-                    type: 'bank',
+                    balances: e.balances ?? [{ currency: 'ARS', amount: 0 }],
+                    activeExpenses: e.activeExpenses ?? 0,
+                    type: e.type ?? 'bank',
                 }));
 
                 setEntities(normalized);
@@ -37,18 +38,21 @@ export function useEntidadesFinancieras() {
         loadEntities();
     }, [auth?.token]);
 
-    // ============================
+    // ============================================================
     // 🔍 Filtrar entidades
-    // ============================
+    // ============================================================
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
         if (!q) return entities;
-        return entities.filter((e) => e.name.toLowerCase().includes(q));
+
+        return entities.filter((e) => (e.name || '').toLowerCase().includes(q));
     }, [query, entities]);
 
-    // ============================
-    // ➕ Crear entidad REAL
-    // ============================
+    const showEmpty = entities.length === 0 && filtered.length === 0;
+
+    // ============================================================
+    // ➕ Crear entidad real
+    // ============================================================
     const handleSaveNew = async ({ name }) => {
         try {
             const newEntity = await createEntity({ name }, auth.token);
@@ -63,27 +67,30 @@ export function useEntidadesFinancieras() {
         }
     };
 
-    const showEmpty = filtered.length === 0 && entities.length === 0;
+    // ============================================================
+    // 🗑 Eliminar entidad real
+    // ============================================================
     const handleDelete = async (entity) => {
         try {
-            // Aquí deberías llamar a la API para eliminar la entidad real
-            // await deleteEntity(entity.id, auth.token);
+            await deleteFinancialEntity(entity.id, auth.token);
+
             setEntities((prev) => prev.filter((e) => e.id !== entity.id));
         } catch (err) {
             console.error('Error deleting entity:', err);
             alert('No se pudo eliminar la entidad.');
         }
     };
+
     return {
         query,
         setQuery,
-        entities,
         filtered,
+        entities,
         openNew,
         setOpenNew,
         handleSaveNew,
+        handleDelete,
         showEmpty,
         navigate,
-        handleDelete,
     };
 }
