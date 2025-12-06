@@ -1,9 +1,14 @@
 import Icon from '../../../components/Icon';
 import ConfirmInstallmentPaymentModal from '../../../components/modals/ConfirmPaymentModal';
+
 import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
 import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
 import { usePayments } from '../../../hooks/use-payments';
 import { useNavigate } from 'react-router-dom';
+import useAuth from '@/hooks/use-auth';
+
+import { useState } from 'react';
+
 
 export default function ActiveExpenses({
     query,
@@ -16,13 +21,26 @@ export default function ActiveExpenses({
     const navigate = useNavigate();
     const filtered = useActiveExpensesFilter(groups, currency, query);
     const modal = useActiveExpensesModal();
-    const { handleConfirm } = usePayments(onPaid);
+
+    const { token } = useAuth();
+    const { handleConfirm } = usePayments(token, onPaid);
+
+    // Estado de carga por ID de gasto
+    const [loadingIds, setLoadingIds] = useState(new Set());
+
+    // Marca items en loading
+    const markLoading = (items) => {
+        const ids = items.map((i) => i.id);
+        setLoadingIds((prev) => new Set([...prev, ...ids]));
+    };
+
+    // Limpia loading
+    const clearLoading = () => setLoadingIds(new Set());
 
     return (
         <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 mt-6">
             {/* HEADER */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                {/* Left Section */}
                 <div className="flex flex-col gap-2">
                     <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
                         Gastos Activos
@@ -70,7 +88,7 @@ export default function ActiveExpenses({
                         <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
                             <h4
                                 className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
-                                onClick={() => navigate(`/entidades/${group.id}`)}
+                                onClick={() => navigate(`/app/entidades/${group.id}`)}
                             >
                                 {group.title}
                             </h4>
@@ -86,72 +104,83 @@ export default function ActiveExpenses({
 
                         {/* Items */}
                         <ul className="flex flex-col gap-3">
-                            {group.items.map((it) => (
-                                <li
-                                    key={it.id}
-                                    className="flex flex-col gap-3 rounded-lg p-3 transition-colors hover:bg-black/5 dark:hover:bg-white/5"
-                                >
-                                    {/* Top row */}
-                                    <div className="flex items-start justify-between gap-4">
-                                        {/* LEFT */}
-                                        <div className="gap-1.5 flex-1">
-                                            <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
-                                                {it.name}
-                                            </p>
+                            {group.items.map((it) => {
+                                const isLoading = loadingIds.has(it.id);
 
-                                            {/* Chip */}
-                                            <span
-                                                className={`rounded-md px-1.5 py-0.5 text-xs font-medium 
-                                                    ${it.type === 'ME_DEBEN'
-                                                        ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                        : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
-                                                    }`}
-                                            >
-                                                {it.type === 'ME_DEBEN' ? 'Me deben' : 'Debo'}
-                                            </span>
-                                        </div>
+                                return (
+                                    <li
+                                        key={it.id}
+                                        className={`flex flex-col gap-3 rounded-lg p-3 transition-colors cursor-pointer 
+                                            hover:bg-black/5 dark:hover:bg-white/5
+                                            ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
+                                        onClick={() => navigate(`/app/gastos/${it.id}`)}
+                                    >
+                                        {/* Top row */}
+                                        <div className="flex items-start justify-between gap-4">
+                                            <div className="gap-1.5 flex-1">
+                                                <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
+                                                    {it.name}
+                                                </p>
 
-                                        {/* RIGHT */}
-                                        <div className="flex flex-col items-end gap-2 text-right">
-                                            <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
-                                                {`${it.currency} $${it.amountPerInstallment.toFixed(2)}`}
-                                            </p>
+                                                <span
+                                                    className={`rounded-md px-1.5 py-0.5 text-xs font-medium 
+                                                        ${it.type === 'ME_DEBEN'
+                                                            ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                            : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                                                        }`}
+                                                >
+                                                    {it.type === 'ME_DEBEN' ? 'Me deben' : 'Debo'}
+                                                </span>
+                                            </div>
 
-                                            <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                {it.installments.total
-                                                    ? `de ${it.currency} $${it.totalAmount.toFixed(
-                                                        2,
-                                                    )} · ${it.installments.paid}/${it.installments.total} cuotas`
-                                                    : `Total ${it.currency} $${it.totalAmount.toFixed(
+                                            {/* RIGHT */}
+                                            <div className="flex flex-col items-end gap-2 text-right">
+                                                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                                                    {`${it.currency} $${it.amountPerInstallment.toFixed(
                                                         2,
                                                     )}`}
-                                            </p>
-                                        </div>
-                                    </div>
+                                                </p>
 
-                                    {/* PROGRESS BAR */}
-                                    <div className="flex items-center gap-4 mt-2">
-                                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
-                                            <div
-                                                className={`h-1.5 rounded-full ${it.type === 'ME_DEBEN'
-                                                    ? 'bg-green-500'
-                                                    : 'bg-red-500'
-                                                    }`}
-                                                style={{ width: `${it.progress}%` }}
-                                            />
+                                                <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                    {it.installments.total
+                                                        ? `de ${it.currency} $${it.totalAmount.toFixed(
+                                                            2,
+                                                        )} · ${it.installments.paid}/${it.installments.total} cuotas`
+                                                        : `Total ${it.currency} $${it.totalAmount.toFixed(2)}`}
+                                                </p>
+                                            </div>
                                         </div>
 
-                                        <button
-                                            className="text-xs font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors"
-                                            onClick={() => modal.openItem(group, it)}
-                                        >
-                                            {it.type === 'ME_DEBEN'
-                                                ? 'Registrar cobro'
-                                                : 'Pagar cuota'}
-                                        </button>
-                                    </div>
-                                </li>
-                            ))}
+                                        {/* PROGRESS BAR */}
+                                        <div className="flex items-center gap-4 mt-2">
+                                            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
+                                                <div
+                                                    className={`h-1.5 rounded-full ${it.type === 'ME_DEBEN'
+                                                        ? 'bg-green-500'
+                                                        : 'bg-red-500'
+                                                        }`}
+                                                    style={{ width: `${it.progress}%` }}
+                                                />
+                                            </div>
+
+                                            <button
+                                                className="text-xs font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors"
+                                                disabled={isLoading}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    modal.openItem(group, it);
+                                                }}
+                                            >
+                                                {isLoading
+                                                    ? 'Procesando...'
+                                                    : it.type === 'ME_DEBEN'
+                                                        ? 'Registrar cobro'
+                                                        : 'Pagar cuota'}
+                                            </button>
+                                        </div>
+                                    </li>
+                                );
+                            })}
                         </ul>
                     </div>
                 ))}
@@ -169,8 +198,11 @@ export default function ActiveExpenses({
                 entityName={modal.modalEntity}
                 items={modal.modalItems}
                 onCancel={() => modal.setModalOpen(false)}
-                onConfirm={() => {
-                    handleConfirm(modal.modalItems);
+                onConfirm={async () => {
+                    modal.setModalOpen(false);
+                    markLoading(modal.modalItems);
+                    await handleConfirm(modal.modalItems);
+                    clearLoading();
                     modal.setModalOpen(false);
                 }}
             />

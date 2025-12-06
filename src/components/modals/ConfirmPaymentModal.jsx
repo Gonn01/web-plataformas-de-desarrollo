@@ -45,7 +45,7 @@ export default function ConfirmInstallmentPaymentModal({
         const map = new Map();
         for (const it of items) {
             const curr = it.currency || 'ARS';
-            map.set(curr, (map.get(curr) || 0) + (it.amountToPay || 0));
+            map.set(curr, (map.get(curr) || 0) + (it.amountPerInstallment || 0));
         }
         return Array.from(map.entries()).map(([currency, amount]) => ({ currency, amount }));
     }, [items]);
@@ -113,7 +113,7 @@ export default function ConfirmInstallmentPaymentModal({
                                         {single.title}
                                     </p>
                                     <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                                        {single.type === 'debo' ? (
+                                        {single.type === 'DEBO' ? (
                                             <span className="inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 font-medium text-red-700 dark:text-red-300">
                                                 Debo
                                             </span>
@@ -134,7 +134,7 @@ export default function ConfirmInstallmentPaymentModal({
                                 <div className="text-right">
                                     <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
                                         {single.currency}{' '}
-                                        {formatMoney(single.amountToPay, single.currency)}
+                                        {formatMoney(single.amountPerInstallment, single.currency)}
                                     </p>
                                     {typeof single.totalAmount === 'number' && (
                                         <p className="text-xs text-slate-500 dark:text-slate-400">
@@ -152,8 +152,8 @@ export default function ConfirmInstallmentPaymentModal({
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
                                             <div
                                                 className={`h-1.5 rounded-full ${single.type === 'debo'
-                                                        ? 'bg-red-500'
-                                                        : 'bg-green-500'
+                                                    ? 'bg-red-500'
+                                                    : 'bg-green-500'
                                                     }`}
                                                 style={{
                                                     width: `${Math.min(
@@ -184,7 +184,7 @@ export default function ConfirmInstallmentPaymentModal({
                                     </span>
                                     <span className="text-lg font-bold text-slate-900 dark:text-white">
                                         {single.currency}{' '}
-                                        {formatMoney(single.amountToPay, single.currency)}
+                                        {formatMoney(single.amountPerInstallment, single.currency)}
                                     </span>
                                 </div>
                             </div>
@@ -201,7 +201,7 @@ export default function ConfirmInstallmentPaymentModal({
                                             {it.title}
                                             <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">
                                                 ({it.currency}{' '}
-                                                {formatMoney(it.amountToPay, it.currency)})
+                                                {formatMoney(it.amountPerInstallment, it.currency)})
                                             </span>
                                         </li>
                                     ))}

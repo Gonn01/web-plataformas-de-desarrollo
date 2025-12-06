@@ -1,17 +1,17 @@
 import { useCallback } from 'react';
 import { pagarCuota, pagarCuotasLote } from '@/services/api';
 
-export function usePayments(onPaid) {
+export function usePayments(token, onPaid) {
     const handleConfirm = useCallback(
         async (items) => {
             try {
                 if (!items.length) return;
 
                 if (items.length === 1) {
-                    await pagarCuota(items[0].id);
+                    await pagarCuota(items[0].id, token);
                 } else {
                     const ids = items.map((it) => it.id);
-                    await pagarCuotasLote(ids);
+                    await pagarCuotasLote(ids, token);
                 }
 
                 onPaid?.();
@@ -20,7 +20,7 @@ export function usePayments(onPaid) {
                 alert('No se pudo registrar el pago.');
             }
         },
-        [onPaid],
+        [onPaid, token],
     );
 
     return { handleConfirm };
