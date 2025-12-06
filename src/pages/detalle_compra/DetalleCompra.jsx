@@ -7,7 +7,6 @@ import CuotasSection from './components/CuotasSection';
 import AdjuntosSection from './components/AdjuntosSection';
 import PeligroEliminar from '../../components/PeligroEliminar';
 import EditDeudaModal from './components/modals/EditDeudaModal';
-import Breadcrumb from './components/Breadcrumb';
 import { useGastoUI } from './hooks/use-gasto-ui';
 
 export default function CompraDetalle() {
@@ -26,13 +25,11 @@ export default function CompraDetalle() {
     const [editOpen, setEditOpen] = useState(false);
 
     if (!detalle) return null;
-
+    console.log('Detalle de compra:', detalle);
     return (
         <div className="min-h-dvh w-full bg-background-dark text-white font-display">
-            <div className="px-4 md:px-10 lg:px-20 xl:px-40 py-6 sm:py-10 flex justify-center">
+            <div className="px-4 md:px-10 lg:px-20 xl:px-40 py-6 flex justify-center">
                 <div className="w-full max-w-[960px] flex flex-col gap-8">
-                    <Breadcrumb detalle={detalle} volverALista={volverALista} />
-
                     <HeaderDetalle
                         detalle={detalle}
                         marcarProxima={pagarCuota}
@@ -67,15 +64,6 @@ export default function CompraDetalle() {
                             volverALista();
                         }}
                     />
-
-                    <div className="pt-2">
-                        <button
-                            onClick={volverALista}
-                            className="h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all"
-                        >
-                            ← Volver a {detalle.tipo === 'ME_DEBEN' ? 'Me deben' : 'Debo'}
-                        </button>
-                    </div>
                 </div>
             </div>
 

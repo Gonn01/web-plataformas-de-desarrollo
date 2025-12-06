@@ -15,7 +15,7 @@ export default function Cuota({ icon, title, venc, monto, paid, next }) {
                     <p className={`font-medium ${paid ? 'line-through text-white' : 'text-white'}`}>
                         {title}
                     </p>
-                    <p className="text-sm text-[#9eb7a8]">Vencimiento: {venc}</p>
+                    <p className="text-sm text-[#9eb7a8]">Pagada: {venc}</p>
                 </div>
             </div>
 
