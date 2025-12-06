@@ -124,12 +124,19 @@ export default function ActiveExpenses({
 
                                                 <span
                                                     className={`rounded-md px-1.5 py-0.5 text-xs font-medium 
-                                                        ${it.type === 'ME_DEBEN'
+                                                        ${
+                                                        it.fixed
+                                                            ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
+                                                            : it.type === 'ME_DEBEN'
                                                             ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
                                                             : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                         }`}
-                                                >
-                                                    {it.type === 'ME_DEBEN' ? 'Me deben' : 'Debo'}
+                                                    >
+                                                    {it.fixed
+                                                        ? 'Gasto fijo'
+                                                        : it.type === 'ME_DEBEN'
+                                                        ? 'Me deben'
+                                                        : 'Debo'}
                                                 </span>
                                             </div>
 
