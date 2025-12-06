@@ -1,9 +1,9 @@
-import Icon from "../../../components/Icon";
-import ConfirmInstallmentPaymentModal from "../../../components/modals/ConfirmPaymentModal";
-import { useActiveExpensesFilter } from "../hooks/use-active-expenses-filter";
-import { useActiveExpensesModal } from "../hooks/use-active-expenses-modal";
-import { usePayments } from "../../../hooks/use-payments";
-import { useNavigate } from "react-router-dom";
+import Icon from '../../../components/Icon';
+import ConfirmInstallmentPaymentModal from '../../../components/modals/ConfirmPaymentModal';
+import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
+import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
+import { usePayments } from '../../../hooks/use-payments';
+import { useNavigate } from 'react-router-dom';
 
 export default function ActiveExpenses({
     query,
@@ -20,7 +20,6 @@ export default function ActiveExpenses({
 
     return (
         <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 mt-6">
-
             {/* HEADER */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 {/* Left Section */}
@@ -31,13 +30,13 @@ export default function ActiveExpenses({
 
                     {/* Currency Toggle */}
                     <div className="flex flex-wrap gap-2">
-                        {["ARS", "USD", "EUR"].map((cur) => (
+                        {['ARS', 'USD', 'EUR'].map((cur) => (
                             <button
                                 key={cur}
                                 type="button"
                                 className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === cur
-                                    ? "bg-primary text-black border-primary"
-                                    : "bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600"
+                                    ? 'bg-primary text-black border-primary'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
                                     }`}
                                 onClick={() => onCurrencyChange?.(cur)}
                             >
@@ -64,10 +63,7 @@ export default function ActiveExpenses({
             </div>
 
             {/* LIST */}
-            <div
-                className="flex flex-col gap-4 overflow-y-auto pr-2"
-                style={{ maxHeight: 550 }}
-            >
+            <div className="flex flex-col gap-4 overflow-y-auto pr-2" style={{ maxHeight: 550 }}>
                 {filtered.map((group) => (
                     <div key={group.id} className="flex flex-col gap-3">
                         {/* Group Header */}
@@ -98,20 +94,20 @@ export default function ActiveExpenses({
                                     {/* Top row */}
                                     <div className="flex items-start justify-between gap-4">
                                         {/* LEFT */}
-                                        <div className="flex flex-col gap-1.5 flex-1">
+                                        <div className="gap-1.5 flex-1">
                                             <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
-                                                {it.title}
+                                                {it.name}
                                             </p>
 
                                             {/* Chip */}
                                             <span
-                                                className={`inline-flex items-center rounded-md px-1.5 py-0.5 text-xs font-medium 
-                                                    ${it.type === "ME_DEBEN"
-                                                        ? "bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300"
-                                                        : "bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300"
+                                                className={`rounded-md px-1.5 py-0.5 text-xs font-medium 
+                                                    ${it.type === 'ME_DEBEN'
+                                                        ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                        : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                     }`}
                                             >
-                                                {it.type === "ME_DEBEN" ? "Me deben" : "Debo"}
+                                                {it.type === 'ME_DEBEN' ? 'Me deben' : 'Debo'}
                                             </span>
                                         </div>
 
@@ -124,10 +120,10 @@ export default function ActiveExpenses({
                                             <p className="text-xs text-slate-500 dark:text-slate-400">
                                                 {it.installments.total
                                                     ? `de ${it.currency} $${it.totalAmount.toFixed(
-                                                        2
+                                                        2,
                                                     )} · ${it.installments.paid}/${it.installments.total} cuotas`
                                                     : `Total ${it.currency} $${it.totalAmount.toFixed(
-                                                        2
+                                                        2,
                                                     )}`}
                                             </p>
                                         </div>
@@ -137,9 +133,9 @@ export default function ActiveExpenses({
                                     <div className="flex items-center gap-4 mt-2">
                                         <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                             <div
-                                                className={`h-1.5 rounded-full ${it.type === "ME_DEBEN"
-                                                    ? "bg-green-500"
-                                                    : "bg-red-500"
+                                                className={`h-1.5 rounded-full ${it.type === 'ME_DEBEN'
+                                                    ? 'bg-green-500'
+                                                    : 'bg-red-500'
                                                     }`}
                                                 style={{ width: `${it.progress}%` }}
                                             />
@@ -149,9 +145,9 @@ export default function ActiveExpenses({
                                             className="text-xs font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors"
                                             onClick={() => modal.openItem(group, it)}
                                         >
-                                            {it.type === "ME_DEBEN"
-                                                ? "Registrar cobro"
-                                                : "Pagar cuota"}
+                                            {it.type === 'ME_DEBEN'
+                                                ? 'Registrar cobro'
+                                                : 'Pagar cuota'}
                                         </button>
                                     </div>
                                 </li>

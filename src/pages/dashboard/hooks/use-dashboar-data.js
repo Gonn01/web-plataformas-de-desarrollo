@@ -64,10 +64,9 @@ export function useDashboardData() {
                         } else {
                             totals[currency].debo += remainingAmount;
                         }
-
                         return {
                             id: g.id,
-                            title: g.name,
+                            name: g.title,
                             type: isMeDeben ? 'ME_DEBEN' : 'DEBO',
                             currency,
                             amountPerInstallment,

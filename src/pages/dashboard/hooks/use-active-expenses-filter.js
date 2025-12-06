@@ -1,27 +1,21 @@
-import { useMemo } from "react";
+import { useMemo } from 'react';
 
-export function useActiveExpensesFilter(groups, currency, query) {
+export function useActiveExpensesFilter(groups = [], currency, query = '') {
     return useMemo(() => {
         const q = query.trim().toLowerCase();
 
-        let filtered = groups;
+        return groups
+            .map((g) => {
+                const items = g.items.filter((it) => {
+                    const title = (it.title || it.name || '').toLowerCase();
+                    const matchTitle = q ? title.includes(q) : true;
+                    const matchCurrency = it.currency === currency;
 
-        if (q) {
-            filtered = filtered
-                .map((g) => ({
-                    ...g,
-                    items: g.items.filter((it) =>
-                        it.title.toLowerCase().includes(q)
-                    ),
-                }))
-                .filter((g) => g.items.length > 0);
-        }
+                    return matchTitle && matchCurrency;
+                });
 
-        return filtered
-            .map((g) => ({
-                ...g,
-                items: g.items.filter((it) => it.currency === currency),
-            }))
+                return { ...g, items };
+            })
             .filter((g) => g.items.length > 0);
     }, [groups, currency, query]);
 }
