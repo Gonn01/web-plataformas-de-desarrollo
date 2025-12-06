@@ -1,21 +1,20 @@
 import { useState, useEffect } from 'react';
 import useAuth from '@/hooks/use-auth';
 
-function currencyFromUser(user) {
-    const pref = user?.preferred_currency ?? user?.monedaPreferida;
-    if (!pref) return 'ARS';
-
-    if (typeof pref === 'number') {
-        if (pref === 2) return 'USD';
-        if (pref === 3) return 'EUR';
-        return 'ARS';
+function currencyCodeToLabel(codeOrLabel) {
+    if (typeof codeOrLabel === 'string') {
+        if (['ARS', 'USD', 'EUR'].includes(codeOrLabel)) return codeOrLabel;
     }
 
-    if (typeof pref === 'string') {
-        if (['ARS', 'USD', 'EUR'].includes(pref)) return pref;
+    const code = Number(codeOrLabel);
+    switch (code) {
+        case 2:
+            return 'USD';
+        case 3:
+            return 'EUR';
+        default:
+            return 'ARS'; 
     }
-
-    return 'ARS';
 }
 
 export function useDashboardUI() {
@@ -25,9 +24,17 @@ export function useDashboardUI() {
     const [query, setQuery] = useState('');
     const [openNewExpense, setOpenNewExpense] = useState(false);
 
+
     useEffect(() => {
         if (!user) return;
-        setCurrency((prev) => prev || currencyFromUser(user));
+
+        const pref =
+            user.preferred_currency !== undefined
+                ? user.preferred_currency
+                : user.monedaPreferida;
+
+        const label = pref ? currencyCodeToLabel(pref) : 'ARS';
+        setCurrency(label);
     }, [user]);
 
     return {

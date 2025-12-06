@@ -1,4 +1,3 @@
-// src/pages/Configuracion.jsx
 import { useEffect, useState } from 'react';
 import useAuth from '@/hooks/use-auth';
 
@@ -25,12 +24,12 @@ function currencyLabelToCode(label) {
         case 'EUR':
             return 3;
         default:
-            return 1; 
+            return 1;
     }
 }
 
 export default function Configuracion() {
-    const { user, token, updateUser } = useAuth();
+    const { user, updateUser } = useAuth(); 
     const [preview, setPreview] = useState('');
     const [nombreVisible, setNombreVisible] = useState('Usuario');
     const [moneda, setMoneda] = useState('ARS');
@@ -44,18 +43,14 @@ export default function Configuracion() {
         setPreview(user.avatar || '');
         setNombreVisible(user.name || user.nombre || 'Usuario');
 
-        const pref =
-            user.preferred_currency !== undefined
-                ? user.preferred_currency
-                : user.monedaPreferida;
-
+        const pref = user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
         const label = pref ? currencyCodeToLabel(pref) : 'ARS';
         setMoneda(label);
     }, [user]);
 
     const handleSave = async () => {
-        if (!token) {
-            alert('No hay sesión activa.');
+        if (!user?.id) {
+            alert('No se encontró el ID de usuario.');
             return;
         }
 
@@ -64,23 +59,20 @@ export default function Configuracion() {
 
             const preferred_currency = currencyLabelToCode(moneda);
 
-            const res = await fetch(`${baseUrl}/auth/me`, {
+            const res = await fetch(`${baseUrl}/auth/preferred-currency`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
                 },
-
                 body: JSON.stringify({
-                    name: nombreVisible,
-                    avatar: preview || null,
+                    user_id: user.id,
                     preferred_currency,
                 }),
             });
 
             if (!res.ok) {
                 const errText = await res.text();
-                console.error('Error actualizando perfil:', res.status, errText);
+                console.error('Error actualizando moneda preferida:', res.status, errText);
                 alert('No se pudieron guardar los cambios.');
                 setLoading(false);
                 return;
@@ -91,12 +83,14 @@ export default function Configuracion() {
 
             if (typeof updateUser === 'function') {
                 updateUser({
+                    ...(user || {}),
                     ...updatedFromApi,
-                    monedaPreferida: moneda, 
+                    preferred_currency,
+                    monedaPreferida: moneda,
                 });
             }
 
-            alert('Datos de usuario actualizados.');
+            alert('Moneda preferida actualizada.');
         } catch (err) {
             console.error('Error guardando configuración:', err);
             alert('Ocurrió un error al guardar los cambios.');
@@ -137,18 +131,14 @@ export default function Configuracion() {
                                         backgroundImage: preview ? `url(${preview})` : 'none',
                                     }}
                                 />
-
-                                <span className="text-xs text-slate-500 dark:text-slate-400">
-                                </span>
                             </div>
                         </div>
 
                         {/* NOMBRE VISIBLE (solo lectura) */}
- 
-                            <p className="text-slate-600 dark:text-slate-300 mt-3">
-                                <span className="font-medium">Nombre: </span>
-                                {nombreVisible}
-                            </p>
+                        <p className="text-slate-600 dark:text-slate-300 mt-3">
+                            <span className="font-medium">Nombre: </span>
+                            {nombreVisible}
+                        </p>
 
                         {/* EMAIL (solo lectura) */}
                         <p className="text-slate-600 dark:text-slate-300 mt-3">
@@ -194,4 +184,5 @@ export default function Configuracion() {
         </div>
     );
 }
+
 
