@@ -5,25 +5,25 @@ import Icon from '../Icon';
 function formatMoney(amount, currency) {
     try {
         const f = new Intl.NumberFormat('es-AR', {
-            style: 'currency',
-            currency,
-            minimumFractionDigits: 0,
-            maximumFractionDigits: 0,
+        style: 'currency',
+        currency,
+        minimumFractionDigits: 0,
+        maximumFractionDigits: 0,
         });
         return f.format(amount);
     } catch {
         return `${currency} $${amount}`;
     }
-}
+    }
 
-export default function ConfirmInstallmentPaymentModal({
+    export default function ConfirmInstallmentPaymentModal({
     open,
     onCancel,
     onConfirm,
     entityName = 'Entidad',
     items = [],
     notes,
-}) {
+    }) {
     useEffect(() => {
         if (!open) return;
         const prev = document.body.style.overflow;
@@ -33,8 +33,8 @@ export default function ConfirmInstallmentPaymentModal({
         document.addEventListener('keydown', onKey);
 
         return () => {
-            document.body.style.overflow = prev;
-            document.removeEventListener('keydown', onKey);
+        document.body.style.overflow = prev;
+        document.removeEventListener('keydown', onKey);
         };
     }, [open, onCancel]);
 
@@ -44,215 +44,233 @@ export default function ConfirmInstallmentPaymentModal({
     const totalsByCurrency = useMemo(() => {
         const map = new Map();
         for (const it of items) {
-            const curr = it.currency || 'ARS';
-            map.set(curr, (map.get(curr) || 0) + (it.amountPerInstallment || 0));
+        const curr = it.currency || 'ARS';
+        const amt = typeof it.amountPerInstallment === 'number'
+            ? it.amountPerInstallment
+            : 0;
+        map.set(curr, (map.get(curr) || 0) + amt);
         }
-        return Array.from(map.entries()).map(([currency, amount]) => ({ currency, amount }));
+        return Array.from(map.entries()).map(([currency, amount]) => ({
+        currency,
+        amount,
+        }));
     }, [items]);
 
     if (!open) return null;
 
     return createPortal(
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
-            role="dialog"
-            aria-modal="true"
-            aria-labelledby="confirm-payment-title"
-            onMouseDown={onCancel}
+        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-payment-title"
+        onMouseDown={onCancel}
         >
-            <div
-                className="w-full max-w-md rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark p-6 shadow-2xl"
-                onMouseDown={(e) => e.stopPropagation()}
-            >
-                <div className="flex flex-col gap-4 text-center">
-                    <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
-                        <Icon name="payments" className="text-4xl" />
-                    </div>
+        <div
+            className="w-full max-w-md rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark p-6 shadow-2xl"
+            onMouseDown={(e) => e.stopPropagation()}
+        >
+            <div className="flex flex-col gap-4 text-center">
+            <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-primary/10 text-primary">
+                <Icon name="payments" className="text-4xl" />
+            </div>
 
-                    <div className="flex flex-col gap-2">
-                        <h2
-                            id="confirm-payment-title"
-                            className="text-xl font-bold text-slate-900 dark:text-white"
-                        >
-                            {isSingle ? 'Confirmar Pago de Cuota' : 'Confirmar Pago de Cuotas'}
-                        </h2>
+            <div className="flex flex-col gap-2">
+                <h2
+                id="confirm-payment-title"
+                className="text-xl font-bold text-slate-900 dark:text-white"
+                >
+                {isSingle ? 'Confirmar Pago de Cuota' : 'Confirmar Pago de Cuotas'}
+                </h2>
 
-                        {!isSingle ? (
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                                Estás por registrar el pago para{' '}
-                                <strong className="font-semibold text-slate-800 dark:text-slate-200">
-                                    {items.length} gasto{items.length === 1 ? '' : 's'} activo
-                                    {items.length === 1 ? '' : 's'}
-                                </strong>{' '}
-                                de la entidad{' '}
-                                <strong className="font-semibold text-slate-800 dark:text-slate-200">
-                                    {entityName}
-                                </strong>
-                                .
-                            </p>
+                {!isSingle ? (
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Estás por registrar el pago para{' '}
+                    <strong className="font-semibold text-slate-800 dark:text-slate-200">
+                    {items.length} gasto{items.length === 1 ? '' : 's'} activo
+                    {items.length === 1 ? '' : 's'}
+                    </strong>{' '}
+                    de la entidad{' '}
+                    <strong className="font-semibold text-slate-800 dark:text-slate-200">
+                    {entityName}
+                    </strong>
+                    .
+                </p>
+                ) : (
+                <p className="text-sm text-slate-500 dark:text-slate-400">
+                    Vas a registrar el pago de{' '}
+                    <strong className="font-semibold text-slate-800 dark:text-slate-200">
+                    {single.title || single.name}
+                    </strong>{' '}
+                    en{' '}
+                    <strong className="font-semibold text-slate-800 dark:text-slate-200">
+                    {entityName}
+                    </strong>
+                    .
+                </p>
+                )}
+            </div>
+
+            {isSingle ? (
+                <div className="flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 text-left">
+                <div className="flex items-start justify-between gap-4">
+                    <div className="flex flex-col gap-1">
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                        {single.title || single.name}
+                    </p>
+                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
+                        {single.type === 'DEBO' ? (
+                        <span className="inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 font-medium text-red-700 dark:text-red-300">
+                            Debo
+                        </span>
+                        ) : single.type === 'ME_DEBEN' ? (
+                        <span className="inline-flex items-center rounded-md bg-green-100 dark:bg-green-900/40 px-1.5 py-0.5 font-medium text-green-700 dark:text-green-300">
+                            Me deben
+                        </span>
                         ) : (
-                            <p className="text-sm text-slate-500 dark:text-slate-400">
-                                Vas a registrar el pago de{' '}
-                                <strong className="font-semibold text-slate-800 dark:text-slate-200">
-                                    {single.title}
-                                </strong>{' '}
-                                en{' '}
-                                <strong className="font-semibold text-slate-800 dark:text-slate-200">
-                                    {entityName}
-                                </strong>
-                                .
-                            </p>
+                        <span className="inline-flex items-center rounded-md bg-slate-200 dark:bg-slate-700 px-1.5 py-0.5 font-medium text-slate-700 dark:text-slate-200">
+                            Gasto fijo
+                        </span>
+                        )}
+                        {typeof single.paidInstallments === 'number' &&
+                        typeof single.totalInstallments === 'number' && (
+                            <span className="text-xs">
+                            {single.paidInstallments}/{single.totalInstallments} cuotas pagadas
+                            </span>
                         )}
                     </div>
-
-                    {isSingle ? (
-                        <div className="flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 text-left">
-                            <div className="flex items-start justify-between gap-4">
-                                <div className="flex flex-col gap-1">
-                                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                                        {single.title}
-                                    </p>
-                                    <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
-                                        {single.type === 'DEBO' ? (
-                                            <span className="inline-flex items-center rounded-md bg-red-100 dark:bg-red-900/40 px-1.5 py-0.5 font-medium text-red-700 dark:text-red-300">
-                                                Debo
-                                            </span>
-                                        ) : (
-                                            <span className="inline-flex items-center rounded-md bg-green-100 dark:bg-green-900/40 px-1.5 py-0.5 font-medium text-green-700 dark:text-green-300">
-                                                Me deben
-                                            </span>
-                                        )}
-                                        {typeof single.paidInstallments === 'number' &&
-                                            typeof single.totalInstallments === 'number' && (
-                                                <span className="text-xs">
-                                                    {single.paidInstallments}/
-                                                    {single.totalInstallments} cuotas pagadas
-                                                </span>
-                                            )}
-                                    </div>
-                                </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
-                                        {single.currency}{' '}
-                                        {formatMoney(single.amountPerInstallment, single.currency)}
-                                    </p>
-                                    {typeof single.totalAmount === 'number' && (
-                                        <p className="text-xs text-slate-500 dark:text-slate-400">
-                                            de {single.currency}{' '}
-                                            {formatMoney(single.totalAmount, single.currency)}
-                                        </p>
-                                    )}
-                                </div>
-                            </div>
-
-                            {typeof single.paidInstallments === 'number' &&
-                                typeof single.totalInstallments === 'number' &&
-                                single.totalInstallments > 0 && (
-                                    <div className="mt-1">
-                                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
-                                            <div
-                                                className={`h-1.5 rounded-full ${single.type === 'debo'
-                                                    ? 'bg-red-500'
-                                                    : 'bg-green-500'
-                                                    }`}
-                                                style={{
-                                                    width: `${Math.min(
-                                                        100,
-                                                        Math.max(
-                                                            0,
-                                                            (single.paidInstallments /
-                                                                single.totalInstallments) *
-                                                            100,
-                                                        ),
-                                                    )}%`,
-                                                }}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
-
-                            {notes && (
-                                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
-                                    {notes}
-                                </p>
-                            )}
-
-                            <div className="rounded-lg border border-black/10 dark:border-white/10 bg-white/60 dark:bg-background-dark/60 p-3">
-                                <div className="flex items-baseline justify-between">
-                                    <span className="text-xs text-slate-500 dark:text-slate-400">
-                                        Monto a pagar
-                                    </span>
-                                    <span className="text-lg font-bold text-slate-900 dark:text-white">
-                                        {single.currency}{' '}
-                                        {formatMoney(single.amountPerInstallment, single.currency)}
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    ) : (
-                        <div className="flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 text-left">
-                            <div>
-                                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                                    Gastos a afectar:
-                                </p>
-                                <ul className="mt-2 flex flex-col gap-1 text-sm text-slate-600 dark:text-slate-300 list-disc list-inside">
-                                    {items.map((it) => (
-                                        <li key={it.id}>
-                                            {it.title}
-                                            <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">
-                                                ({it.currency}{' '}
-                                                {formatMoney(it.amountPerInstallment, it.currency)})
-                                            </span>
-                                        </li>
-                                    ))}
-                                </ul>
-                            </div>
-
-                            <div className="border-t border-black/10 dark:border-white/10" />
-
-                            <div>
-                                <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
-                                    Monto total a pagar:
-                                </p>
-                                <div className="mt-2 flex flex-col gap-1">
-                                    {totalsByCurrency.map((row) => (
-                                        <div
-                                            key={row.currency}
-                                            className="flex items-baseline justify-between"
-                                        >
-                                            <span className="text-xs text-slate-500 dark:text-slate-400">
-                                                En {row.currency}
-                                            </span>
-                                            <span className="text-lg font-bold text-slate-900 dark:text-white">
-                                                {row.currency}{' '}
-                                                {formatMoney(row.amount, row.currency)}
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
-                        </div>
+                    </div>
+                    <div className="text-right">
+                    <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
+                        {formatMoney(
+                        single.amountPerInstallment || 0,
+                        single.currency || 'ARS'
+                        )}
+                    </p>
+                    {typeof single.totalAmount === 'number' && (
+                        <p className="text-xs text-slate-500 dark:text-slate-400">
+                        de{' '}
+                        {formatMoney(
+                            single.totalAmount,
+                            single.currency || 'ARS'
+                        )}
+                        </p>
                     )}
-
-                    <div className="mt-2 flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
-                        <button
-                            type="button"
-                            onClick={onCancel}
-                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
-                        >
-                            <span className="truncate">Cancelar</span>
-                        </button>
-                        <button
-                            type="button"
-                            onClick={onConfirm}
-                            className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors"
-                        >
-                            <Icon name="check_circle" className="mr-2 text-lg" />
-                            <span className="truncate">Confirmar Pago</span>
-                        </button>
                     </div>
                 </div>
+
+                {typeof single.paidInstallments === 'number' &&
+                    typeof single.totalInstallments === 'number' &&
+                    single.totalInstallments > 0 && (
+                    <div className="mt-1">
+                        <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                        <div
+                            className={`h-1.5 rounded-full ${
+                            single.type === 'DEBO' ? 'bg-red-500' : 'bg-green-500'
+                            }`}
+                            style={{
+                            width: `${Math.min(
+                                100,
+                                Math.max(
+                                0,
+                                (single.paidInstallments /
+                                    single.totalInstallments) *
+                                    100,
+                                ),
+                            )}%`,
+                            }}
+                        />
+                        </div>
+                    </div>
+                    )}
+
+                {notes && (
+                    <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">
+                    {notes}
+                    </p>
+                )}
+
+                <div className="rounded-lg border border-black/10 dark:border-white/10 bg-white/60 dark:bg-background-dark/60 p-3">
+                    <div className="flex items-baseline justify-between">
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                        Monto a pagar
+                    </span>
+                    <span className="text-lg font-bold text-slate-900 dark:text-white">
+                        {formatMoney(
+                        single.amountPerInstallment || 0,
+                        single.currency || 'ARS'
+                        )}
+                    </span>
+                    </div>
+                </div>
+                </div>
+            ) : (
+                <div className="flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 text-left">
+                <div>
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    Gastos a afectar:
+                    </p>
+                    <ul className="mt-2 flex flex-col gap-1 text-sm text-slate-600 dark:text-slate-300 list-disc list-inside">
+                    {items.map((it) => (
+                        <li key={it.id}>
+                        {it.title || it.name}
+                        <span className="ml-2 text-xs text-slate-500 dark:text-slate-400">
+                            (
+                            {formatMoney(
+                            it.amountPerInstallment || 0,
+                            it.currency || 'ARS'
+                            )}
+                            )
+                        </span>
+                        </li>
+                    ))}
+                    </ul>
+                </div>
+
+                <div className="border-t border-black/10 dark:border-white/10" />
+
+                <div>
+                    <p className="text-sm font-semibold text-slate-800 dark:text-slate-200">
+                    Monto total a pagar:
+                    </p>
+                    <div className="mt-2 flex flex-col gap-1">
+                    {totalsByCurrency.map((row) => (
+                        <div
+                        key={row.currency}
+                        className="flex items-baseline justify-between"
+                        >
+                        <span className="text-xs text-slate-500 dark:text-slate-400">
+                            En {row.currency}
+                        </span>
+                        <span className="text-lg font-bold text-slate-900 dark:text-white">
+                            {formatMoney(row.amount, row.currency)}
+                        </span>
+                        </div>
+                    ))}
+                    </div>
+                </div>
+                </div>
+            )}
+
+            <div className="mt-2 flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
+                <button
+                type="button"
+                onClick={onCancel}
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-slate-200 dark:bg-slate-700 text-slate-800 dark:text-slate-100 text-sm font-bold leading-normal tracking-[0.015em] hover:bg-slate-300 dark:hover:bg-slate-600 transition-colors"
+                >
+                <span className="truncate">Cancelar</span>
+                </button>
+                <button
+                type="button"
+                onClick={onConfirm}
+                className="flex min-w-[84px] max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold leading-normal tracking-[0.015em] hover:bg-primary/90 transition-colors"
+                >
+                <Icon name="check_circle" className="mr-2 text-lg" />
+                <span className="truncate">Confirmar Pago</span>
+                </button>
             </div>
+            </div>
+        </div>
         </div>,
         document.body,
     );
