@@ -98,7 +98,11 @@ export default function EntidadDetalle() {
                     emptyLabel="Sin gastos finalizados."
                 >
                     {entity.gastos_inactivos.map((g) => (
-                        <GastoFinalizadoItem key={g.id} gasto={g} />
+                        <GastoFinalizadoItem
+                            key={g.id}
+                            gasto={g}
+                            onClick={() => navigate(`/app/gastos/${g.id}`)}
+                        />
                     ))}
                 </ListContainer>
             )}

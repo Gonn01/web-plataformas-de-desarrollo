@@ -5,7 +5,7 @@ export default function HeaderDetalle({ detalle, marcarProxima, abrirEditar }) {
                 <p className="text-4xl font-black tracking-[-0.033em]">{detalle.titulo}</p>
                 <div className="mt-2">
                     <span className="bg-yellow-400/20 text-yellow-400 text-xs font-semibold px-2.5 py-1 rounded-full">
-                        {detalle.estado}
+                        {detalle.tipo}
                     </span>
                 </div>
             </div>

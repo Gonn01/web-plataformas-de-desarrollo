@@ -1,8 +1,8 @@
 import { formatMoney } from '@/utils/FormatMoney';
 
-export function GastoFinalizadoItem({ gasto }) {
+export function GastoFinalizadoItem({ gasto, onClick }) {
     return (
-        <div className="flex items-center justify-between py-4">
+        <div onClick={onClick} className="flex items-center justify-between py-4">
             <div>
                 <p className="font-medium text-zinc-900 dark:text-white">{gasto.name}</p>
                 <p className="text-sm text-zinc-600 dark:text-zinc-400">Finalizado</p>
