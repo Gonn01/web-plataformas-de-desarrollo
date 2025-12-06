@@ -20,7 +20,7 @@
 - [x] Añadir zona de peligro igual que detalle de gasto.
 - [ ] Actualizar logs cuando se actualiza el nombre.
 - [x] Click en StatCards cambia el tab.
-- [ ] En finalizados, mostrar fecha de finalización en lugar del valor por cuota.
+- [x] En finalizados, mostrar fecha de finalización en lugar del valor por cuota.
 - [x] Ordenar categorías.
 - [x] Añadir botón “Agregar gasto”.
 - [x] Añadir botón “Eliminar entidad”.
