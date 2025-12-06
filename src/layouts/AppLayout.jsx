@@ -1,8 +1,17 @@
-// src/layouts/AppLayout.jsx
 import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
+import useAuth from '@/hooks/use-auth';
+import { useEntitiesStore } from '@/store/use-entities-store';
+import { useEffect } from 'react';
 
 export default function AppLayout() {
+    const { token } = useAuth();
+    const { loadEntities } = useEntitiesStore();
+
+    useEffect(() => {
+        if (token) loadEntities(token);
+    }, [loadEntities, token]);
+
     return (
         <div className="font-display bg-background-light dark:bg-background-dark">
             <div className="flex h-screen w-full overflow-hidden">

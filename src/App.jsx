@@ -2,10 +2,10 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/auth/Login/Login';
 import AppLayout from './layouts/AppLayout';
-import EntidadesFinancieras from './pages/EntidadesFinancieras';
-import EntidadDetalle from './pages/detalle_entidad/EntidadDetalle';
+import EntidadesFinancieras from './pages/entidades_financieras/EntidadesFinancieras';
+import EntidadDetalle from './pages/detalle_entidad/DetalleEntidad';
 import ProtectedRoute from './guards/ProtectedRoute';
-import CompraDetalle from './pages/CompraDetalle';
+import DetalleGasto from './pages/detalle_compra/DetalleGasto';
 import Configuracion from './pages/Configuracion';
 import Register from './pages/auth/Register/Register';
 import Dashboard from './pages/dashboard/Dashboard';
@@ -30,7 +30,7 @@ export default function App() {
                 <Route path="dashboard" element={<Dashboard />} />
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
-                <Route path="gastos/:id" element={<CompraDetalle />} />
+                <Route path="gastos/:id" element={<DetalleGasto />} />
                 <Route path="configuracion" element={<Configuracion />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
             </Route>

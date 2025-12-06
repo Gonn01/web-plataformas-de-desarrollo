@@ -1,73 +1,54 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
-import ErrorMessage from '../../components/ErrorMessage';
-import SubmitButton from '../../../../components/SubmitButton';
 import TextInput from '../../../../components/TextInput';
 import PasswordInput from '../../components/PasswordInput';
-import { register } from '@/services/api';
+import ErrorMessage from '../../components/ErrorMessage';
+import SubmitButton from '../../../../components/SubmitButton';
+import { useRegister } from '../hooks/user-register';
 
 export default function RegisterForm() {
-    const nav = useNavigate();
+    const { loading, error, setError, handleRegister } = useRegister();
 
-    const [name, setName] = useState('');
-    const [email, setEmail] = useState('');
-    const [clave, setClave] = useState('');
-    const [cargando, setCargando] = useState(false);
-    const [error, setError] = useState('');
+    const [form, setForm] = useState({
+        name: '',
+        email: '',
+        password: '',
+    });
 
-    const validar = () => {
-        if (name.trim().length < 2) return 'El nombre debe tener al menos 2 caracteres';
-        if (!email.includes('@')) return 'Email inválido';
-        if (clave.length < 6) return 'La contraseña debe tener 6+ caracteres';
-        return '';
+    const onChange = (key, value) => {
+        setForm({ ...form, [key]: value });
+        if (error) setError('');
     };
 
     const onSubmit = async (e) => {
         e.preventDefault();
-        const msg = validar();
-        if (msg) return setError(msg);
-
-        try {
-            setCargando(true);
-            setError('');
-
-            await register({ name, email, password: clave });
-
-            nav('/login');
-        } catch (err) {
-            setError(err.message || 'Error registrando usuario');
-        } finally {
-            setCargando(false);
-        }
+        await handleRegister(form);
     };
 
     return (
         <form onSubmit={onSubmit} className="mt-8 space-y-6">
             <TextInput
                 label="Nombre"
-                value={name}
+                value={form.name}
+                onChange={(e) => onChange('name', e.target.value)}
                 placeholder="Tu nombre"
-                onChange={(e) => setName(e.target.value)}
             />
 
             <TextInput
                 label="Email"
                 type="email"
-                value={email}
+                value={form.email}
+                onChange={(e) => onChange('email', e.target.value)}
                 placeholder="tu@email.com"
-                onChange={(e) => setEmail(e.target.value)}
             />
 
             <PasswordInput
-                value={clave}
-                onChange={(e) => setClave(e.target.value)}
+                value={form.password}
+                onChange={(e) => onChange('password', e.target.value)}
                 placeholder="Crea una contraseña"
             />
 
             {error && <ErrorMessage message={error} />}
-
-            <SubmitButton loading={cargando}>Registrarse</SubmitButton>
+            <SubmitButton loading={loading}>Registrarse</SubmitButton>
         </form>
     );
 }
