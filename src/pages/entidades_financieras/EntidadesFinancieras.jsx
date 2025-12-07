@@ -3,6 +3,7 @@ import SearchBox from './components/SearchBox';
 import EntitiesList from './components/EntitiesList';
 import EmptyState from './components/EmptyState';
 import NewEntityModal from '../../components/modals/NewEntityModal';
+import Loader from '@/components/Loader';
 
 import { useEntidadesUI } from './hooks/use-entidades-ui';
 
@@ -14,10 +15,15 @@ export default function EntidadesFinancieras() {
         openNew,
         setOpenNew,
         showEmpty,
+        loading,
         handleSaveNew,
         handleDelete,
         navigate,
     } = useEntidadesUI();
+
+    if (loading) {
+        return <Loader label="Preparando información..." />;
+    }
 
     return (
         <>

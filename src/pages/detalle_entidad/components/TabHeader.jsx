@@ -7,19 +7,20 @@ export function TabHeader({ tab, setTab }) {
                 {tabs.map((t) => (
                     <button
                         key={t}
-                        className={`pb-3 pt-2 text-sm ${tab === t
-                            ? 'text-primary font-bold border-b-2 border-b-primary'
-                            : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 cursor-pointer dark:hover:text-zinc-200 border-b-2 border-b-transparent'
-                            }`}
+                        className={`pb-3 pt-2 text-sm ${
+                            tab === t
+                                ? 'text-primary font-bold border-b-2 border-b-primary'
+                                : 'text-zinc-500 hover:text-zinc-800 dark:text-zinc-400 cursor-pointer dark:hover:text-zinc-200 border-b-2 border-b-transparent'
+                        }`}
                         onClick={() => setTab(t)}
                     >
                         {t === 'activos'
                             ? 'Gastos Activos'
                             : t === 'finalizados'
-                                ? 'Gastos Finalizados'
-                                : t === 'fijos'
-                                    ? 'Gastos Fijos'
-                                    : 'Log de Cambios'}
+                              ? 'Gastos Finalizados'
+                              : t === 'fijos'
+                                ? 'Gastos Fijos'
+                                : 'Log de Cambios'}
                     </button>
                 ))}
             </div>

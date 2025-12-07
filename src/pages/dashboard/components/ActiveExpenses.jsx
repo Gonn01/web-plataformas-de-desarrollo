@@ -9,7 +9,6 @@ import useAuth from '@/hooks/use-auth';
 
 import { useState } from 'react';
 
-
 export default function ActiveExpenses({
     query,
     groups,
@@ -52,10 +51,11 @@ export default function ActiveExpenses({
                             <button
                                 key={cur}
                                 type="button"
-                                className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === cur
-                                    ? 'bg-primary text-black border-primary'
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
-                                    }`}
+                                className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                                    currency === cur
+                                        ? 'bg-primary text-black border-primary'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
+                                }`}
                                 onClick={() => onCurrencyChange?.(cur)}
                             >
                                 {cur}
@@ -125,18 +125,18 @@ export default function ActiveExpenses({
                                                 <span
                                                     className={`rounded-md px-1.5 py-0.5 text-xs font-medium 
                                                         ${
-                                                        it.fixed
-                                                            ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
-                                                            : it.type === 'ME_DEBEN'
-                                                            ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
-                                                            : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
+                                                            it.fixed
+                                                                ? 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200'
+                                                                : it.type === 'ME_DEBEN'
+                                                                  ? 'bg-green-100 dark:bg-green-900/40 text-green-700 dark:text-green-300'
+                                                                  : 'bg-red-100 dark:bg-red-900/40 text-red-700 dark:text-red-300'
                                                         }`}
-                                                    >
+                                                >
                                                     {it.fixed
                                                         ? 'Gasto fijo'
                                                         : it.type === 'ME_DEBEN'
-                                                        ? 'Me deben'
-                                                        : 'Debo'}
+                                                          ? 'Me deben'
+                                                          : 'Debo'}
                                                 </span>
                                             </div>
 
@@ -151,8 +151,8 @@ export default function ActiveExpenses({
                                                 <p className="text-xs text-slate-500 dark:text-slate-400">
                                                     {it.installments.total
                                                         ? `de ${it.currency} $${it.totalAmount.toFixed(
-                                                            2,
-                                                        )} · ${it.installments.paid}/${it.installments.total} cuotas`
+                                                              2,
+                                                          )} · ${it.installments.paid}/${it.installments.total} cuotas`
                                                         : `Total ${it.currency} $${it.totalAmount.toFixed(2)}`}
                                                 </p>
                                             </div>
@@ -162,10 +162,11 @@ export default function ActiveExpenses({
                                         <div className="flex items-center gap-4 mt-2">
                                             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                                 <div
-                                                    className={`h-1.5 rounded-full ${it.type === 'ME_DEBEN'
-                                                        ? 'bg-green-500'
-                                                        : 'bg-red-500'
-                                                        }`}
+                                                    className={`h-1.5 rounded-full ${
+                                                        it.type === 'ME_DEBEN'
+                                                            ? 'bg-green-500'
+                                                            : 'bg-red-500'
+                                                    }`}
                                                     style={{ width: `${it.progress}%` }}
                                                 />
                                             </div>
@@ -181,8 +182,8 @@ export default function ActiveExpenses({
                                                 {isLoading
                                                     ? 'Procesando...'
                                                     : it.type === 'ME_DEBEN'
-                                                        ? 'Registrar cobro'
-                                                        : 'Pagar cuota'}
+                                                      ? 'Registrar cobro'
+                                                      : 'Pagar cuota'}
                                             </button>
                                         </div>
                                     </li>

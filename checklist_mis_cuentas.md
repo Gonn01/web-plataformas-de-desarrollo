@@ -8,9 +8,9 @@
 
 ## ENTIDADES FINANCIERAS
 
-- [ ] Agregar spinner de carga al obtener entidades.
+- [ x] Agregar spinner de carga al obtener entidades.
 - [ ] Al crear una entidad, volver a la lista.
-- [ ] Corregir el layout de la lupa en el buscador.
+- [ x] Corregir el layout de la lupa en el buscador.
 
 ## DETALLE DE ENTIDAD
 
