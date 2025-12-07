@@ -32,7 +32,6 @@ export default function App() {
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
                 <Route path="gastos/:id" element={<DetalleGasto />} />
                 <Route path="configuracion" element={<Configuracion />} />
-                <Route path="entidades/:id" element={<EntidadDetalle />} />
             </Route>
         </Routes>
     );

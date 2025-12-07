@@ -14,7 +14,7 @@ export function useGastoUI() {
 
     const { gasto, setGasto, actualizar, pagarCuota, eliminar, loading } = useGastoData();
 
-    // -------------------------
+    // ----------------------
     // CALCULOS DERIVADOS
     // -------------------------
     const totalPagado = useMemo(() => {
@@ -32,7 +32,8 @@ export function useGastoUI() {
     // -------------------------
     const volverALista = () => {
         if (!gasto) return;
-        nav(`/app/entidades-financieras/${gasto.financial_entity_id}/compras`);
+        console.log(gasto);
+        nav(`/app/entidades/${gasto.entidad}`);
     };
 
     // -------------------------
