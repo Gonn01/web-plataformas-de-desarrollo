@@ -6,7 +6,7 @@ import { useEntidadesData } from './use-entidades-data';
 
 export function useEntidadesUI() {
     const navigate = useNavigate();
-    const { entities, crearEntidad, eliminarEntidad } = useEntidadesData();
+    const { entities, loading, crearEntidad, eliminarEntidad } = useEntidadesData();
 
     const [query, setQuery] = useState('');
     const [openNew, setOpenNew] = useState(false);
@@ -18,7 +18,8 @@ export function useEntidadesUI() {
         return entities.filter((e) => (e.name || '').toLowerCase().includes(q));
     }, [query, entities]);
 
-    const showEmpty = entities.length === 0 && filtered.length === 0;
+    // const showEmpty = entities.length === 0 && filtered.length === 0;
+    const showEmpty = !loading && entities.length === 0 && filtered.length === 0;
 
     async function handleSaveNew({ name }) {
         try {
@@ -48,6 +49,7 @@ export function useEntidadesUI() {
         setOpenNew,
         filtered,
         showEmpty,
+        loading,
 
         // acciones
         handleSaveNew,
