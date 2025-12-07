@@ -86,7 +86,7 @@ export function useDashboardData() {
                             name: displayName,
                             title: displayName,
                             fixed,
-                            type: fixed ? 'GASTO_FIJO' : isMeDeben ? 'ME_DEBEN' : 'DEBO',
+                            type: isMeDeben ? 'ME_DEBEN' : 'DEBO',
                             currency,
                             amountPerInstallment,
                             totalAmount: amount,
@@ -95,16 +95,13 @@ export function useDashboardData() {
                                 paid,
                                 total: num,
                             },
-                            progress:
-                                num > 0
-                                    ? Math.min(100, Math.round((paid / num) * 100))
-                                    : fixed
-                                        ? paid > 0
-                                            ? 100
-                                            : 0
-                                        : paid > 0
-                                            ? 100
-                                            : 0,
+                            progress: fixed
+                                ? 100
+                                : num > 0
+                                    ? Math.min((paid / num) * 100, 100)
+                                    : paid === 0
+                                        ? 0
+                                        : 100,
                         };
                     });
 

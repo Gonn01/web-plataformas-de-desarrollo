@@ -7,7 +7,7 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
 
     switch (variant) {
         case 'activo':
-            subtitle = `Cuotas: ${gasto.payed_quotas}/${gasto.number_of_quotas}`;
+            subtitle = gasto.fixed_expense ? `Veces pagado ${gasto.payed_quotas}` : `Cuotas: ${gasto.payed_quotas}/${gasto.number_of_quotas}`;
             break;
 
         case 'finalizado':

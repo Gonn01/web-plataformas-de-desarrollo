@@ -1,4 +1,5 @@
 export function ChipTipoGasto({ fijo, tipo, column = false }) {
+    console.log('Renderizando ChipTipoGasto con:', { fijo, tipo, column });
     const tipoColor =
         tipo == 'ME_DEBEN' || tipo === 'Me deben'
             ? 'bg-green-400/20 text-green-400'
