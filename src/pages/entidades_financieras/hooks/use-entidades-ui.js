@@ -22,9 +22,9 @@ export function useEntidadesUI() {
 
     async function handleSaveNew({ name }) {
         try {
-            const newEntity = await crearEntidad({ name });
+            await crearEntidad({ name });
             setOpenNew(false);
-            navigate(`/app/entidades/${newEntity.id}`);
+            navigate('/app/entidades');
         } catch (err) {
             console.error('Error creating entity:', err);
             alert('No se pudo crear la entidad.');
