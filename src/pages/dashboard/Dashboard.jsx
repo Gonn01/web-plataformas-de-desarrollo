@@ -5,6 +5,7 @@ import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpe
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useNewExpense } from './hooks/use-new-expense';
+import Loader from '@/components/Loader';
 
 export default function Dashboard() {
     const ui = useDashboardUI();
@@ -12,7 +13,9 @@ export default function Dashboard() {
     const { saveExpense } = useNewExpense(data.loadDashboard, () => ui.setOpenNewExpense(false));
 
     const summary = data.getSummaryForCurrency(ui.currency);
-
+    if (data.loading) {
+        return <Loader />;
+    }
     return (
         <>
             {/* HEADER */}

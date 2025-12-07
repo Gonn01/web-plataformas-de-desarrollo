@@ -32,7 +32,6 @@ export function useGastoUI() {
     // -------------------------
     const volverALista = () => {
         if (!gasto) return;
-        console.log(gasto);
         nav(`/app/entidades/${gasto.entidad}`);
     };
 

@@ -8,11 +8,13 @@ export function useDashboardData() {
 
     const [summaryByCurrency, setSummaryByCurrency] = useState(null);
     const [groups, setGroups] = useState([]);
+    const [loading, setLoading] = useState(false);
 
     const loadDashboard = useCallback(async () => {
         if (!token) return;
 
         try {
+            setLoading(true);
             const entities = await fetchDashboardData(token);
 
             const totals = {
@@ -63,10 +65,10 @@ export function useDashboardData() {
                                 ? 1
                                 : 0
                             : num > 0
-                              ? Math.max(num - paid, 0)
-                              : paid === 0
-                                ? 1
-                                : 0;
+                                ? Math.max(num - paid, 0)
+                                : paid === 0
+                                    ? 1
+                                    : 0;
 
                         const remainingAmount = remainingInstallments * amountPerInstallment;
 
@@ -97,12 +99,12 @@ export function useDashboardData() {
                                 num > 0
                                     ? Math.min(100, Math.round((paid / num) * 100))
                                     : fixed
-                                      ? paid > 0
-                                          ? 100
-                                          : 0
-                                      : paid > 0
-                                        ? 100
-                                        : 0,
+                                        ? paid > 0
+                                            ? 100
+                                            : 0
+                                        : paid > 0
+                                            ? 100
+                                            : 0,
                         };
                     });
 
@@ -129,6 +131,8 @@ export function useDashboardData() {
             setGroups(mappedGroups.filter(Boolean));
         } catch (err) {
             console.error('Error cargando dashboard:', err);
+        } finally {
+            setLoading(false);
         }
     }, [token]);
 
@@ -146,5 +150,6 @@ export function useDashboardData() {
         summaryByCurrency,
         loadDashboard,
         getSummaryForCurrency,
+        loading,
     };
 }

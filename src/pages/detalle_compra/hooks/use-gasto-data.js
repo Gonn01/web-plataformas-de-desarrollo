@@ -90,7 +90,7 @@ export function useGastoData() {
             setGasto(mapGasto(res));
         } catch (err) {
             console.error('Error cargando gasto', err);
-            navigate(`/app/entidades-financieras/${gasto.financial_entity_id}/gastos`);
+            navigate(`/app/entidades/${gasto.entidad}`);
         } finally {
             setLoading(false);
         }
@@ -125,7 +125,7 @@ export function useGastoData() {
         if (!gasto) return;
         setLoading(true);
         await deleteGasto(gasto.id, token);
-        navigate(`/app/entidades-financieras/${gasto.financial_entity_id}/gastos`);
+        navigate(`/app/entidades/${gasto.entidad}`);
         setLoading(false);
     }
 
