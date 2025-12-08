@@ -18,7 +18,7 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
             subtitle = '';
     }
 
-    const currency = gasto.currency_type === '1' ? 'ARS' : 'USD';
+    const currency = gasto.currency_type === '0' ? 'ARS' : gasto.currency_type === '1' ? 'USD' : 'EUR';
 
     return (
         <div

@@ -118,7 +118,7 @@ export default function ActiveExpenses({
                                         {/* Top row */}
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="gap-1.5 flex-1">
-                                                <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
+                                                <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 mb-2">
                                                     {it.name}
                                                 </p>
                                                 <ChipTipoGasto
@@ -144,7 +144,7 @@ export default function ActiveExpenses({
                                         </div>
 
                                         {/* PROGRESS BAR */}
-                                        <div className="flex items-center gap-4 mt-2">
+                                        <div className="flex items-center gap-4">
                                             <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
                                                 <div
                                                     className={`h-1.5 rounded-full ${it.fixed

@@ -11,35 +11,12 @@ export function useEntidadesData() {
     const [loading, setLoading] = useState(true);
     const { addEntity } = useEntitiesStore();
 
-    /* useEffect(() => {
-        if (!token) return;
-
-        const load = async () => {
-            try {
-                const data = await fetchFinancialEntities(token);
-
-                const normalized = data.map((e) => ({
-                    ...e,
-                    balances: e.balances ?? [{ currency: 'ARS', amount: 0 }],
-                    activeExpenses: e.activeExpenses ?? 0,
-                    type: e.type ?? 'bank',
-                }));
-
-                setEntities(normalized);
-            } catch (err) {
-                console.error('Error fetching entities:', err);
-            }
-        };
-
-        load();
-    }, [token]);
- */
     useEffect(() => {
         if (!token) return;
 
         const load = async () => {
             try {
-                setLoading(true); // 👈 SE USA
+                setLoading(true);
 
                 const data = await fetchFinancialEntities(token);
 

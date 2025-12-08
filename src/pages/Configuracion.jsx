@@ -1,35 +1,39 @@
 import { useEffect, useState } from 'react';
 import useAuth from '@/hooks/use-auth';
 
-function currencyCodeToLabel(codeOrLabel) {
+export function currencyCodeToLabel(codeOrLabel) {
     if (typeof codeOrLabel === 'string') {
         if (['ARS', 'USD', 'EUR'].includes(codeOrLabel)) return codeOrLabel;
     }
 
     const code = Number(codeOrLabel);
     switch (code) {
-        case 2:
+        case 0:
+            return 'ARS';
+        case 1:
             return 'USD';
-        case 3:
+        case 2:
             return 'EUR';
         default:
             return 'ARS';
     }
 }
 
-function currencyLabelToCode(label) {
+export function currencyLabelToCode(label) {
     switch (label) {
+        case 'ARS':
+            return 0;
         case 'USD':
-            return 2;
-        case 'EUR':
-            return 3;
-        default:
             return 1;
+        case 'EUR':
+            return 2;
+        default:
+            return 0;
     }
 }
 
 export default function Configuracion() {
-    const { user, updateUser } = useAuth(); 
+    const { user, updateUser } = useAuth();
     const [preview, setPreview] = useState('');
     const [nombreVisible, setNombreVisible] = useState('Usuario');
     const [moneda, setMoneda] = useState('ARS');

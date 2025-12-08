@@ -51,7 +51,7 @@ export function useDashboardData() {
                         const displayName = g.title || g.name || '';
 
                         const currency =
-                            g.currency_type === 2 ? 'USD' : g.currency_type === 3 ? 'EUR' : 'ARS';
+                            g.currency_type === 1 ? 'USD' : g.currency_type === 2 ? 'EUR' : 'ARS';
 
                         const amountPerInstallment =
                             num > 0

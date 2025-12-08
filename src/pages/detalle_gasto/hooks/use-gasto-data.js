@@ -71,7 +71,7 @@ export function useGastoData() {
             titulo: g.name,
             entidad: g.financial_entity_id,
             total: amount,
-            moneda: g.currency_type === '1' ? 'ARS' : g.currency_type === '2' ? 'USD' : 'EUR',
+            moneda: g.currency_type === '0' ? 'ARS' : g.currency_type === '1' ? 'USD' : 'EUR',
             tipo: g.type === 'ME_DEBEN' ? 'Me deben' : 'Debo',
             cuotas,
             fijo: isFixed,

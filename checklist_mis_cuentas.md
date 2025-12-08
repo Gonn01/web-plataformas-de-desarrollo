@@ -55,3 +55,5 @@
 
 - [ ] Entidad como tarjeta para saber cuando vencen
 - [ ] Agrupar gastos por grupos
+- [ ] Ser consistente a la hora de usar el tipo de moneda(tambien cambiar a enum en la db)
+- [ ] Ser consistente en la sincronizacion de cuentas registro y logeo con google
