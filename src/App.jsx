@@ -5,7 +5,7 @@ import AppLayout from './layouts/AppLayout';
 import EntidadesFinancieras from './pages/entidades_financieras/EntidadesFinancieras';
 import EntidadDetalle from './pages/detalle_entidad/DetalleEntidad';
 import ProtectedRoute from './guards/ProtectedRoute';
-import DetalleGasto from './pages/detalle_compra/DetalleGasto';
+import DetalleGasto from './pages/detalle_gasto/DetalleGasto';
 import Configuracion from './pages/Configuracion';
 import Register from './pages/auth/Register/Register';
 import Dashboard from './pages/dashboard/Dashboard';
