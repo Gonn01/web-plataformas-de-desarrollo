@@ -34,7 +34,7 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
     const [isFixed, setIsFixed] = useState(false);
     const [isInstallment, setIsInstallment] = useState(false);
     const [paidInstallments, setPaidInstallments] = useState('0');
-    const { entities, setEntities } = useEntitiesStore();
+    const { entities, addEntity } = useEntitiesStore();
     const totalInstallments = Number(installments) || 0;
     const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
     const progressPct = totalInstallments > 0 ? Math.min(100, (paid / totalInstallments) * 100) : 0;
@@ -52,7 +52,7 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
 
         try {
             const created = await createEntity({ name: newEntityName.trim() }, token);
-            setEntities((prev) => [...prev, created]);
+            addEntity(created);
             setEntity(created.id);
             setShowNewEntity(false);
             setNewEntityName('');

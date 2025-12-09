@@ -35,7 +35,7 @@ export default function MultiPaymentSection({ items }) {
 
             <div className="border-t" />
 
-            <p className="text-sm font-semibold text-white">Monto total a pagar:</p>
+            <p className="text-sm font-semibold text-white">Monto total a pagar/cobrar:</p>
 
             <div className="flex flex-col gap-2">
                 {totals.map((row) => (
