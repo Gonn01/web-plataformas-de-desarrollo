@@ -1,4 +1,3 @@
-// src/pages/dashboard/components/CurrencyToggle.jsx
 export default function CurrencyToggle({ currency, onChange }) {
     const options = ['ARS', 'USD', 'EUR'];
 

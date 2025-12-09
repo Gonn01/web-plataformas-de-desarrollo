@@ -1,7 +1,6 @@
 import TextInput from '@/components/TextInput';
 
 export default function ExpenseAmountSection({ amount, setAmount, currency, setCurrency }) {
-    // Detectamos si el monto es inválido
     const isInvalid = amount !== '' && Number(amount) <= 0;
 
     return (

@@ -1,4 +1,3 @@
-// src/components/modals/NewExpenseCard/components/ExpenseInstallmentsSection.jsx
 import TextInput from '@/components/TextInput';
 
 export default function ExpenseInstallmentsSection({
@@ -28,10 +27,8 @@ export default function ExpenseInstallmentsSection({
                         const value = Number(e.target.value);
                         const max = Number(installments) || 0;
 
-                        // evitar negativos
                         if (value < 0) return setPaidInstallments('0');
 
-                        // limitar a total
                         if (value > max) return setPaidInstallments(String(max));
 
                         setPaidInstallments(e.target.value);

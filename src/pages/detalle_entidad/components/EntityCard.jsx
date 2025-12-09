@@ -49,7 +49,7 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                 {onDelete && (
                     <button
                         onClick={(e) => {
-                            e.stopPropagation(); // ← evita que abra el detalle
+                            e.stopPropagation();
                             onDelete(entity);
                         }}
                         className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded-lg text-white font-semibold transition-all">

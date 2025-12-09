@@ -16,9 +16,6 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
 
     const containerRef = useRef(null);
 
-    // =========================
-    // INITIAL STATE FROM GASTO
-    // =========================
     const [type, setType] = useState(gasto.type === 'ME_DEBEN' ? 'Me deben' : 'Debo');
     const [name, setName] = useState(gasto.name);
     const [entity, setEntity] = useState(gasto.financial_entity_id);
@@ -42,23 +39,14 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
 
-    // =============================
-    // PROGRESS
-    // =============================
     const totalInstallments = Number(installments) || 0;
     const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
     const progressPct = totalInstallments > 0 ? Math.min(100, (paid / totalInstallments) * 100) : 0;
 
-    // =============================
-    // VALIDATION
-    // =============================
     const canSave = useMemo(() => {
         return name?.trim() && entity && Number(amount) > 0 && currency;
     }, [name, entity, amount, currency]);
 
-    // =============================
-    // CREATE ENTITY (inline)
-    // =============================
     const handleCreateEntity = async () => {
         if (!newEntityName.trim()) return;
 
@@ -73,9 +61,6 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
         }
     };
 
-    // =============================
-    // ESC + SCROLL LOCK
-    // =============================
     useEffect(() => {
         const onKey = (e) => e.key === 'Escape' && onClose?.();
         document.addEventListener('keydown', onKey);
@@ -89,9 +74,6 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
         };
     }, [onClose]);
 
-    // =============================
-    // SAVE EDITED GASTO
-    // =============================
     const handleSubmit = () => {
         if (!canSave) return;
 
@@ -113,9 +95,6 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
         onSave?.(payload);
     };
 
-    // =============================
-    // MODAL CONTENT
-    // =============================
     const modal = (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center"

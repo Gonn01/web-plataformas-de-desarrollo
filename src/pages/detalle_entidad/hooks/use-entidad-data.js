@@ -1,5 +1,3 @@
-// src/pages/entidad_detalle/hooks/use-entidad-data.js
-
 import { useEffect, useState, useCallback, useMemo } from 'react';
 import {
     fetchFinancialEntityById,
@@ -17,9 +15,6 @@ export function useEntidadData() {
     const [entity, setEntity] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    // ------------------------------
-    // LOAD ENTITY
-    // ------------------------------
     useEffect(() => {
         if (!token) return;
 
@@ -38,9 +33,6 @@ export function useEntidadData() {
         load();
     }, [id, token]);
 
-    // ------------------------------
-    // STATS (solo lectura)
-    // ------------------------------
     const stats = useMemo(() => {
         if (!entity) return { amount: 0, debts: 0, fixed: 0, finalized: 0 };
 
@@ -67,9 +59,6 @@ export function useEntidadData() {
         };
     }, [entity]);
 
-    // ------------------------------
-    // CREATE EXPENSE
-    // ------------------------------
     const crearGastoEntidad = useCallback(
         async (payload) => {
             const nuevo = await createGasto(payload, token);
@@ -78,7 +67,6 @@ export function useEntidadData() {
             const total = Number(nuevo.number_of_quotas || 0);
 
             setEntity((prev) => {
-                // === GASTO FIJO ===
                 if (isFixed) {
                     return {
                         ...prev,
@@ -86,7 +74,6 @@ export function useEntidadData() {
                     };
                 }
 
-                // === GASTO CON CUOTAS ===
                 if (total > 0) {
                     const isFinished = paid >= total;
 
@@ -102,7 +89,6 @@ export function useEntidadData() {
                     };
                 }
 
-                // === GASTO SIN CUOTAS (one-shot) ===
                 return {
                     ...prev,
                     gastos_activos: [...prev.gastos_activos, nuevo],
@@ -114,9 +100,6 @@ export function useEntidadData() {
         [token],
     );
 
-    // ------------------------------
-    // UPDATE ENTITY
-    // ------------------------------
     const actualizarEntidad = useCallback(
         async (newName) => {
             await updateFinancialEntity(id, newName, token);
@@ -126,9 +109,6 @@ export function useEntidadData() {
         [id, token],
     );
 
-    // ------------------------------
-    // DELETE ENTITY
-    // ------------------------------
     const eliminarEntidad = useCallback(async () => {
         await deleteFinancialEntity(id, token);
     }, [id, token]);

@@ -12,18 +12,15 @@ export default function ConfirmDeleteModal({
 }) {
     const [visible, setVisible] = useState(open);
 
-    // Maneja el fade-out antes de desmontar el modal
     useEffect(() => {
         if (open) {
             setVisible(true);
         } else {
-            // Esperamos la animación → 150ms
             const t = setTimeout(() => setVisible(false), 150);
             return () => clearTimeout(t);
         }
     }, [open]);
 
-    // No renderizar nada cuando ni open ni visible están activos
     if (!open && !visible) return null;
 
     return createPortal(

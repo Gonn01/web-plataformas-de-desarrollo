@@ -15,9 +15,6 @@ export function useGastoData() {
         load();
     }, [id, token]);
 
-    // -----------------------------------------
-    // CARGAR GASTO DESDE API
-    // -----------------------------------------
     async function load() {
         try {
             setLoading(true);
@@ -31,9 +28,6 @@ export function useGastoData() {
         }
     }
 
-    // -----------------------------------------
-    // ACTUALIZAR GASTO
-    // -----------------------------------------
     async function actualizar(payload) {
         if (!gasto) return;
         setLoading(true);
@@ -42,9 +36,6 @@ export function useGastoData() {
         setLoading(false);
     }
 
-    // -----------------------------------------
-    // PAGAR CUOTA
-    // -----------------------------------------
     async function pagarCuota() {
         if (!gasto) return;
         setLoading(true);
@@ -53,9 +44,6 @@ export function useGastoData() {
         setLoading(false);
     }
 
-    // -----------------------------------------
-    // ELIMINAR GASTO
-    // -----------------------------------------
     async function eliminar() {
         if (!gasto) return;
         setLoading(true);

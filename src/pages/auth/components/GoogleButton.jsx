@@ -1,4 +1,3 @@
-// src/pages/auth/components/GoogleButton.jsx
 import { useGoogleAuth } from '../hooks/use-google-auth';
 
 export default function GoogleButton() {

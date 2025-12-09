@@ -30,10 +30,10 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                 </span>
             </div>
 
-            {/* Tacho de basura (solo aparece en hover) */}
+            {/* Tacho de basura */}
             <button
                 onClick={(e) => {
-                    e.stopPropagation(); // para que no dispare el onClick del card
+                    e.stopPropagation();
                     onDelete?.(entity);
                 }}
                 className="

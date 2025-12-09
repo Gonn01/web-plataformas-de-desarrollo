@@ -1,10 +1,8 @@
-// src/components/modals/NewExpenseCard/NewExpenseCard.jsx
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import useAuth from '@/hooks/use-auth';
 import { createEntity } from '@/services/api';
 
-// import ExpenseFilesUpload from './components/ExpenseFilesUpload';
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
 import { useEntitiesStore } from '@/store/use-entities-store';
@@ -17,7 +15,6 @@ import { currencyLabelToCode } from '@/pages/Configuracion';
 export default function NewExpenseModal({ onClose, onSave, defaultEntityId = null }) {
     const { token } = useAuth();
 
-    // === STATES ===
     const [type, setType] = useState('Debo');
     const [name, setName] = useState('');
     const [entity, setEntity] = useState(defaultEntityId || '');
@@ -46,7 +43,6 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
         [name, entity, amount, currency],
     );
 
-    // === CREATE ENTITY ===
     const handleCreateEntity = async () => {
         if (!newEntityName.trim()) return;
 
@@ -61,7 +57,6 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
         }
     };
 
-    // === ESCAPE + SCROLL LOCK ===
     useEffect(() => {
         const onKey = (e) => e.key === 'Escape' && onClose?.();
         document.addEventListener('keydown', onKey);
@@ -75,7 +70,6 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
         };
     }, [onClose]);
 
-    // === SAVE ===
     function handleSubmit() {
         if (!canSave) return;
 
@@ -97,9 +91,6 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
         onSave?.(payload);
     }
 
-    // ============================
-    // 🎨 MODAL COMPLETO
-    // ============================
     const modalContent = (
         <div
             className="fixed inset-0 z-50 flex items-center justify-center"

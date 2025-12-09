@@ -26,16 +26,13 @@ export default function ActiveExpenses({
     const { token } = useAuth();
     const { handleConfirm } = usePayments(token);
 
-    // Estado de carga por ID de gasto
     const [loadingIds, setLoadingIds] = useState(new Set());
 
-    // Marca items en loading
     const markLoading = (items) => {
         const ids = items.map((i) => i.id);
         setLoadingIds((prev) => new Set([...prev, ...ids]));
     };
 
-    // Limpia loading
     const clearLoading = () => setLoadingIds(new Set());
 
     return (
@@ -143,12 +140,10 @@ export default function ActiveExpenses({
                                                 </p>
 
                                                 {it.fixed_expense ? (
-                                                    // SI ES UN GASTO FIJO
                                                     <p className="text-xs text-slate-500 dark:text-slate-400">
                                                         {`${it.payed_quotas} ${it.payed_quotas === 1 ? 'vez pagado' : 'veces pagado'}`}
                                                     </p>
                                                 ) : (
-                                                    // NO ES GASTO FIJO → cuotas
                                                     <p className="text-xs text-slate-500 dark:text-slate-400">
                                                         {`de ${currencyCodeToLabel(it.currency_type)} $${it.amount.toFixed(2)} · ${it.payed_quotas}/${it.number_of_quotas} cuotas`}
                                                     </p>

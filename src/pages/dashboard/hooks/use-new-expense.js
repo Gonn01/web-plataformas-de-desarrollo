@@ -1,4 +1,3 @@
-// src/pages/dashboard/hooks/use-new-expense.js
 import { useCallback } from 'react';
 import useAuth from '@/hooks/use-auth';
 import { createGasto } from '@/services/api';

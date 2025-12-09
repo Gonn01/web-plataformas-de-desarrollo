@@ -10,9 +10,6 @@ export function useDashboardData() {
     const [groups, setGroups] = useState([]);
     const [loading, setLoading] = useState(false);
 
-    // =========================================
-    // CALCULAR BALANCES LOCALMENTE
-    // =========================================
     const recalcSummary = useCallback((groupsToUse) => {
         const totals = {
             ARS: { debo: 0, meDeben: 0 },
@@ -45,9 +42,6 @@ export function useDashboardData() {
         setSummaryByCurrency(summary);
     }, []);
 
-    // =========================================
-    // CARGA INICIAL DESDE API
-    // =========================================
     const loadDashboard = useCallback(async () => {
         if (!token) return;
 
@@ -85,9 +79,6 @@ export function useDashboardData() {
         }
     }, [token, recalcSummary]);
 
-    // =========================================
-    // ACTUALIZACIÓN LOCAL TRAS PAGAR CUOTAS
-    // =========================================
     const updateAfterPayment = useCallback(
         (paidItems) => {
             const paidIds = new Set(paidItems.map((i) => i.id));
@@ -108,10 +99,8 @@ export function useDashboardData() {
                                     : Math.min((newPaid / it.number_of_quotas) * 100, 100),
                             };
 
-                            // si es gasto fijo, no se elimina nunca
                             if (it.fixed_expense) return updated;
 
-                            // si completó las cuotas → se elimina
                             if (newPaid >= it.number_of_quotas) return null;
 
                             return updated;

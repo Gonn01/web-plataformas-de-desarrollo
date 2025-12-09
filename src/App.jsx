@@ -1,4 +1,3 @@
-// src/App.jsx
 import { Routes, Route, Navigate } from 'react-router-dom';
 import Login from './pages/auth/Login/Login';
 import AppLayout from './layouts/AppLayout';

@@ -4,7 +4,6 @@ import HeaderDetalle from './components/HeaderDetalle';
 import InfoItem from './components/InfoItem';
 import ProgresoPago from './components/ProgresoPago';
 import CuotasSection from './components/CuotasSection';
-// import AdjuntosSection from './components/AdjuntosSection';
 import PeligroEliminar from '../../components/PeligroEliminar';
 import { useGastoUI } from './hooks/use-gasto-ui';
 import Loader from '@/components/Loader';

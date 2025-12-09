@@ -16,7 +16,6 @@ export function ChipTipoGasto({ fijo, tipo, column = false }) {
         </span>
     );
 
-    // Si es fijo → mostrar ambos chips
     if (fijo) {
         return (
             <div className={`flex ${column ? 'flex-col' : 'items-center'} gap-2`}>
@@ -26,6 +25,5 @@ export function ChipTipoGasto({ fijo, tipo, column = false }) {
         );
     }
 
-    // Si NO es fijo → chip único
     return tipoChip;
 }

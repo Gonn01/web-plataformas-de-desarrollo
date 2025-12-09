@@ -1,5 +1,3 @@
-// src/pages/entidades_financieras/hooks/use-entidades-ui.js
-
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEntidadesData } from './use-entidades-data';
@@ -42,7 +40,6 @@ export function useEntidadesUI() {
     }
 
     return {
-        // UI
         query,
         setQuery,
         openNew,
@@ -51,11 +48,9 @@ export function useEntidadesUI() {
         showEmpty,
         loading,
 
-        // acciones
         handleSaveNew,
         handleDelete,
 
-        // navegación
         navigate,
     };
 }

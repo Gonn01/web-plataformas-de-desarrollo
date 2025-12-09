@@ -1,4 +1,3 @@
-// src/components/entities/EntityIcon.jsx
 export default function EntityIcon({ type }) {
     const icon = type === 'bank' ? 'account_balance' : type === 'wallet' ? 'wallet' : 'person';
     return (

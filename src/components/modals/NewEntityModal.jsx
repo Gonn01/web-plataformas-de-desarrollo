@@ -2,17 +2,9 @@ import { useEffect, useMemo, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '../Icon';
 
-/**
- * Modal para crear una nueva entidad (banco, persona o servicio).
- * Props:
- * - open: boolean (controla visibilidad)
- * - onClose: () => void
- * - onSave: (payload: { name: string }) => void
- */
 export default function NewEntityModal({ open, onClose, onSave }) {
     const [name, setName] = useState('');
 
-    // Deshabilitar scroll del body cuando está abierto
     useEffect(() => {
         if (!open) return;
         const prev = document.body.style.overflow;
@@ -22,7 +14,6 @@ export default function NewEntityModal({ open, onClose, onSave }) {
         };
     }, [open]);
 
-    // Cerrar con Escape
     useEffect(() => {
         if (!open) return;
         const onKey = (e) => e.key === 'Escape' && onClose?.();
@@ -45,7 +36,7 @@ export default function NewEntityModal({ open, onClose, onSave }) {
             {/* Backdrop */}
             <div
                 className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
-                onMouseDown={onClose} // click en backdrop cierra
+                onMouseDown={onClose}
             />
 
             {/* Modal */}
@@ -54,7 +45,6 @@ export default function NewEntityModal({ open, onClose, onSave }) {
                 aria-modal="true"
                 role="dialog"
                 aria-labelledby="new-entity-title"
-                // Evita que el click dentro cierre (detiene burbujeo del backdrop)
                 onMouseDown={(e) => e.stopPropagation()}
             >
                 <div className="relative flex flex-col w-full max-w-lg overflow-hidden bg-[#18211b] rounded-xl border border-[#3d5245] shadow-xl">

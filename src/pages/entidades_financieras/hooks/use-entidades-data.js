@@ -1,5 +1,3 @@
-// src/pages/entidades_financieras/hooks/use-entidades-data.js
-
 import { useEffect, useState } from 'react';
 import { fetchFinancialEntities, createEntity, deleteFinancialEntity } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
