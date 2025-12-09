@@ -19,12 +19,11 @@ export function useGastoUI() {
     // -------------------------
     const totalPagado = useMemo(() => {
         if (!gasto) return 0;
-        return gasto.cuotas.filter((c) => c.pagada).reduce((a, c) => a + c.monto, 0);
+        return gasto.payed_quotas * gasto.amount_per_quota;
     }, [gasto]);
 
     const porcentaje = useMemo(() => {
-        if (!gasto?.total) return 0;
-        return Math.min(100, (totalPagado / gasto.total) * 100);
+        return gasto ? (totalPagado / gasto.amount) * 100 : 0;
     }, [gasto, totalPagado]);
 
     // -------------------------
