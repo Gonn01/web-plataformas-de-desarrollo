@@ -1,3 +1,4 @@
+import { currencyLabelToCode } from '@/pages/Configuracion';
 import { useMemo } from 'react';
 
 export function useActiveExpensesFilter(groups = [], currency, query = '') {
@@ -7,9 +8,9 @@ export function useActiveExpensesFilter(groups = [], currency, query = '') {
         return groups
             .map((g) => {
                 const items = g.items.filter((it) => {
-                    const title = (it.title || it.name || '').toLowerCase();
+                    const title = it.name.toLowerCase();
                     const matchTitle = q ? title.includes(q) : true;
-                    const matchCurrency = it.currency === currency;
+                    const matchCurrency = it.currency_type === currencyLabelToCode(currency);
 
                     return matchTitle && matchCurrency;
                 });

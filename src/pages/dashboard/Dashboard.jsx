@@ -13,9 +13,11 @@ export default function Dashboard() {
     const { saveExpense } = useNewExpense(data.loadDashboard, () => ui.setOpenNewExpense(false));
 
     const summary = data.getSummaryForCurrency(ui.currency);
+
     if (data.loading) {
         return <Loader />;
     }
+
     return (
         <>
             {/* HEADER */}
