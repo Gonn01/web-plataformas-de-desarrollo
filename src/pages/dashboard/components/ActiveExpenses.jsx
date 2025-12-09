@@ -14,17 +14,17 @@ import { currencyCodeToLabel } from '@/pages/Configuracion';
 export default function ActiveExpenses({
     query,
     groups,
+    updateAfterPayment,
     currency,
     onCurrencyChange,
     onQueryChange,
-    onPaid,
 }) {
     const navigate = useNavigate();
     const filtered = useActiveExpensesFilter(groups, currency, query);
     const modal = useActiveExpensesModal();
 
     const { token } = useAuth();
-    const { handleConfirm } = usePayments(token, onPaid);
+    const { handleConfirm } = usePayments(token);
 
     // Estado de carga por ID de gasto
     const [loadingIds, setLoadingIds] = useState(new Set());
@@ -142,13 +142,17 @@ export default function ActiveExpenses({
                                                     {`${currencyCodeToLabel(it.currency_type)} $${it.amount_per_quota.toFixed(2)}`}
                                                 </p>
 
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                    {it.number_of_quotas.total
-                                                        ? `de ${currencyCodeToLabel(it.currency_type)} $${it.amount.toFixed(
-                                                            2,
-                                                        )} · ${it.number_of_quotas}/${it.number_of_quotas} cuotas`
-                                                        : `Total ${currencyCodeToLabel(it.currency_type)} $${it.amount.toFixed(2)}`}
-                                                </p>
+                                                {it.fixed_expense ? (
+                                                    // SI ES UN GASTO FIJO
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        {`${it.payed_quotas} ${it.payed_quotas === 1 ? 'vez pagado' : 'veces pagado'}`}
+                                                    </p>
+                                                ) : (
+                                                    // NO ES GASTO FIJO → cuotas
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        {`de ${currencyCodeToLabel(it.currency_type)} $${it.amount.toFixed(2)} · ${it.payed_quotas}/${it.number_of_quotas} cuotas`}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
 
@@ -182,9 +186,9 @@ export default function ActiveExpenses({
                                                         Procesando…
                                                     </>
                                                 ) : it.type === 'ME_DEBEN' ? (
-                                                    `Registrar cobro${!it.fixed_expense ? ` (${it.payed_quotas + 1}/${it.number_of_quotas})` : ''}`
+                                                    `Registrar cobro`
                                                 ) : (
-                                                    `Pagar cuota${!it.fixed_expense ? ` (${it.payed_quotas + 1}/${it.number_of_quotas})` : ''}`
+                                                    `Pagar cuota`
                                                 )}
                                             </button>
                                         </div>
@@ -211,7 +215,10 @@ export default function ActiveExpenses({
                 onConfirm={async () => {
                     modal.setModalOpen(false);
                     markLoading(modal.modalItems);
+
                     await handleConfirm(modal.modalItems);
+                    updateAfterPayment(modal.modalItems);
+
                     clearLoading();
                     modal.setModalOpen(false);
                 }}

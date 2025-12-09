@@ -45,11 +45,11 @@ export default function Dashboard() {
             <ActiveExpenses
                 query={ui.query}
                 groups={data.groups}
+                setGroups={data.setGroups}
+                updateAfterPayment={data.updateAfterPayment}
                 currency={ui.currency}
                 onCurrencyChange={ui.setCurrency}
                 onQueryChange={ui.setQuery}
-                token={null}
-                onPaid={data.loadDashboard}
             />
 
             {/* MODAL */}
