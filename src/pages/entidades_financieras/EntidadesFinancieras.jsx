@@ -36,6 +36,7 @@ export default function EntidadesFinancieras() {
                 query={query}
                 navigate={navigate}
                 onDelete={handleDelete}
+                showEmpty={showEmpty}
             />
 
             {showEmpty && <EmptyState onCreate={() => setOpenNew(true)} />}

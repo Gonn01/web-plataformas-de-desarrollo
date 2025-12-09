@@ -2,7 +2,7 @@ import { useState } from 'react';
 import EntityCard from '@/pages/entidades_financieras/components/EntityCard';
 import ConfirmDeleteModal from '@/components/modals/ConfirmDeleteModal';
 
-export default function EntitiesList({ filtered, query, navigate, onDelete }) {
+export default function EntitiesList({ filtered, query, navigate, onDelete, showEmpty }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [selected, setSelected] = useState(null);
 
@@ -29,7 +29,7 @@ export default function EntitiesList({ filtered, query, navigate, onDelete }) {
                     />
                 ))}
 
-                {filtered.length === 0 && (
+                {filtered.length === 0 && !showEmpty && (
                     <div className="text-center text-sm text-slate-500 dark:text-slate-400 py-8">
                         No se encontraron entidades para “{query}”.
                     </div>
