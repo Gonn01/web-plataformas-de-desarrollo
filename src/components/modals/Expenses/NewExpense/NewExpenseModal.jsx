@@ -12,6 +12,7 @@ import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
+import { currencyLabelToCode } from '@/pages/Configuracion';
 
 export default function NewExpenseModal({ onClose, onSave, defaultEntityId = null }) {
     const { token } = useAuth();
@@ -74,24 +75,17 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
         };
     }, [onClose]);
 
-    function currencyLabelToCode(value) {
-        if (value === 'USD' || value === 2 || value === '2') return 2;
-        if (value === 'EUR' || value === 3 || value === '3') return 3;
-    return 1;
-}
-
     // === SAVE ===
-    const handleSubmit = () => {
+    function handleSubmit() {
         if (!canSave) return;
 
-     
         const currency_type = currencyLabelToCode(currency);
 
         const payload = {
             financial_entity_id: entity,
             name: name.trim(),
             amount: Number(amount),
-            number_of_quotas: isInstallment ? Number(installments) : 0,
+            number_of_quotas: isInstallment ? Number(installments) : 1,
             currency_type,
             first_quota_date: null,
             fixed_expense: isFixed,
@@ -101,7 +95,7 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
         };
 
         onSave?.(payload);
-    };
+    }
 
     // ============================
     // 🎨 MODAL COMPLETO
