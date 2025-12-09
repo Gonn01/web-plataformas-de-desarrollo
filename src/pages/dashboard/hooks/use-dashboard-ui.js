@@ -12,7 +12,8 @@ export function useDashboardUI() {
     useEffect(() => {
         if (!user) return;
 
-        const pref = user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
+        const pref =
+            user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
 
         const label = pref ? currencyCodeToLabel(pref) : 'ARS';
         setCurrency(label);

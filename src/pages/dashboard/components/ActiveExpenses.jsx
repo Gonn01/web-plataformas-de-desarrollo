@@ -1,5 +1,5 @@
 import Icon from '../../../components/Icon';
-import ConfirmInstallmentPaymentModal from '../../../components/modals/ConfirmPaymentModal';
+import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal/ConfirmPaymentModal';
 
 import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
 import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
@@ -9,21 +9,22 @@ import useAuth from '@/hooks/use-auth';
 
 import { useState } from 'react';
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
+import { currencyCodeToLabel } from '@/pages/Configuracion';
 
 export default function ActiveExpenses({
     query,
     groups,
+    updateAfterPayment,
     currency,
     onCurrencyChange,
     onQueryChange,
-    onPaid,
 }) {
     const navigate = useNavigate();
     const filtered = useActiveExpensesFilter(groups, currency, query);
     const modal = useActiveExpensesModal();
 
     const { token } = useAuth();
-    const { handleConfirm } = usePayments(token, onPaid);
+    const { handleConfirm } = usePayments(token);
 
     // Estado de carga por ID de gasto
     const [loadingIds, setLoadingIds] = useState(new Set());
@@ -81,7 +82,7 @@ export default function ActiveExpenses({
             </div>
 
             {/* LIST */}
-            <div className="flex flex-col gap-2 overflow-y-auto pr-2" style={{ maxHeight: 550 }}>
+            <div className="flex flex-col gap-2 overflow-y-auto pr-2">
                 {filtered.map((group) => (
                     <div key={group.id} className="flex flex-col gap-3">
                         {/* Group Header */}
@@ -90,7 +91,7 @@ export default function ActiveExpenses({
                                 className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
                                 onClick={() => navigate(`/app/entidades/${group.id}`)}
                             >
-                                {group.title}
+                                {group.name}
                             </h4>
 
                             <button
@@ -98,7 +99,7 @@ export default function ActiveExpenses({
                                 onClick={() => modal.openGroup(group)}
                                 type="button"
                             >
-                                {group.cta}
+                                Pagar/Registrar cobros
                             </button>
                         </div>
 
@@ -110,66 +111,85 @@ export default function ActiveExpenses({
                                 return (
                                     <li
                                         key={it.id}
-                                        className={`flex flex-col gap-3 rounded-lg p-3 transition-colors cursor-pointer 
+                                        className={`
+                                            flex flex-col rounded-lg p-3 transition-all cursor-pointer relative
                                             hover:bg-black/5 dark:hover:bg-white/5
-                                            ${isLoading ? 'opacity-50 pointer-events-none' : ''}`}
+                                            ${isLoading ? 'pointer-events-none' : ''}
+                                        `}
                                         onClick={() => navigate(`/app/gastos/${it.id}`)}
                                     >
+                                        {/* LOADING OVERLAY */}
+                                        {isLoading && (
+                                            <div className="absolute inset-0 bg-white/30 dark:bg-black/30 backdrop-blur-sm rounded-lg animate-pulse z-10"></div>
+                                        )}
+
                                         {/* Top row */}
                                         <div className="flex items-start justify-between gap-4">
                                             <div className="gap-1.5 flex-1">
                                                 <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 mb-2">
                                                     {it.name}
                                                 </p>
+
                                                 <ChipTipoGasto
                                                     tipo={it.type}
-                                                    fijo={it.fixed}
-                                                ></ChipTipoGasto>
+                                                    fijo={it.fixed_expense}
+                                                />
                                             </div>
 
                                             {/* RIGHT */}
                                             <div className="flex flex-col items-end gap-2 text-right">
                                                 <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
-                                                    {`${it.currency} $${it.amountPerInstallment.toFixed(
-                                                        2,
-                                                    )}`}
+                                                    {`${currencyCodeToLabel(it.currency_type)} $${it.amount_per_quota.toFixed(2)}`}
                                                 </p>
 
-                                                <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                    {it.installments.total
-                                                        ? `de ${it.currency} $${it.totalAmount.toFixed(2)} · ${it.installments.paid}/${it.installments.total} cuotas`
-                                                        : `Total ${it.currency} $${it.totalAmount.toFixed(2)}`}
-                                                </p>
+                                                {it.fixed_expense ? (
+                                                    // SI ES UN GASTO FIJO
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        {`${it.payed_quotas} ${it.payed_quotas === 1 ? 'vez pagado' : 'veces pagado'}`}
+                                                    </p>
+                                                ) : (
+                                                    // NO ES GASTO FIJO → cuotas
+                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                                                        {`de ${currencyCodeToLabel(it.currency_type)} $${it.amount.toFixed(2)} · ${it.payed_quotas}/${it.number_of_quotas} cuotas`}
+                                                    </p>
+                                                )}
                                             </div>
                                         </div>
 
                                         {/* PROGRESS BAR */}
                                         <div className="flex items-center gap-4">
-                                            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1">
+                                            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1 overflow-hidden">
                                                 <div
-                                                    className={`h-1.5 rounded-full ${it.fixed
-                                                        ? 'bg-yellow-400'
-                                                        : it.type === 'ME_DEBEN'
-                                                            ? 'bg-green-500'
-                                                            : 'bg-red-500'
-                                                        }`}
+                                                    className={`h-1.5 rounded-full transition-all duration-500
+                                                         ${it.fixed_expense
+                                                            ? 'bg-yellow-400'
+                                                            : it.type === 'ME_DEBEN'
+                                                                ? 'bg-green-500'
+                                                                : 'bg-red-500'
+                                                        }
+                `}
                                                     style={{ width: `${it.progress}%` }}
                                                 />
                                             </div>
 
                                             <button
-                                                className="text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors"
+                                                className="text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors flex items-center gap-2"
                                                 disabled={isLoading}
                                                 onClick={(e) => {
                                                     e.stopPropagation();
                                                     modal.openItem(group, it);
                                                 }}
                                             >
-                                                {isLoading
-                                                    ? 'Procesando...'
-                                                    : it.type === 'ME_DEBEN'
-                                                        ? 'Registrar cobro'
-                                                        : 'Pagar cuota'}
+                                                {isLoading ? (
+                                                    <>
+                                                        <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                                                        Procesando…
+                                                    </>
+                                                ) : it.type === 'ME_DEBEN' ? (
+                                                    `Registrar cobro`
+                                                ) : (
+                                                    `Pagar cuota`
+                                                )}
                                             </button>
                                         </div>
                                     </li>
@@ -195,7 +215,10 @@ export default function ActiveExpenses({
                 onConfirm={async () => {
                     modal.setModalOpen(false);
                     markLoading(modal.modalItems);
+
                     await handleConfirm(modal.modalItems);
+                    updateAfterPayment(modal.modalItems);
+
                     clearLoading();
                     modal.setModalOpen(false);
                 }}

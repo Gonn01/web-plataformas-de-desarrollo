@@ -1,0 +1,66 @@
+import { ChipTipoGasto } from '@/components/ChipTipoGasto';
+import { currencyCodeToLabel } from '@/pages/Configuracion';
+import { formatMoney } from '@/utils/FormatMoney';
+
+export default function SinglePaymentSection({ item }) {
+    return (
+        <div className="flex flex-col gap-4 rounded-lg border border-black/10 dark:border-white/10 bg-black/5 dark:bg-white/5 p-4 text-left text-white">
+            <div className="flex items-start justify-between gap-4 ">
+                <div className="flex flex-col gap-1">
+                    <p className="text-sm font-semibold">{item.name}</p>
+
+                    <div className="flex items-center gap-2 text-xs">
+                        <ChipTipoGasto tipo={item.type} fijo={item.fixed_expense} />
+                        {!item.fixed_expense && (
+                            <span>
+                                {item.payed_quotas}/{item.number_of_quotas} cuotas pagadas
+                            </span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="text-right">
+                    <p className="font-medium">
+                        {formatMoney(
+                            item.amount_per_quota,
+                            currencyCodeToLabel(item.currency_type),
+                        )}
+                    </p>
+
+                    {!item.fixed_expense && (
+                        <p className="text-xs text-slate-500">
+                            de {formatMoney(item.amount, currencyCodeToLabel(item.currency_type))}
+                        </p>
+                    )}
+                </div>
+            </div>
+
+            {/* Progress bar */}
+            {item.number_of_quotas > 0 && (
+                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
+                    <div
+                        className={`h-1.5 rounded-full ${item.type === 'DEBO' ? 'bg-red-500' : 'bg-green-500'}`}
+                        style={{
+                            width: `${Math.min(100, (item.payed_quotas / item.number_of_quotas) * 100)}%`,
+                        }}
+                    />
+                </div>
+            )}
+
+            <p className="text-xs text-slate-500"></p>
+
+            {/* Total */}
+            <div className="rounded-lg border border-black/10 p-3 bg-white/60 dark:bg-background-dark/60">
+                <div className="flex items-baseline justify-between">
+                    <span className="text-xs text-slate-500">Monto a pagar</span>
+                    <span className="text-lg font-bold">
+                        {formatMoney(
+                            item.amount_per_quota,
+                            currencyCodeToLabel(item.currency_type),
+                        )}
+                    </span>
+                </div>
+            </div>
+        </div>
+    );
+}

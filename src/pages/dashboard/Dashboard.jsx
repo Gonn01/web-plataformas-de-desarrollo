@@ -13,9 +13,11 @@ export default function Dashboard() {
     const { saveExpense } = useNewExpense(data.loadDashboard, () => ui.setOpenNewExpense(false));
 
     const summary = data.getSummaryForCurrency(ui.currency);
+
     if (data.loading) {
         return <Loader />;
     }
+
     return (
         <>
             {/* HEADER */}
@@ -43,11 +45,11 @@ export default function Dashboard() {
             <ActiveExpenses
                 query={ui.query}
                 groups={data.groups}
+                setGroups={data.setGroups}
+                updateAfterPayment={data.updateAfterPayment}
                 currency={ui.currency}
                 onCurrencyChange={ui.setCurrency}
                 onQueryChange={ui.setQuery}
-                token={null}
-                onPaid={data.loadDashboard}
             />
 
             {/* MODAL */}
