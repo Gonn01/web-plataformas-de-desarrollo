@@ -57,7 +57,7 @@ export default function EntidadDetalle() {
 
             {/* Stats */}
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
-                <StatCard label="Balance Total (ARS)" value={stats.amount} currency="ARS" />
+                {/* <StatCard label="Balance Total" value={stats.amount} currency="ARS" /> */}
                 <StatCard
                     label="Gastos activos"
                     value={stats.debts}

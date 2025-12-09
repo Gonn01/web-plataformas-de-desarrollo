@@ -60,7 +60,6 @@ export function useGastoData() {
         if (!gasto) return;
         setLoading(true);
         await deleteGasto(gasto.id, token);
-        navigate(`/app/entidades/${gasto.financial_entity_id}`);
         setLoading(false);
     }
 

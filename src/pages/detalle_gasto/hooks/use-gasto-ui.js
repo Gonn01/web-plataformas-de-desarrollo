@@ -31,7 +31,7 @@ export function useGastoUI() {
     // -------------------------
     const volverALista = () => {
         if (!gasto) return;
-        nav(`/app/entidades/${gasto.entidad}`);
+        nav(`/app/entidades/${gasto.financial_entity_id}`);
     };
 
     // -------------------------
