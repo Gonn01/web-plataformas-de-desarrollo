@@ -3,6 +3,23 @@ import { useCallback, useEffect, useState } from 'react';
 import { fetchDashboardData } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 
+
+function currencyCodeToLabel(codeOrLabel) {
+    if (codeOrLabel === 'ARS' || codeOrLabel === 'USD' || codeOrLabel === 'EUR') {
+        return codeOrLabel;
+    }
+
+    const n = Number(codeOrLabel);
+    switch (n) {
+        case 2:
+            return 'USD';
+        case 3:
+            return 'EUR';
+        default:
+            return 'ARS';
+    }
+}
+
 export function useDashboardData() {
     const { token } = useAuth();
 
@@ -32,78 +49,66 @@ export function useDashboardData() {
                         const paid = Number(g.payed_quotas) || 0;
                         const fixed = Boolean(g.fixed_expense);
 
-                        if (fixed) {
-                            return paid === 0;
-                        }
-
-                        if (num > 0) {
-                            return paid < num;
-                        }
-
+                        if (fixed) return true;
+                        if (num > 0) return paid < num;
                         return paid === 0;
                     })
                     .map((g) => {
-                        const num = Number(g.number_of_quotas) || 0;
-                        const paid = Number(g.payed_quotas) || 0;
-                        const amount = Number(g.amount) || 0;
-                        const fixed = Boolean(g.fixed_expense);
+                            const num = Number(g.number_of_quotas) || 0;
+                            const paid = Number(g.payed_quotas) || 0;
+                            const amount = Number(g.amount) || 0;
 
-                        const displayName = g.title || g.name || '';
+                            const currency = currencyCodeToLabel(g.currency_type);
+                            const fixed = Boolean(g.fixed_expense);
 
-                        const currency =
-                            g.currency_type === 1 ? 'USD' : g.currency_type === 2 ? 'EUR' : 'ARS';
+                            const amountPerInstallment =
+                                num > 0
+                                    ? Number(g.amount_per_quota) || amount / num
+                                    : amount;
 
-                        const amountPerInstallment =
-                            num > 0
-                                ? g.amount_per_quota != null
-                                    ? Number(g.amount_per_quota)
-                                    : amount / num
-                                : amount;
-
-                        const remainingInstallments = fixed
-                            ? paid === 0
-                                ? 1
-                                : 0
-                            : num > 0
-                                ? Math.max(num - paid, 0)
-                                : paid === 0
+                            const remainingInstallments = fixed
+                                ? paid === 0
                                     ? 1
-                                    : 0;
-
-                        const remainingAmount = remainingInstallments * amountPerInstallment;
-
-                        const typeString = (g.type || 'DEBO').toUpperCase();
-                        const isMeDeben = typeString === 'ME_DEBEN';
-
-                        if (isMeDeben && !fixed) {
-                            totals[currency].meDeben += remainingAmount;
-                        } else {
-                            totals[currency].debo += remainingAmount;
-                        }
-
-                        return {
-                            id: g.id,
-                            name: displayName,
-                            title: displayName,
-                            fixed,
-                            type: isMeDeben ? 'ME_DEBEN' : 'DEBO',
-                            currency,
-                            amountPerInstallment,
-                            totalAmount: amount,
-                            remainingAmount,
-                            installments: {
-                                paid,
-                                total: num,
-                            },
-                            progress: fixed
-                                ? 100
+                                    : 0
                                 : num > 0
-                                    ? Math.min((paid / num) * 100, 100)
+                                    ? Math.max(num - paid, 0)
                                     : paid === 0
-                                        ? 0
-                                        : 100,
-                        };
-                    });
+                                        ? 1
+                                        : 0;
+
+                            const remainingAmount =
+                                remainingInstallments * amountPerInstallment;
+
+                            const typeString = (g.type || 'DEBO').toString().toUpperCase();
+                            const isMeDeben = typeString === 'ME_DEBEN';
+
+                            if (isMeDeben) {
+                                totals[currency].meDeben += remainingAmount;
+                            } else {
+                                totals[currency].debo += remainingAmount;
+                            }
+
+                            return {
+                                id: g.id,
+                                name: g.name || g.title || '',
+                                type: isMeDeben ? 'ME_DEBEN' : 'DEBO',
+                                currency,
+                                amountPerInstallment,
+                                totalAmount: amount,
+                                remainingAmount,
+                                fixed,
+                                installments: {
+                                    paid,
+                                    total: num,
+                                },
+                                progress:
+                                    num > 0
+                                        ? Math.min(100, Math.round((paid / num) * 100))
+                                        : fixed
+                                            ? 100
+                                            : 0,
+                            };
+                        });
 
                 if (items.length === 0) return null;
 

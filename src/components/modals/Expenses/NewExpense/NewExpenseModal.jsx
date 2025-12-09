@@ -74,11 +74,18 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
         };
     }, [onClose]);
 
+    function currencyLabelToCode(value) {
+        if (value === 'USD' || value === 2 || value === '2') return 2;
+        if (value === 'EUR' || value === 3 || value === '3') return 3;
+    return 1;
+}
+
     // === SAVE ===
     const handleSubmit = () => {
         if (!canSave) return;
 
-        const currency_type = currency === 'USD' ? 2 : currency === 'EUR' ? 3 : 1;
+     
+        const currency_type = currencyLabelToCode(currency);
 
         const payload = {
             financial_entity_id: entity,
