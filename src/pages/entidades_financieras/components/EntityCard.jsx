@@ -23,7 +23,6 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                 </div>
             </div>
 
-            {/* Chevron (normalmente visible, desaparece en hover) */}
             <div className="shrink-0 transition-opacity group-hover:opacity-0">
                 <span className="material-symbols-outlined text-2xl text-slate-400 dark:text-slate-500">
                     chevron_right

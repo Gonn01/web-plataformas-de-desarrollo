@@ -28,7 +28,6 @@ export default function Sidebar() {
                     <div
                         className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
                         aria-label="User profile picture"
-                        /* style={{ backgroundImage: `url(${USER.avatar})` }} */
                         style={{ backgroundImage: `url(${avatar})` }}
                     />
                     <div className="flex flex-col">

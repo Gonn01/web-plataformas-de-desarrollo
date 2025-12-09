@@ -99,8 +99,6 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
             {/* Background */}
             <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" />
 
-            {/* SOLO se muestra cuando YA cargó */}
-
             <div
                 ref={containerRef}
                 className="

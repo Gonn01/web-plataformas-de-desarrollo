@@ -115,14 +115,12 @@ export default function Configuracion() {
             </header>
 
             <section className="grid gap-6 md:grid-cols-2">
-                {/* DATOS DEL USUARIO (SOLO LECTURA) */}
                 <div className="rounded-2xl border border-black/10 dark:border-white/10 p-4 bg-white/70 dark:bg-background-dark/70">
                     <h2 className="text-base font-medium mb-3 text-slate-900 dark:text-white">
                         Datos del usuario
                     </h2>
 
                     <div className="space-y-3 text-sm">
-                        {/* FOTO DE PERFIL (solo mostrar) */}
                         <div className="flex flex-col gap-2">
                             <p className="text-slate-600 dark:text-slate-300 font-medium">
                                 Foto de perfil
@@ -138,13 +136,11 @@ export default function Configuracion() {
                             </div>
                         </div>
 
-                        {/* NOMBRE VISIBLE (solo lectura) */}
                         <p className="text-slate-600 dark:text-slate-300 mt-3">
                             <span className="font-medium">Nombre: </span>
                             {nombreVisible}
                         </p>
 
-                        {/* EMAIL (solo lectura) */}
                         <p className="text-slate-600 dark:text-slate-300 mt-3">
                             <span className="font-medium">Email: </span>
                             {user?.email || '—'}

@@ -5,7 +5,6 @@ export default function EntityCard({ entity, onClick, onDelete }) {
     return (
         <div className="w-full flex gap-4 bg-white dark:bg-slate-800/50 p-4 rounded-xl items-center justify-between shadow-sm border border-slate-200 dark:border-slate-800 hover:shadow-lg hover:dark:bg-slate-800 transition-all">
 
-            {/* === SECCIÓN IZQUIERDA (ICONO + INFO) === */}
             <button
                 onClick={() => onClick?.(entity)}
                 className="text-left flex-1 flex items-center gap-4 cursor-pointer"
@@ -34,10 +33,7 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                 </div>
             </button>
 
-            {/* === SECCIÓN DERECHA (flecha + botón eliminar) === */}
             <div className="flex flex-col items-end gap-2">
-
-                {/* FLECHITA → ver detalle */}
                 <button
                     onClick={() => onClick?.(entity)}
                     className="text-slate-400 dark:text-slate-500 flex size-7 items-center justify-center hover:text-primary transition"
@@ -45,7 +41,6 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                     <span className="material-symbols-outlined text-2xl">chevron_right</span>
                 </button>
 
-                {/* 🟥 BOTÓN ELIMINAR — solo si viene la prop */}
                 {onDelete && (
                     <button
                         onClick={(e) => {

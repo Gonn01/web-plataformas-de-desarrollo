@@ -34,7 +34,6 @@ export default function EntitySelector({
                 </div>
             </div>
 
-            {/* NUEVA ENTIDAD INLINE */}
             <button
                 className="text-primary text-sm mt-2 hover:underline"
                 onClick={() => setShowNewEntity(true)}

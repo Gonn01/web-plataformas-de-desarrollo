@@ -8,64 +8,54 @@
         'opsz' 24;
 }
 
-/* theme.css (o dentro de tu index.css, antes de tus @layers) */
 @theme {
-    /* Tipografías */
     --font-display: 'Manrope', 'sans-serif';
 
-    /* Breakpoints opcionales (ejemplo) */
     --breakpoint-3xl: 120rem;
 
-    /* Radios (de tu config) */
     --radius: 0.25rem;
     --radius-lg: 0.5rem;
     --radius-xl: 0.75rem;
     --radius-full: 9999px;
 
-    /* Colores base (tus tokens) */
     --color-primary: #38e07b;
     --color-background-light: #f6f8f7;
     --color-background-dark: #122017;
 
-    /* Derivados útiles (texto sobre fondos) */
-    --color-on-primary: #122017; /* texto sobre primary */
-    --color-on-bg-light: #0f172a; /* ~slate-900 */
-    --color-on-bg-dark: #f1f5f9; /* ~slate-100 */
+    --color-on-primary: #122017;
+    --color-on-bg-light: #0f172a;
+    --color-on-bg-dark: #f1f5f9;
 
-    /* Easing comunes */
     --ease-fluid: cubic-bezier(0.3, 0, 0, 1);
     --ease-snappy: cubic-bezier(0.2, 0, 0, 1);
 }
-/* SCROLL */
-    *::-webkit-scrollbar {
-        height: 7px;
-        width: 7px;
-    }
+*::-webkit-scrollbar {
+    height: 7px;
+    width: 7px;
+}
 
-    *::-webkit-scrollbar-track {
-        border-radius: 0px;
-        background-color: transparent;
-    }
+*::-webkit-scrollbar-track {
+    border-radius: 0px;
+    background-color: transparent;
+}
 
-    *::-webkit-scrollbar-track:hover {
-        background-color: transparent;
-    }
+*::-webkit-scrollbar-track:hover {
+    background-color: transparent;
+}
 
-    *::-webkit-scrollbar-track:active {
-        background-color: transparent;
-    }
+*::-webkit-scrollbar-track:active {
+    background-color: transparent;
+}
 
-    *::-webkit-scrollbar-thumb {
-        border-radius: 20px;
-        background-color: #B2B3CA;
-    }
+*::-webkit-scrollbar-thumb {
+    border-radius: 20px;
+    background-color: #b2b3ca;
+}
 
-    *::-webkit-scrollbar-thumb:hover {
-        background-color: #999abf;
-    }
+*::-webkit-scrollbar-thumb:hover {
+    background-color: #999abf;
+}
 
-    *::-webkit-scrollbar-thumb:active {
-        background-color: #7B7DA9;
-    }
-
-    /* /SCROLL */
+*::-webkit-scrollbar-thumb:active {
+    background-color: #7b7da9;
+}
