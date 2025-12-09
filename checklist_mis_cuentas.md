@@ -28,7 +28,7 @@
 ## DETALLE DE GASTO
 
 - [x] Quitar breadcrumb.
-- [ ] Editar no funciona → revisar.
+- [x] Editar no funciona → revisar.
 - [x] Ocultar “Marcar cuota como pagada” si está finalizada.
 - [x] Marcar cuota como pagada no funciona.
 - [x] El tipo debe representarse por color.
@@ -37,6 +37,7 @@
 - [x] Formatear montos en cuotas pagadas.
 - [x] Si es gasto fijo, mostrar cuotas pagadas y no vencimiento.
 - [x] Quitar botón “volver a debo”.
+- [x] Adaptar a gastos fijos.
 
 ## CONFIGURACIÓN
 

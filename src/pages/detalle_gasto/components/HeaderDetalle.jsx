@@ -4,9 +4,9 @@ export default function HeaderDetalle({ gasto, marcarProxima, abrirEditar }) {
     return (
         <div className="flex flex-col sm:flex-row items-start justify-between gap-4">
             <div>
-                <p className="text-4xl font-black tracking-[-0.033em]">{gasto.titulo}</p>
+                <p className="text-4xl font-black tracking-[-0.033em]">{gasto.name}</p>
                 <div className="mt-2">
-                    <ChipTipoGasto fijo={gasto.fijo} tipo={gasto.tipo}></ChipTipoGasto>
+                    <ChipTipoGasto fijo={gasto.fixed_expense} tipo={gasto.type}></ChipTipoGasto>
                 </div>
             </div>
 

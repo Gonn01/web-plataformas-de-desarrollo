@@ -10,6 +10,7 @@ import { useGastoUI } from './hooks/use-gasto-ui';
 import Loader from '@/components/Loader';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import UpdateExpenseModal from '@/components/modals/Expenses/UpdateExpense/UpdateExpenseModal';
+import { currencyCodeToLabel } from '../Configuracion';
 
 export default function DetalleGasto() {
     const {
@@ -31,7 +32,7 @@ export default function DetalleGasto() {
     }
 
     if (!gasto) return null;
-
+    console.log('Gasto en DetalleGasto:', gasto);
     return (
         <div className="min-h-dvh w-full bg-background-dark text-white font-display">
             <div className="px-4 md:px-10 lg:px-20 xl:px-40 py-6 flex justify-center">
@@ -47,10 +48,13 @@ export default function DetalleGasto() {
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-x-4 gap-y-6">
                             <InfoItem
                                 label="Entidad"
-                                value={getEntityById(gasto.entidad)?.name || gasto.entidad}
+                                value={getEntityById(gasto.financial_entity_id)?.name}
                             />
-                            <InfoItem label="Monto Total" value={`$${gasto.total}`} />
-                            <InfoItem label="Moneda" value={gasto.moneda} />
+                            <InfoItem label="Monto Total" value={`$${gasto.amount}`} />
+                            <InfoItem
+                                label="Moneda"
+                                value={currencyCodeToLabel(gasto.currency_type)}
+                            />
                         </div>
 
                         <ProgresoPago
@@ -60,8 +64,7 @@ export default function DetalleGasto() {
                             loading={loading}
                         />
                     </div>
-
-                    <CuotasSection cuotas={gasto.cuotas} loading={loading} />
+                    {!gasto.fixed_expense && <CuotasSection gasto={gasto} loading={loading} />}
 
                     {/* <AdjuntosSection
                         adjuntos={detalle.adjuntos}

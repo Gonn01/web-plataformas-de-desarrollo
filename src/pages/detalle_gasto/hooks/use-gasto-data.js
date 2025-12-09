@@ -16,78 +16,13 @@ export function useGastoData() {
     }, [id, token]);
 
     // -----------------------------------------
-    // TRANSFORMADOR → convierte API → Modelo UI
-    // -----------------------------------------
-    function mapGasto(g) {
-        const totalCuotas = Number(g.number_of_quotas) || 0;
-        const pagadas = Number(g.payed_quotas) || 0;
-        const amount = Number(g.amount) || 0;
-        const amountPerQuota = Number(g.amount_per_quota) || amount;
-        const isFixed = Boolean(g.fixed_expense);
-
-        let cuotas = [];
-
-        // --------------------------
-        // GASTO FIJO
-        // --------------------------
-        if (isFixed) {
-            cuotas = [
-                {
-                    nro: 1,
-                    monto: amountPerQuota,
-                    pagada: pagadas > 0,
-                    proxima: pagadas === 0,
-                    venc: 'Gasto fijo',
-                },
-            ];
-        }
-        // --------------------------
-        // GASTO CON CUOTAS NORMALES
-        // --------------------------
-        else if (totalCuotas > 0) {
-            cuotas = Array.from({ length: totalCuotas }, (_, i) => ({
-                nro: i + 1,
-                monto: amountPerQuota,
-                pagada: i < pagadas,
-                proxima: i === pagadas,
-            }));
-        }
-        // --------------------------
-        // GASTO ÚNICO (sin cuotas)
-        // --------------------------
-        else {
-            cuotas = [
-                {
-                    nro: 1,
-                    monto: amount,
-                    pagada: pagadas > 0,
-                    proxima: pagadas === 0,
-                },
-            ];
-        }
-
-        return {
-            id: g.id,
-            titulo: g.name,
-            entidad: g.financial_entity_id,
-            total: amount,
-            moneda: g.currency_type === '0' ? 'ARS' : g.currency_type === '1' ? 'USD' : 'EUR',
-            tipo: g.type === 'ME_DEBEN' ? 'Me deben' : 'Debo',
-            cuotas,
-            fijo: isFixed,
-            finalization_date: g.finalization_date,
-            logs: g.logs || [],
-        };
-    }
-
-    // -----------------------------------------
     // CARGAR GASTO DESDE API
     // -----------------------------------------
     async function load() {
         try {
             setLoading(true);
             const res = await fetchGastoById(id, token);
-            setGasto(mapGasto(res));
+            setGasto(res);
         } catch (err) {
             console.error('Error cargando gasto', err);
             navigate(`/app/entidades/${gasto.entidad}`);
@@ -125,7 +60,7 @@ export function useGastoData() {
         if (!gasto) return;
         setLoading(true);
         await deleteGasto(gasto.id, token);
-        navigate(`/app/entidades/${gasto.entidad}`);
+        navigate(`/app/entidades/${gasto.financial_entity_id}`);
         setLoading(false);
     }
 
