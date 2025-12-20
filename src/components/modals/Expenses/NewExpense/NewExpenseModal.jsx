@@ -12,7 +12,12 @@ import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
 import { currencyLabelToCode } from '@/pages/Configuracion';
 
-export default function NewExpenseModal({ onClose, onSave, defaultEntityId = null }) {
+export default function NewExpenseModal({
+    onClose,
+    onSave,
+    saving = false,
+    defaultEntityId = null,
+}) {
     const { token } = useAuth();
 
     const [type, setType] = useState('Debo');
@@ -24,14 +29,13 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
 
     const [installments, setInstallments] = useState('');
 
-    // const [files, setFiles] = useState(null);
-
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
     const [isFixed, setIsFixed] = useState(false);
     const [isInstallment, setIsInstallment] = useState(false);
     const [paidInstallments, setPaidInstallments] = useState('0');
-    const { entities, addEntity } = useEntitiesStore();
+    const { entities, loading, addEntity } = useEntitiesStore();
+    const [loadingNewEntity, setLoadingNewEntity] = useState(false);
     const totalInstallments = Number(installments) || 0;
     const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
     const progressPct = totalInstallments > 0 ? Math.min(100, (paid / totalInstallments) * 100) : 0;
@@ -45,7 +49,7 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
 
     const handleCreateEntity = async () => {
         if (!newEntityName.trim()) return;
-
+        setLoadingNewEntity(true);
         try {
             const created = await createEntity({ name: newEntityName.trim() }, token);
             addEntity(created);
@@ -54,6 +58,8 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
             setNewEntityName('');
         } catch (err) {
             console.error('Error creando entidad', err);
+        } finally {
+            setLoadingNewEntity(false);
         }
     };
 
@@ -116,7 +122,7 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
 
                     <button
                         onClick={onClose}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#29382f] text-white hover:bg-[#3d5245]"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#29382f] text-white hover:bg-[#3d5245] cursor-pointer"
                     >
                         <Icon name="close" className="text-xl" />
                     </button>
@@ -162,6 +168,8 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
                     <EntitySelector
                         entity={entity}
                         setEntity={setEntity}
+                        loading={loading}
+                        loadingNewEntity={loadingNewEntity}
                         entities={entities}
                         showNewEntity={showNewEntity}
                         setShowNewEntity={setShowNewEntity}
@@ -195,27 +203,37 @@ export default function NewExpenseModal({ onClose, onSave, defaultEntityId = nul
                             progressPct={progressPct}
                         />
                     )}
-
-                    {/* <ExpenseFilesUpload setFiles={setFiles} /> */}
                 </div>
 
                 {/* FOOTER */}
                 <footer className="sticky bottom-0 flex justify-end gap-3 border-t border-[#29382f] px-6 py-4 bg-[#111714]">
                     <button
                         onClick={onClose}
-                        className="h-11 px-4 text-sm font-bold text-[#9eb7a8] hover:bg-[#29382f] rounded-lg"
+                        className="h-11 px-4 text-sm font-bold text-[#9eb7a8] hover:bg-[#29382f] rounded-lg cursor-pointer"
                     >
                         Cancelar
                     </button>
 
                     <button
-                        disabled={!canSave}
+                        disabled={!canSave || saving}
                         onClick={handleSubmit}
-                        className="h-11 px-4 text-sm font-bold flex items-center gap-2 rounded-lg 
-                               bg-primary text-black disabled:opacity-60"
+                        className="
+        h-11 px-4 text-sm font-bold flex items-center gap-2 rounded-lg 
+        bg-primary text-black cursor-pointer hover:bg-primary/80
+        disabled:opacity-60 disabled:cursor-not-allowed
+    "
                     >
-                        <Icon name="save" />
-                        Guardar gasto
+                        {saving ? (
+                            <>
+                                <Icon name="progress_activity" className="animate-spin" />
+                                Guardando...
+                            </>
+                        ) : (
+                            <>
+                                <Icon name="save" />
+                                Guardar gasto
+                            </>
+                        )}
                     </button>
                 </footer>
             </div>

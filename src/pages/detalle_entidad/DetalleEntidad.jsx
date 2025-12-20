@@ -23,6 +23,7 @@ export default function EntidadDetalle() {
         openEditEntity,
         setOpenEditEntity,
         onCreateExpense,
+        loadingExpense,
         onUpdateEntity,
         navigate,
         onDeleteEntity,
@@ -41,13 +42,13 @@ export default function EntidadDetalle() {
                 <h1 className="text-3xl sm:text-4xl font-black dark:text-white">{entity.name}</h1>
                 <div className="flex">
                     <button
-                        className="flex me-3 items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold"
+                        className="flex me-3 items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold cursor-pointer"
                         onClick={() => setOpenNewExpense(true)}
                     >
                         <Icon name="add" /> Crear Gasto
                     </button>
                     <button
-                        className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold"
+                        className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold cursor-pointer"
                         onClick={() => setOpenEditEntity(true)}
                     >
                         <Icon name="edit" /> Editar Entidad
@@ -135,6 +136,7 @@ export default function EntidadDetalle() {
                     defaultEntityId={entity.id}
                     onClose={() => setOpenNewExpense(false)}
                     onSave={onCreateExpense}
+                    saving={loadingExpense}
                 />
             )}
         </>

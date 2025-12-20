@@ -11,9 +11,12 @@ export function useEntidadUI() {
     const [tab, setTab] = useState('activos');
     const [openNewExpense, setOpenNewExpense] = useState(false);
     const [openEditEntity, setOpenEditEntity] = useState(false);
+    const [loadingExpense, setLoadingExpense] = useState(false);
 
     async function onCreateExpense(payload) {
+        setLoadingExpense(true);
         await crearGastoEntidad(payload);
+        setLoadingExpense(false);
         setOpenNewExpense(false);
     }
 
@@ -41,6 +44,7 @@ export function useEntidadUI() {
         setOpenEditEntity,
 
         onCreateExpense,
+        loadingExpense,
         onUpdateEntity,
         onDeleteEntity,
 

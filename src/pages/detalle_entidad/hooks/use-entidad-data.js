@@ -70,7 +70,7 @@ export function useEntidadData() {
                 if (isFixed) {
                     return {
                         ...prev,
-                        gastos_fijos: [...prev.gastos_fijos, nuevo],
+                        gastos_activos: [...prev.gastos_activos, nuevo],
                     };
                 }
 

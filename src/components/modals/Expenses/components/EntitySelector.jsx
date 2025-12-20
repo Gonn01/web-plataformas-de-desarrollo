@@ -9,25 +9,39 @@ export default function EntitySelector({
     newEntityName,
     setNewEntityName,
     handleCreateEntity,
+    loading,
+    loadingNewEntity,
 }) {
     return (
         <div className="space-y-2">
             <label className="text-white text-sm font-medium">Entidad financiera</label>
 
             <div className="relative">
-                <select
-                    className="h-12 w-full rounded-lg border border-[#3d5245] bg-[#1c2620] px-3 text-white"
-                    value={entity}
-                    onChange={(e) => setEntity(e.target.value)}
-                >
-                    <option value="">Seleccionar...</option>
+                {loading ? (
+                    <div className="h-12 w-full rounded-lg bg-[#1c2620] border border-[#3d5245] animate-pulse flex items-center px-3">
+                        <div className="h-4 w-32 bg-[#29382f] rounded" />
+                    </div>
+                ) : (
+                    <div className="relative">
+                        <select
+                            className="h-12 w-full rounded-lg border border-[#3d5245] bg-[#1c2620]
+                       px-3 pr-10 text-white appearance-none"
+                            value={entity}
+                            onChange={(e) => setEntity(e.target.value)}
+                        >
+                            <option value="">Seleccionar...</option>
+                            {entities.map((e) => (
+                                <option key={`entity-${e.id}`} value={e.id}>
+                                    {e.name}
+                                </option>
+                            ))}
+                        </select>
 
-                    {entities.map((e) => (
-                        <option key={`entity-${e.id}`} value={e.id}>
-                            {e.name}
-                        </option>
-                    ))}
-                </select>
+                        <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#9eb7a8]">
+                            <Icon name="expand_more" />
+                        </div>
+                    </div>
+                )}
 
                 <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#9eb7a8]">
                     <Icon name="expand_more" />
@@ -35,16 +49,23 @@ export default function EntitySelector({
             </div>
 
             <button
-                className="text-primary text-sm mt-2 hover:underline"
+                disabled={loading}
                 onClick={() => setShowNewEntity(true)}
+                className="
+                    text-primary text-sm mt-2 flex items-center gap-1
+                    hover:underline disabled:opacity-50
+                "
             >
-                + Crear nueva entidad
+                {loading && <Icon name="progress_activity" className="animate-spin text-xs" />}+
+                Crear nueva entidad
             </button>
 
             {showNewEntity && (
                 <div className="mt-3 p-3 border border-[#29382f] rounded-lg bg-[#1c2620] space-y-3">
                     <input
-                        className="h-11 w-full rounded-lg bg-[#111714] border border-[#3d5245] text-white px-3"
+                        disabled={loadingNewEntity}
+                        className="h-11 w-full rounded-lg bg-[#111714] border border-[#3d5245] 
+               text-white px-3 disabled:opacity-60"
                         placeholder="Nombre de la nueva entidad"
                         value={newEntityName}
                         onChange={(e) => setNewEntityName(e.target.value)}
@@ -53,15 +74,27 @@ export default function EntitySelector({
                     <div className="flex justify-end gap-2">
                         <button
                             onClick={() => setShowNewEntity(false)}
-                            className="text-sm px-3 py-1.5 rounded-lg bg-[#29382f] text-white"
+                            disabled={loadingNewEntity}
+                            className={`text-sm px-3 py-1.5 rounded-lg cursor-pointer
+                            ${loadingNewEntity ? 'bg-[#29382f]/60 cursor-not-allowed text-white/50' : 'bg-[#29382f] text-white'}`}
                         >
                             Cancelar
                         </button>
+
                         <button
                             onClick={handleCreateEntity}
-                            className="text-sm px-3 py-1.5 rounded-lg bg-primary text-black"
+                            disabled={loadingNewEntity}
+                            className={`text-sm px-3 py-1.5 rounded-lg flex items-center gap-2 cursor-pointer
+                                ${loadingNewEntity ? 'bg-primary/60 cursor-not-allowed text-black' : 'bg-primary text-black'}`}
                         >
-                            Crear
+                            {loadingNewEntity ? (
+                                <>
+                                    <Icon name="progress_activity" className="animate-spin" />
+                                    Creando...
+                                </>
+                            ) : (
+                                'Crear'
+                            )}
                         </button>
                     </div>
                 </div>

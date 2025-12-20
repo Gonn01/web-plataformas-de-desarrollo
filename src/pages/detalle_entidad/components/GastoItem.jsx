@@ -7,7 +7,9 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
 
     switch (variant) {
         case 'activo':
-            subtitle = gasto.fixed_expense ? `Veces pagado ${gasto.payed_quotas}` : `Cuotas: ${gasto.payed_quotas}/${gasto.number_of_quotas}`;
+            subtitle = gasto.fixed_expense
+                ? `Veces pagado ${gasto.payed_quotas}`
+                : `Cuotas: ${gasto.payed_quotas}/${gasto.number_of_quotas}`;
             break;
 
         case 'finalizado':
@@ -18,7 +20,8 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
             subtitle = '';
     }
 
-    const currency = gasto.currency_type === '0' ? 'ARS' : gasto.currency_type === '1' ? 'USD' : 'EUR';
+    const currency =
+        gasto.currency_type === '0' ? 'ARS' : gasto.currency_type === '1' ? 'USD' : 'EUR';
 
     return (
         <div
