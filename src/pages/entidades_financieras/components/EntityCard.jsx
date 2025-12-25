@@ -35,7 +35,7 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                     e.stopPropagation();
                     onDelete?.(entity);
                 }}
-                className="
+                className="cursor-pointer
                     absolute right-3 top-1/2 -translate-y-1/2
                     opacity-0 translate-x-2
                     group-hover:opacity-100 group-hover:translate-x-0

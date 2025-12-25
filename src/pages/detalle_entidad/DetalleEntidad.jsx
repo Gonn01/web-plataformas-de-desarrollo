@@ -23,8 +23,9 @@ export default function EntidadDetalle() {
         openEditEntity,
         setOpenEditEntity,
         onCreateExpense,
-        loadingExpense,
+        loadingCreatingExpense,
         onUpdateEntity,
+        // loadingUpdatingEntity,
         navigate,
         onDeleteEntity,
     } = useEntidadUI();
@@ -127,6 +128,7 @@ export default function EntidadDetalle() {
                     entity={entity}
                     onClose={() => setOpenEditEntity(false)}
                     onSave={onUpdateEntity}
+                    saving={loadingCreatingExpense}
                 />
             )}
 
@@ -136,7 +138,7 @@ export default function EntidadDetalle() {
                     defaultEntityId={entity.id}
                     onClose={() => setOpenNewExpense(false)}
                     onSave={onCreateExpense}
-                    saving={loadingExpense}
+                    saving={true}
                 />
             )}
         </>
