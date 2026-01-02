@@ -31,7 +31,7 @@ export default function Dashboard() {
 
                 <button
                     onClick={() => ui.setOpenNewExpense(true)}
-                    className="flex items-center h-11 px-5 rounded-lg bg-primary text-background-dark font-bold"
+                    className="cursor-pointer flex items-center h-11 px-5 rounded-lg bg-primary text-background-dark font-bold"
                 >
                     <Icon name="add_circle" className="mr-2" />
                     Crear Gasto / Deuda

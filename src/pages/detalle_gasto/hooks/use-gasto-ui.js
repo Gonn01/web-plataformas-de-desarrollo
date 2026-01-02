@@ -13,7 +13,7 @@ export function useGastoUI() {
     }, [gasto]);
 
     const porcentaje = useMemo(() => {
-        return gasto ? (totalPagado / gasto.amount) * 100 : 0;
+        return gasto?.fixed_expense ? 100 : gasto ? (totalPagado / gasto.amount) * 100 : 0;
     }, [gasto, totalPagado]);
 
     const volverALista = () => {

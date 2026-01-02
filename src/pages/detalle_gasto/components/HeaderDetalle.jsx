@@ -14,7 +14,7 @@ export default function HeaderDetalle({ gasto, marcarProxima, abrirEditar }) {
                 {gasto.finalization_date == null ? (
                     <button
                         onClick={marcarProxima}
-                        className="h-10 px-4 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-opacity-90 transition-opacity"
+                        className="cursor-pointer h-10 px-4 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-opacity-90 transition-opacity"
                     >
                         Marcar cuota como pagada
                     </button>
@@ -22,7 +22,7 @@ export default function HeaderDetalle({ gasto, marcarProxima, abrirEditar }) {
 
                 <button
                     onClick={abrirEditar}
-                    className="h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all"
+                    className="cursor-pointer h-10 px-4 rounded-lg bg-[#29382f] text-white text-sm font-bold hover:bg-opacity-80 transition-all"
                 >
                     Editar
                 </button>
