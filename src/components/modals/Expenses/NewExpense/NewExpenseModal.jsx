@@ -36,6 +36,12 @@ export default function NewExpenseModal({
     const [paidInstallments, setPaidInstallments] = useState('0');
     const { entities, loading, addEntity } = useEntitiesStore();
     const [loadingNewEntity, setLoadingNewEntity] = useState(false);
+
+    useEffect(() => {
+        if (!loading && entities.length === 0) {
+            setShowNewEntity(true);
+        }
+    }, [loading, entities.length]);
     const totalInstallments = Number(installments) || 0;
     const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
     const progressPct = totalInstallments > 0 ? Math.min(100, (paid / totalInstallments) * 100) : 0;

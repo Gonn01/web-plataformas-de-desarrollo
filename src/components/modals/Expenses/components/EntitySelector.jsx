@@ -21,6 +21,11 @@ export default function EntitySelector({
                     <div className="h-12 w-full rounded-lg bg-[#1c2620] border border-[#3d5245] animate-pulse flex items-center px-3">
                         <div className="h-4 w-32 bg-[#29382f] rounded" />
                     </div>
+                ) : entities.length === 0 ? (
+                    <div className="h-12 w-full rounded-lg border border-[#3d5245] bg-[#1c2620] px-3 flex items-center gap-2 text-[#9eb7a8] text-sm">
+                        <Icon name="info" className="text-base" />
+                        No tenés entidades creadas aún
+                    </div>
                 ) : (
                     <div className="relative">
                         <select
@@ -42,23 +47,21 @@ export default function EntitySelector({
                         </div>
                     </div>
                 )}
-
-                <div className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-[#9eb7a8]">
-                    <Icon name="expand_more" />
-                </div>
             </div>
 
-            <button
-                disabled={loading}
-                onClick={() => setShowNewEntity(true)}
-                className="
+            {!showNewEntity && (
+                <button
+                    disabled={loading}
+                    onClick={() => setShowNewEntity(true)}
+                    className="
                     text-primary text-sm mt-2 flex items-center gap-1
                     hover:underline disabled:opacity-50
                 "
-            >
-                {loading && <Icon name="progress_activity" className="animate-spin text-xs" />}+
-                Crear nueva entidad
-            </button>
+                >
+                    {loading && <Icon name="progress_activity" className="animate-spin text-xs" />}+
+                    Crear nueva entidad
+                </button>
+            )}
 
             {showNewEntity && (
                 <div className="mt-3 p-3 border border-[#29382f] rounded-lg bg-[#1c2620] space-y-3">
