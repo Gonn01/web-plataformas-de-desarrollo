@@ -158,7 +158,7 @@ export default function ActiveExpenses({
                                                     className={`h-1.5 rounded-full transition-all duration-500
                                                          ${it.fixed_expense
                                                             ? 'bg-yellow-400'
-                                                            : it.type === 'ME_DEBEN'
+                                                            : it.type === 'INGRESO'
                                                                 ? 'bg-green-500'
                                                                 : 'bg-red-500'
                                                         }
@@ -180,7 +180,7 @@ export default function ActiveExpenses({
                                                         <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
                                                         Procesando…
                                                     </>
-                                                ) : it.type === 'ME_DEBEN' ? (
+                                                ) : it.type === 'INGRESO' ? (
                                                     `Registrar cobro`
                                                 ) : (
                                                     `Pagar cuota`

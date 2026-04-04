@@ -9,6 +9,7 @@ import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
+import { currencyCodeToLabel, currencyLabelToCode } from '@/pages/Configuracion';
 
 export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const { token } = useAuth();
@@ -16,14 +17,12 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
 
     const containerRef = useRef(null);
 
-    const [type, setType] = useState(gasto.type === 'ME_DEBEN' ? 'Me deben' : 'Debo');
+    const [type, setType] = useState(gasto.type === 'INGRESO' ? 'Me deben' : 'Debo');
     const [name, setName] = useState(gasto.name);
     const [entity, setEntity] = useState(gasto.financial_entity_id);
 
     const [amount, setAmount] = useState(String(gasto.amount));
-    const [currency, setCurrency] = useState(
-        gasto.currency_type === '2' ? 'USD' : gasto.currency_type === '3' ? 'EUR' : 'ARS',
-    );
+    const [currency, setCurrency] = useState(currencyCodeToLabel(gasto.currency_type));
 
     const [isFixed, setIsFixed] = useState(Boolean(gasto.fixed_expense));
     const [isInstallment, setIsInstallment] = useState(gasto.number_of_quotas > 0);
@@ -77,7 +76,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const handleSubmit = () => {
         if (!canSave) return;
 
-        const currency_type = currency === 'USD' ? 2 : currency === 'EUR' ? 3 : 1;
+        const currency_type = currencyLabelToCode(currency);
 
         const payload = {
             financial_entity_id: entity,
@@ -88,7 +87,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
             first_quota_date: gasto.first_quota_date,
             fixed_expense: isFixed,
             image: gasto.image ?? null,
-            type: type === 'Me deben' ? 'ME_DEBEN' : 'DEBO',
+            type: type === 'Me deben' ? 'INGRESO' : 'EGRESO',
             payed_quotas: isInstallment ? Number(paidInstallments) : 0,
         };
 

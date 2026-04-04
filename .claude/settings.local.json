@@ -1,0 +1,13 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/routes/**)",
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/controller//**)",
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/middleware//**)",
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/config//**)",
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/services//**)",
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/**)",
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/utils//**)"
+    ]
+  }
+}

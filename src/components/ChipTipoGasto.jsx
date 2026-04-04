@@ -1,6 +1,6 @@
 export function ChipTipoGasto({ fijo, tipo, column = false }) {
     const tipoColor =
-        tipo == 'ME_DEBEN' || tipo === 'Me deben'
+        tipo == 'INGRESO' || tipo === 'Me deben'
             ? 'bg-green-400/20 text-green-400'
             : 'bg-red-400/20 text-red-400';
 
@@ -12,7 +12,7 @@ export function ChipTipoGasto({ fijo, tipo, column = false }) {
 
     const tipoChip = (
         <span className={`text-center text-xs font-semibold px-2.5 py-1 rounded-full ${tipoColor}`}>
-            {tipo == 'ME_DEBEN' || tipo === 'Me deben' ? 'Me deben' : 'Debo'}
+            {tipo == 'INGRESO' || tipo === 'Me deben' ? 'Me deben' : 'Debo'}
         </span>
     );
 

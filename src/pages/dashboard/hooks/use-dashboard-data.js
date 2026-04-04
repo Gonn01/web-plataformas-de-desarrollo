@@ -22,7 +22,7 @@ export function useDashboardData() {
                 const curr = currencyCodeToLabel(g.currency_type);
                 const restante = g.amount - g.payed_quotas * g.amount_per_quota;
 
-                if (g.type === 'ME_DEBEN') {
+                if (g.type === 'INGRESO') {
                     totals[curr].meDeben += restante;
                 } else {
                     totals[curr].debo += restante;

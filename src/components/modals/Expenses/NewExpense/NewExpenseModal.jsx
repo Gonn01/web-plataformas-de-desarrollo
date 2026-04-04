@@ -90,7 +90,7 @@ export default function NewExpenseModal({
             first_quota_date: null,
             fixed_expense: isFixed,
             image: null,
-            type: type === 'Me deben' ? 'ME_DEBEN' : 'DEBO',
+            type: type === 'Me deben' ? 'INGRESO' : 'EGRESO',
             payed_quotas: isInstallment ? Number(paidInstallments) : 0,
         };
 

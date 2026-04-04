@@ -1,6 +1,7 @@
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
 import { formatDate } from '@/utils/FormatDate';
 import { formatMoney } from '@/utils/FormatMoney';
+import { currencyCodeToLabel } from '@/pages/Configuracion';
 
 export default function GastoItem({ gasto, variant = 'activo', onClick }) {
     let subtitle = '';
@@ -20,8 +21,7 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
             subtitle = '';
     }
 
-    const currency =
-        gasto.currency_type === '0' ? 'ARS' : gasto.currency_type === '1' ? 'USD' : 'EUR';
+    const currency = currencyCodeToLabel(gasto.currency_type);
 
     return (
         <div

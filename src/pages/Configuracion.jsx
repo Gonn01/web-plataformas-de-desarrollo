@@ -33,13 +33,13 @@ export function currencyLabelToCode(label) {
 }
 
 export default function Configuracion() {
-    const { user, updateUser } = useAuth();
+    const { user, token, updateUser } = useAuth();
     const [preview, setPreview] = useState('');
     const [nombreVisible, setNombreVisible] = useState('Usuario');
     const [moneda, setMoneda] = useState('ARS');
     const [loading, setLoading] = useState(false);
 
-    const baseUrl = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
     useEffect(() => {
         if (!user) return;
@@ -67,6 +67,7 @@ export default function Configuracion() {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
                     user_id: user.id,

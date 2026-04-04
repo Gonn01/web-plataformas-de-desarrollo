@@ -109,10 +109,10 @@ export default function EntidadDetalle() {
             )}
 
             {tab === 'log' && (
-                <ListContainer empty={entity.logs.length === 0} emptyLabel="Sin registros.">
-                    {entity.logs.map((l, i) => (
+                <ListContainer empty={entity.movements.length === 0} emptyLabel="Sin registros.">
+                    {entity.movements.map((l, i) => (
                         <div key={i} className="flex justify-between py-3">
-                            <p className="text-sm text-zinc-600">{l.content}</p>
+                            <p className="text-sm text-zinc-600">{l.movement_type}</p>
                             <span className="text-xs text-zinc-500">
                                 {new Date(l.created_at).toLocaleString()}
                             </span>
