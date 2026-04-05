@@ -102,15 +102,24 @@ function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates }) {
                         <div className="flex flex-col gap-1.5 mt-1">
                             {currencies.map((cur) => {
                                 const val = summaryByCurrency[cur]?.[card.key] ?? 0;
+                                const isEmpty = val === 0;
                                 return (
-                                    <div key={cur} className="flex items-center justify-between gap-2">
-                                        <span className="text-xs font-semibold text-slate-400 dark:text-slate-500 w-8">
+                                    <div
+                                        key={cur}
+                                        className="flex items-center justify-between gap-2"
+                                    >
+                                        <span
+                                            className={`text-xs font-semibold w-8 ${isEmpty ? 'text-slate-600 dark:text-slate-700' : 'text-slate-400 dark:text-slate-500'}`}
+                                        >
                                             {cur}
                                         </span>
                                         <span
-                                            className={`${card.tone(val)} text-base font-bold leading-tight tracking-tight`}
+                                            className={`text-base font-bold leading-tight tracking-tight ${isEmpty ? 'text-slate-600 dark:text-slate-700' : card.tone(val)}`}
                                         >
-                                            {formatMoney(val, cur)}
+                                            {new Intl.NumberFormat('es-AR', {
+                                                minimumFractionDigits: 2,
+                                                maximumFractionDigits: 2,
+                                            }).format(val)}
                                         </span>
                                     </div>
                                 );

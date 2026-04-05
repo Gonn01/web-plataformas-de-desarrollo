@@ -21,7 +21,7 @@ export default function Dashboard() {
     }
 
     return (
-        <>
+        <div className="flex flex-col flex-1 min-h-0">
             {/* HEADER */}
             <div className="flex justify-between mb-4">
                 <div>
@@ -64,6 +64,6 @@ export default function Dashboard() {
             {ui.openNewExpense && (
                 <NewExpenseModal onClose={() => ui.setOpenNewExpense(false)} onSave={saveExpense} />
             )}
-        </>
+        </div>
     );
 }

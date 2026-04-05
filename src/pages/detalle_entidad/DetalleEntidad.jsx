@@ -1,5 +1,7 @@
 import Icon from '../../components/Icon';
 import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
+import ConfirmInstallmentPaymentModal from '../dashboard/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
+import ExpenseCard from '@/components/ExpenseCard';
 
 import { TabHeader } from './components/TabHeader';
 import { ListContainer } from './components/ListContainer';
@@ -28,6 +30,12 @@ export default function EntidadDetalle() {
         // loadingUpdatingEntity,
         navigate,
         onDeleteEntity,
+        payModalOpen,
+        payModalItem,
+        openPayModal,
+        onConfirmPay,
+        setPayModalOpen,
+        loadingPayIds,
     } = useEntidadUI();
 
     if (loading) return <Loader />;
@@ -82,11 +90,12 @@ export default function EntidadDetalle() {
                     emptyLabel="Sin gastos activos."
                 >
                     {entity.gastos_activos.map((g) => (
-                        <GastoItem
+                        <ExpenseCard
                             key={g.id}
                             gasto={g}
-                            variant="activo"
+                            loading={loadingPayIds.has(g.id)}
                             onClick={() => navigate(`/app/gastos/${g.id}`)}
+                            onPayClick={() => openPayModal(g)}
                         />
                     ))}
                 </ListContainer>
@@ -121,6 +130,14 @@ export default function EntidadDetalle() {
                 </ListContainer>
             )}
             <PeligroEliminar label="Eliminar Entidad" onDelete={onDeleteEntity} />
+
+            <ConfirmInstallmentPaymentModal
+                open={payModalOpen}
+                entityName={entity?.name ?? ''}
+                items={payModalItem ? [payModalItem] : []}
+                onCancel={() => setPayModalOpen(false)}
+                onConfirm={onConfirmPay}
+            />
             {/* MODAL EDITAR */}
             {openEditEntity && (
                 <EditEntityModal

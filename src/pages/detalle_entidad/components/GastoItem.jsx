@@ -1,4 +1,5 @@
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
+import ProgressBar from '@/components/ProgressBar';
 import { formatDate } from '@/utils/FormatDate';
 import { formatMoney } from '@/utils/FormatMoney';
 
@@ -21,29 +22,65 @@ export default function GastoItem({ gasto, variant = 'activo', onClick }) {
     }
 
     const currency = gasto.currency_type;
+    let progress = 0;
+    if (gasto.fixed_expense) progress = 100;
+    else if (gasto.number_of_quotas > 0)
+        progress = (gasto.payed_quotas / gasto.number_of_quotas) * 100;
+
+    const paidTotal = (gasto.payed_quotas ?? 0) * (gasto.amount_per_quota ?? 0);
+    const percentageLabel = gasto.fixed_expense ? null : `${Math.round(progress)}%`;
 
     return (
         <div
             onClick={onClick}
-            className="flex items-center justify-between py-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 rounded-lg px-2 transition-colors"
+            className="flex flex-col gap-2 py-4 cursor-pointer hover:bg-black/5 dark:hover:bg-white/5 rounded-lg px-2 transition-colors"
         >
-            <div className="flex items-center gap-3">
-                <ChipTipoGasto
-                    fijo={gasto.fixed_expense}
-                    tipo={gasto.type}
-                    column={true}
-                ></ChipTipoGasto>
-                <div>
-                    <p className="font-medium text-zinc-900 dark:text-white">{gasto.name}</p>
-                    <p className="text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>
+            <div className="flex items-center justify-between">
+                <div className="flex items-center gap-3">
+                    <ChipTipoGasto fijo={gasto.fixed_expense} tipo={gasto.type} column={true} />
+                    <div>
+                        <p className="font-medium text-zinc-900 dark:text-white">{gasto.name}</p>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400">{subtitle}</p>
+                    </div>
+                </div>
+
+                <div className="flex flex-col items-end gap-0.5">
+                    <p className="font-semibold text-primary">
+                        {variant === 'finalizado'
+                            ? formatDate(gasto.finalization_date)
+                            : formatMoney(gasto.amount, currency)}
+                    </p>
+                    <span className="text-xs text-zinc-500 dark:text-zinc-400">{currency}</span>
                 </div>
             </div>
 
-            <p className="font-semibold text-primary">
-                {variant == 'finalizado'
-                    ? formatDate(gasto.finalization_date)
-                    : formatMoney(gasto.amount, currency)}
-            </p>
+            {variant === 'activo' && (
+                <>
+                    <ProgressBar
+                        progress={progress}
+                        type={gasto.type}
+                        fixed={gasto.fixed_expense}
+                        quotas={gasto.number_of_quotas}
+                        height="h-1"
+                    />
+                    <div className="flex items-center justify-between text-xs text-zinc-500 dark:text-zinc-400">
+                        <span>
+                            {formatMoney(paidTotal, currency)} pagado de{' '}
+                            {formatMoney(gasto.amount, currency)}
+                        </span>
+                        <div className="flex items-center gap-2">
+                            {!gasto.fixed_expense && (
+                                <span>c/u {formatMoney(gasto.amount_per_quota, currency)}</span>
+                            )}
+                            {percentageLabel && (
+                                <span className="font-semibold text-zinc-300">
+                                    {percentageLabel}
+                                </span>
+                            )}
+                        </div>
+                    </div>
+                </>
+            )}
         </div>
     );
 }

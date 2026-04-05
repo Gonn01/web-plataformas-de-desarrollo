@@ -1,5 +1,6 @@
 import Icon from '../../../components/Icon';
 import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal/ConfirmPaymentModal';
+import ExpenseCard from '@/components/ExpenseCard';
 
 import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
 import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
@@ -8,11 +9,7 @@ import { useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
 
 import { useState } from 'react';
-import { ChipTipoGasto } from '@/components/ChipTipoGasto';
 import { Currency } from '@/utils/enums';
-import CategoryBadges from '@/components/CategoryBadges';
-import { formatMoney } from '@/utils/FormatMoney';
-import ProgressBar from '@/components/ProgressBar';
 
 export default function ActiveExpenses({
     query,
@@ -29,7 +26,7 @@ export default function ActiveExpenses({
     const countByCurrency = Object.values(Currency).reduce((acc, cur) => {
         acc[cur] = groups.reduce(
             (sum, g) => sum + g.items.filter((it) => it.currency_type === cur).length,
-            0
+            0,
         );
         return acc;
     }, {});
@@ -48,7 +45,7 @@ export default function ActiveExpenses({
     const clearLoading = () => setLoadingIds(new Set());
 
     return (
-        <div className="lg:col-span-3 xl:col-span-3 h-[490px] flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 mt-6">
+        <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 mt-6 min-h-0 flex-1">
             {/* HEADER */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-col gap-2">
@@ -60,11 +57,10 @@ export default function ActiveExpenses({
                     <div className="flex flex-wrap gap-2">
                         <button
                             type="button"
-                            className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${
-                                currency === null
+                            className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === null
                                     ? 'bg-primary text-black border-primary'
                                     : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
-                            }`}
+                                }`}
                             onClick={() => onCurrencyChange?.(null)}
                         >
                             Todos ({totalCount})
@@ -102,7 +98,7 @@ export default function ActiveExpenses({
             </div>
 
             {/* LIST */}
-            <div className="flex flex-col gap-2 overflow-y-auto pr-2">
+            <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0">
                 {filtered.map((group) => (
                     <div key={group.id} className="flex flex-col gap-3">
                         {/* Group Header */}
@@ -124,96 +120,17 @@ export default function ActiveExpenses({
                         </div>
 
                         {/* Items */}
-                        <ul className="flex flex-col gap-3">
-                            {group.items.map((it) => {
-                                const isLoading = loadingIds.has(it.id);
-
-                                return (
-                                    <li
-                                        key={it.id}
-                                        className={`
-                                            flex flex-col rounded-lg p-3 transition-all cursor-pointer relative
-                                            hover:bg-black/5 dark:hover:bg-white/5
-                                            ${isLoading ? 'pointer-events-none' : ''}
-                                        `}
+                        <ul className="flex flex-col gap-1">
+                            {group.items.map((it) => (
+                                <li key={it.id}>
+                                    <ExpenseCard
+                                        gasto={it}
+                                        loading={loadingIds.has(it.id)}
                                         onClick={() => navigate(`/app/gastos/${it.id}`)}
-                                    >
-                                        {/* LOADING OVERLAY */}
-                                        {isLoading && (
-                                            <div className="absolute inset-0 bg-white/30 dark:bg-black/30 backdrop-blur-sm rounded-lg animate-pulse z-10"></div>
-                                        )}
-
-                                        {/* Top row */}
-                                        <div className="flex items-start justify-between gap-4">
-                                            <div className="gap-1.5 flex-1">
-                                                <p className="font-semibold text-sm text-slate-800 dark:text-slate-100 mb-2">
-                                                    {it.name}
-                                                </p>
-
-                                                <ChipTipoGasto
-                                                    tipo={it.type}
-                                                    fijo={it.fixed_expense}
-                                                />
-                                                <CategoryBadges categories={it.categories} />
-                                            </div>
-
-                                            {/* RIGHT */}
-                                            <div className="flex flex-col items-end gap-2 text-right">
-                                                <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
-                                                    {formatMoney(it.amount_per_quota, it.currency_type)}
-                                                </p>
-
-                                                {it.fixed_expense ? (
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                        {`${it.payed_quotas} ${it.payed_quotas === 1 ? 'vez pagado' : 'veces pagado'}`}
-                                                    </p>
-                                                ) : (
-                                                    <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                        {`de ${formatMoney(it.amount, it.currency_type)} · ${it.payed_quotas}/${it.number_of_quotas} cuotas`}
-                                                    </p>
-                                                )}
-                                            </div>
-                                        </div>
-
-                                        {/* PROGRESS BAR */}
-                                        <div className="flex items-center gap-4">
-                                            <div className="flex-1">
-                                                <ProgressBar
-                                                    progress={it.progress}
-                                                    type={it.type}
-                                                    fixed={it.fixed_expense}
-                                                    quotas={it.number_of_quotas}
-                                                />
-                                            </div>
-                                            {!it.fixed_expense && (
-                                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 w-9 text-right shrink-0">
-                                                    {it.progress.toFixed(0)}%
-                                                </span>
-                                            )}
-
-                                            <button
-                                                className="text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors flex items-center gap-2"
-                                                disabled={isLoading}
-                                                onClick={(e) => {
-                                                    e.stopPropagation();
-                                                    modal.openItem(group, it);
-                                                }}
-                                            >
-                                                {isLoading ? (
-                                                    <>
-                                                        <span className="w-3 h-3 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                                                        Procesando…
-                                                    </>
-                                                ) : it.type === 'INGRESO' ? (
-                                                    `Registrar cobro`
-                                                ) : (
-                                                    `Pagar cuota`
-                                                )}
-                                            </button>
-                                        </div>
-                                    </li>
-                                );
-                            })}
+                                        onPayClick={() => modal.openItem(group, it)}
+                                    />
+                                </li>
+                            ))}
                         </ul>
                     </div>
                 ))}
