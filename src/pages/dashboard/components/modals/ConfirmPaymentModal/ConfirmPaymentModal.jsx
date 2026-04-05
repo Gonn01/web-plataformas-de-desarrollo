@@ -11,7 +11,7 @@ export default function ConfirmInstallmentPaymentModal({
     open,
     onCancel,
     onConfirm,
-    entityName = 'Entidad',
+    entityName,
     items = [],
 }) {
     useEffect(() => {

@@ -4,11 +4,13 @@ import useAuth from '@/hooks/use-auth';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
-import { createEntity } from '@/services/api';
+import { createEntity, createCategory } from '@/services/api';
 import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
+import CategorySelector from '../components/CategorySelector';
+import { useCategoriesStore } from '@/store/use-categories-store';
 
 export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const { token } = useAuth();
@@ -36,6 +38,23 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
 
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
+
+    const { categories, loading: loadingCategories, addCategory } = useCategoriesStore();
+    const [selectedCategoryIds, setSelectedCategoryIds] = useState(
+        (gasto.categories ?? []).map((c) => c.id)
+    );
+
+    const handleToggleCategory = (id) => {
+        setSelectedCategoryIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
+    };
+
+    const handleCreateCategory = async (name) => {
+        const created = await createCategory({ name }, token);
+        addCategory(created);
+        setSelectedCategoryIds((prev) => [...prev, created.id]);
+    };
 
     const totalInstallments = Number(installments) || 0;
     const paid = Math.min(Number(paidInstallments) || 0, totalInstallments);
@@ -86,6 +105,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
             image: gasto.image ?? null,
             type,
             payed_quotas: isInstallment ? Number(paidInstallments) : 0,
+            category_ids: selectedCategoryIds,
         };
 
         onSave?.(payload);
@@ -193,6 +213,14 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
                             progressPct={progressPct}
                         />
                     )}
+
+                    <CategorySelector
+                        categories={categories}
+                        selectedIds={selectedCategoryIds}
+                        onToggle={handleToggleCategory}
+                        onCreate={handleCreateCategory}
+                        loading={loadingCategories}
+                    />
                 </div>
 
                 {/* FOOTER */}

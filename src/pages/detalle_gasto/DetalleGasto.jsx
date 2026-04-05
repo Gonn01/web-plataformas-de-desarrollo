@@ -11,6 +11,7 @@ import { useEntitiesStore } from '@/store/use-entities-store';
 import { formatMoney } from '@/utils/FormatMoney';
 import UpdateExpenseModal from '@/components/modals/Expenses/UpdateExpense/UpdateExpenseModal';
 import CategoryBadges from '@/components/CategoryBadges';
+import ConfirmInstallmentPaymentModal from '@/pages/dashboard/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
 
 export default function DetalleGasto() {
     const {
@@ -26,6 +27,7 @@ export default function DetalleGasto() {
     } = useGastoUI();
     const { getEntityById } = useEntitiesStore();
     const [editOpen, setEditOpen] = useState(false);
+    const [confirmOpen, setConfirmOpen] = useState(false);
 
     if (loading) {
         return <Loader />;
@@ -40,7 +42,7 @@ export default function DetalleGasto() {
                     {!loading ? (
                         <HeaderDetalle
                             gasto={gasto}
-                            marcarProxima={pagarCuota}
+                            marcarProxima={() => setConfirmOpen(true)}
                             abrirEditar={() => setEditOpen(true)}
                         />
                     ) : null}
@@ -81,6 +83,18 @@ export default function DetalleGasto() {
                     />
                 </div>
             </div>
+
+            {/* MODAL CONFIRMAR PAGO */}
+            <ConfirmInstallmentPaymentModal
+                open={confirmOpen}
+                onCancel={() => setConfirmOpen(false)}
+                onConfirm={async () => {
+                    await pagarCuota();
+                    setConfirmOpen(false);
+                }}
+                items={gasto ? [gasto] : []}
+                entityName={getEntityById(gasto?.financial_entity_id)?.name ?? ''}
+            />
 
             {/* MODAL EDITAR */}
             {editOpen && (
