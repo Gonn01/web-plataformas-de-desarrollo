@@ -13,6 +13,7 @@ import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
 import CategorySelector from '../components/CategorySelector';
+import ExpenseModeSelector from '../components/ExpenseModeSelector';
 
 export default function NewExpenseModal({
     onClose,
@@ -35,6 +36,7 @@ export default function NewExpenseModal({
     const [newEntityName, setNewEntityName] = useState('');
     const [isFixed, setIsFixed] = useState(false);
     const [isInstallment, setIsInstallment] = useState(false);
+    const [isPaid, setIsPaid] = useState(false);
     const [paidInstallments, setPaidInstallments] = useState('0');
     const { entities, loading, addEntity } = useEntitiesStore();
     const [loadingNewEntity, setLoadingNewEntity] = useState(false);
@@ -112,7 +114,7 @@ export default function NewExpenseModal({
             fixed_expense: isFixed,
             image: null,
             type,
-            payed_quotas: isInstallment ? Number(paidInstallments) : 0,
+            payed_quotas: isInstallment ? Number(paidInstallments) : isPaid ? 1 : 0,
             category_ids: selectedCategoryIds,
         };
 
@@ -154,38 +156,29 @@ export default function NewExpenseModal({
                 <div className="p-6 space-y-6">
                     <ExpenseTypeSelector type={type} setType={setType} />
 
-                    {/* CHECKBOXES */}
-                    <div className="flex items-center gap-6 text-white">
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="w-4 h-4"
-                                checked={isInstallment}
-                                onChange={(e) => {
-                                    setIsInstallment(e.target.checked);
-                                    if (e.target.checked) setIsFixed(false);
-                                }}
-                            />
-                            <span>Es por cuotas</span>
-                        </label>
+                    <ExpenseModeSelector
+                        isInstallment={isInstallment}
+                        isFixed={isFixed}
+                        onChange={({ isInstallment: i, isFixed: f }) => {
+                            setIsInstallment(i);
+                            setIsFixed(f);
+                            if (!i) { setInstallments(''); setPaidInstallments('0'); }
+                            setIsPaid(false);
+                        }}
+                    />
 
-                        <label className="flex items-center gap-2 cursor-pointer">
-                            <input
-                                type="checkbox"
-                                className="w-4 h-4"
-                                checked={isFixed}
-                                onChange={(e) => {
-                                    setIsFixed(e.target.checked);
-                                    if (e.target.checked) {
-                                        setIsInstallment(false);
-                                        setInstallments('');
-                                        setPaidInstallments('0');
-                                    }
-                                }}
-                            />
-                            <span>Gasto fijo</span>
+                    {!isInstallment && !isFixed && (
+                        <label className="flex items-center gap-3 cursor-pointer select-none">
+                            <div
+                                onClick={() => setIsPaid((v) => !v)}
+                                className={`w-5 h-5 rounded flex items-center justify-center border transition-colors shrink-0 cursor-pointer
+                                    ${isPaid ? 'bg-primary border-primary' : 'border-[#3d5245] bg-[#1c2620]'}`}
+                            >
+                                {isPaid && <span className="text-black text-xs font-bold">✓</span>}
+                            </div>
+                            <span className="text-white text-sm font-medium">Pagado</span>
                         </label>
-                    </div>
+                    )}
 
                     <EntitySelector
                         entity={entity}
