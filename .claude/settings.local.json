@@ -7,7 +7,8 @@
       "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/config//**)",
       "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/services//**)",
       "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/**)",
-      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/utils//**)"
+      "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/utils//**)",
+      "WebFetch(domain:dolarapi.com)"
     ]
   }
 }

@@ -20,9 +20,16 @@ export function useDashboardUI() {
         setCurrency(CURRENCY_VALUES[pref] ?? Currency.ARS);
     }, [user]);
 
+    const preferredCurrency = CURRENCY_VALUES[
+        user?.preferred_currency !== undefined
+            ? user.preferred_currency
+            : user?.monedaPreferida
+    ] ?? Currency.ARS;
+
     return {
         currency,
         setCurrency,
+        preferredCurrency,
         query,
         setQuery,
         openNewExpense,

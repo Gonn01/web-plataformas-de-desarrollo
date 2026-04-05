@@ -26,6 +26,15 @@ export default function ActiveExpenses({
     const filtered = useActiveExpensesFilter(groups, currency, query);
     const modal = useActiveExpensesModal();
 
+    const countByCurrency = Object.values(Currency).reduce((acc, cur) => {
+        acc[cur] = groups.reduce(
+            (sum, g) => sum + g.items.filter((it) => it.currency_type === cur).length,
+            0
+        );
+        return acc;
+    }, {});
+    const totalCount = groups.reduce((sum, g) => sum + g.items.length, 0);
+
     const { token } = useAuth();
     const { handleConfirm } = usePayments(token);
 
@@ -49,6 +58,17 @@ export default function ActiveExpenses({
 
                     {/* Currency Toggle */}
                     <div className="flex flex-wrap gap-2">
+                        <button
+                            type="button"
+                            className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${
+                                currency === null
+                                    ? 'bg-primary text-black border-primary'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
+                            }`}
+                            onClick={() => onCurrencyChange?.(null)}
+                        >
+                            Todos ({totalCount})
+                        </button>
                         {Object.values(Currency).map((cur) => (
                             <button
                                 key={cur}
@@ -59,7 +79,7 @@ export default function ActiveExpenses({
                                     }`}
                                 onClick={() => onCurrencyChange?.(cur)}
                             >
-                                {cur}
+                                {cur} ({countByCurrency[cur]})
                             </button>
                         ))}
                     </div>

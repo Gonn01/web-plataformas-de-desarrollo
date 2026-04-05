@@ -5,12 +5,14 @@ import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpe
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useNewExpense } from './hooks/use-new-expense';
+import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import Loader from '@/components/Loader';
 
 export default function Dashboard() {
     const ui = useDashboardUI();
     const data = useDashboardData();
     const { saveExpense } = useNewExpense(data.loadDashboard, () => ui.setOpenNewExpense(false));
+    const { rates } = useExchangeRates();
 
     const summary = data.getSummaryForCurrency(ui.currency);
 
@@ -39,7 +41,13 @@ export default function Dashboard() {
             </div>
 
             {/* BALANCE */}
-            <StatCards summary={summary} currency={ui.currency} />
+            <StatCards
+                summary={summary}
+                currency={ui.currency}
+                summaryByCurrency={data.summaryByCurrency}
+                preferredCurrency={ui.preferredCurrency}
+                rates={rates}
+            />
 
             {/* LISTA DE GASTOS ACTIVOS */}
             <ActiveExpenses
