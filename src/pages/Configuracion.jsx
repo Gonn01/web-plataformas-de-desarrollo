@@ -1,36 +1,8 @@
 import { useEffect, useState } from 'react';
 import useAuth from '@/hooks/use-auth';
+import { Currency } from '@/utils/enums';
 
-export function currencyCodeToLabel(codeOrLabel) {
-    if (typeof codeOrLabel === 'string') {
-        if (['ARS', 'USD', 'EUR'].includes(codeOrLabel)) return codeOrLabel;
-    }
-
-    const code = Number(codeOrLabel);
-    switch (code) {
-        case 0:
-            return 'ARS';
-        case 1:
-            return 'USD';
-        case 2:
-            return 'EUR';
-        default:
-            return 'ARS';
-    }
-}
-
-export function currencyLabelToCode(label) {
-    switch (label) {
-        case 'ARS':
-            return 0;
-        case 'USD':
-            return 1;
-        case 'EUR':
-            return 2;
-        default:
-            return 0;
-    }
-}
+const CURRENCY_VALUES = Object.values(Currency);
 
 export default function Configuracion() {
     const { user, token, updateUser } = useAuth();
@@ -48,8 +20,7 @@ export default function Configuracion() {
         setNombreVisible(user.name || user.nombre || 'Usuario');
 
         const pref = user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
-        const label = pref ? currencyCodeToLabel(pref) : 'ARS';
-        setMoneda(label);
+        setMoneda(CURRENCY_VALUES[pref] ?? 'ARS');
     }, [user]);
 
     const handleSave = async () => {
@@ -61,7 +32,7 @@ export default function Configuracion() {
         try {
             setLoading(true);
 
-            const preferred_currency = currencyLabelToCode(moneda);
+            const preferred_currency = CURRENCY_VALUES.indexOf(moneda);
 
             const res = await fetch(`${baseUrl}/auth/preferred-currency`, {
                 method: 'PUT',

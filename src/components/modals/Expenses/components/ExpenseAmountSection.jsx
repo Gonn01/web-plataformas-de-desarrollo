@@ -1,6 +1,6 @@
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
-import { CURRENCY_TYPE } from '@/utils/CurrencyType.js';
+import { Currency } from '@/utils/enums';
 
 export default function ExpenseAmountSection({ amount, setAmount, currency, setCurrency }) {
     const isInvalid = amount !== '' && Number(amount) <= 0;
@@ -34,9 +34,9 @@ export default function ExpenseAmountSection({ amount, setAmount, currency, setC
                         value={currency}
                         onChange={(e) => setCurrency(e.target.value)}
                     >
-                        {Object.values(CURRENCY_TYPE).map((curr) => (
-                            <option key={curr.id} value={curr.id}>
-                                {curr.label}
+                        {Object.values(Currency).map((curr) => (
+                            <option key={curr} value={curr}>
+                                {curr}
                             </option>
                         ))}
                     </select>

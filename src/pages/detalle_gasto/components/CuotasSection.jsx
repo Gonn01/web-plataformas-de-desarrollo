@@ -1,6 +1,12 @@
 import Cuota from './Cuota';
+import { formatMoney } from '@/utils/FormatMoney';
 
 export default function CuotasSection({ gasto }) {
+    const paymentDates = (gasto.movements ?? [])
+        .filter((m) => m.movement_type === 'PAYMENT')
+        .sort((a, b) => new Date(a.payment_date) - new Date(b.payment_date))
+        .map((m) => m.payment_date);
+
     return (
         <section className="flex flex-col gap-4">
             <h2 className="text-xl font-bold">Cuotas</h2>
@@ -16,7 +22,9 @@ export default function CuotasSection({ gasto }) {
                                 : 'schedule'
                     }
                     title={`Cuota #${index + 1}`}
-                    monto={`$${gasto.amount_per_quota}`}
+                    monto={formatMoney(gasto.amount_per_quota, gasto.currency_type)}
+                    currency={gasto.currency_type}
+                    paymentDate={paymentDates[index] ?? null}
                     paid={index + 1 <= gasto.payed_quotas}
                     next={index + 1 === gasto.payed_quotas + 1}
                 />

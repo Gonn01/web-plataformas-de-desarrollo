@@ -10,7 +10,6 @@ import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
-import { currencyLabelToCode } from '@/pages/Configuracion';
 
 export default function NewExpenseModal({
     onClose,
@@ -85,14 +84,12 @@ export default function NewExpenseModal({
     function handleSubmit() {
         if (!canSave) return;
 
-        const currency_type = currencyLabelToCode(currency);
-
         const payload = {
             financial_entity_id: entity,
             name: name.trim(),
             amount: Number(amount),
             number_of_quotas: isInstallment ? Number(installments) : 1,
-            currency_type,
+            currency_type: currency,
             first_quota_date: null,
             fixed_expense: isFixed,
             image: null,

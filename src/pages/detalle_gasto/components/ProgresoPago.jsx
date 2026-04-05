@@ -1,8 +1,11 @@
+import { formatMoney } from '@/utils/FormatMoney';
+
 export default function ProgresoPago({ gasto, porcentaje, totalPagado }) {
     return (
         <div className="flex flex-col gap-3">
-            <div className="flex justify-between">
+            <div className="flex justify-between items-center">
                 <p className="text-base font-medium">Progreso de Pago</p>
+                <span className="text-sm font-semibold text-primary">{porcentaje.toFixed(0)}%</span>
             </div>
 
             <div className="h-2 rounded-full bg-[#3d5245]">
@@ -15,7 +18,7 @@ export default function ProgresoPago({ gasto, porcentaje, totalPagado }) {
             <p className="text-sm text-[#9eb7a8]">
                 {gasto.fixed_expense
                     ? `Veces pagado ${gasto.payed_quotas}`
-                    : `${gasto.payed_quotas} de ${gasto.number_of_quotas} cuotas pagadas ($${totalPagado.toFixed(2)} / $${gasto.amount})`}
+                    : `${gasto.payed_quotas} de ${gasto.number_of_quotas} cuotas pagadas (${formatMoney(totalPagado, gasto.currency_type)} / ${formatMoney(gasto.amount, gasto.currency_type)})`}
             </p>
         </div>
     );

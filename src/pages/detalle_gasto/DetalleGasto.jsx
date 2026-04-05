@@ -8,8 +8,8 @@ import PeligroEliminar from '../../components/PeligroEliminar';
 import { useGastoUI } from './hooks/use-gasto-ui';
 import Loader from '@/components/Loader';
 import { useEntitiesStore } from '@/store/use-entities-store';
+import { formatMoney } from '@/utils/FormatMoney';
 import UpdateExpenseModal from '@/components/modals/Expenses/UpdateExpense/UpdateExpenseModal';
-import { currencyCodeToLabel } from '../Configuracion';
 
 export default function DetalleGasto() {
     const {
@@ -49,11 +49,11 @@ export default function DetalleGasto() {
                                 label="Entidad"
                                 value={getEntityById(gasto.financial_entity_id)?.name}
                             />
-                            <InfoItem label="Monto Total" value={`$${gasto.amount}`} />
                             <InfoItem
-                                label="Moneda"
-                                value={currencyCodeToLabel(gasto.currency_type)}
+                                label="Monto Total"
+                                value={formatMoney(gasto.amount, gasto.currency_type)}
                             />
+                            <InfoItem label="Moneda" value={gasto.currency_type} />
                         </div>
 
                         <ProgresoPago

@@ -1,5 +1,4 @@
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
-import { currencyCodeToLabel } from '@/pages/Configuracion';
 import { formatMoney } from '@/utils/FormatMoney';
 
 export default function SinglePaymentSection({ item }) {
@@ -21,15 +20,12 @@ export default function SinglePaymentSection({ item }) {
 
                 <div className="text-right">
                     <p className="font-medium">
-                        {formatMoney(
-                            item.amount_per_quota,
-                            currencyCodeToLabel(item.currency_type),
-                        )}
+                        {formatMoney(item.amount_per_quota, item.currency_type)}
                     </p>
 
                     {!item.fixed_expense && (
                         <p className="text-xs text-slate-500">
-                            de {formatMoney(item.amount, currencyCodeToLabel(item.currency_type))}
+                            de {formatMoney(item.amount, item.currency_type)}
                         </p>
                     )}
                 </div>
@@ -54,10 +50,7 @@ export default function SinglePaymentSection({ item }) {
                 <div className="flex items-baseline justify-between">
                     <span className="text-xs text-slate-500">Monto a pagar</span>
                     <span className="text-lg font-bold">
-                        {formatMoney(
-                            item.amount_per_quota,
-                            currencyCodeToLabel(item.currency_type),
-                        )}
+                        {formatMoney(item.amount_per_quota, item.currency_type)}
                     </span>
                 </div>
             </div>

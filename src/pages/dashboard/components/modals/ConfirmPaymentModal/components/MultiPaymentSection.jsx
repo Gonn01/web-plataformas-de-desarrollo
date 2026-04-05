@@ -1,4 +1,3 @@
-import { currencyCodeToLabel } from '@/pages/Configuracion';
 import { formatMoney } from '@/utils/FormatMoney';
 
 export default function MultiPaymentSection({ items }) {
@@ -23,10 +22,7 @@ export default function MultiPaymentSection({ items }) {
                         {it.name}
                         <span className="ml-2 text-xs text-slate-500">
                             (
-                            {formatMoney(
-                                it.amount_per_quota,
-                                currencyCodeToLabel(it.currency_type),
-                            )}
+                            {formatMoney(it.amount_per_quota, it.currency_type)}
                             )
                         </span>
                     </li>
@@ -40,9 +36,9 @@ export default function MultiPaymentSection({ items }) {
             <div className="flex flex-col gap-2">
                 {totals.map((row) => (
                     <div key={row.currency} className="flex justify-between text-white">
-                        <span className="text-xs">En {currencyCodeToLabel(row.currency)}</span>
+                        <span className="text-xs">En {row.currency}</span>
                         <span className="text-lg font-bold">
-                            {formatMoney(row.amount, currencyCodeToLabel(row.currency))}
+                            {formatMoney(row.amount, row.currency)}
                         </span>
                     </div>
                 ))}

@@ -9,7 +9,6 @@ import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
-import { currencyCodeToLabel, currencyLabelToCode } from '@/pages/Configuracion';
 
 export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const { token } = useAuth();
@@ -22,7 +21,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const [entity, setEntity] = useState(gasto.financial_entity_id);
 
     const [amount, setAmount] = useState(String(gasto.amount));
-    const [currency, setCurrency] = useState(currencyCodeToLabel(gasto.currency_type));
+    const [currency, setCurrency] = useState(gasto.currency_type);
 
     const [isFixed, setIsFixed] = useState(Boolean(gasto.fixed_expense));
     const [isInstallment, setIsInstallment] = useState(gasto.number_of_quotas > 0);
@@ -76,14 +75,12 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const handleSubmit = () => {
         if (!canSave) return;
 
-        const currency_type = currencyLabelToCode(currency);
-
         const payload = {
             financial_entity_id: entity,
             name: name.trim(),
             amount: Number(amount),
             number_of_quotas: isInstallment ? Number(installments) : 0,
-            currency_type,
+            currency_type: currency,
             first_quota_date: gasto.first_quota_date,
             fixed_expense: isFixed,
             image: gasto.image ?? null,

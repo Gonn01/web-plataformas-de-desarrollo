@@ -1,7 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchDashboardData } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
-import { currencyCodeToLabel } from '@/pages/Configuracion';
 
 export function useDashboardData() {
     const { token } = useAuth();
@@ -19,7 +18,7 @@ export function useDashboardData() {
 
         groupsToUse.forEach((group) => {
             group.items.forEach((g) => {
-                const curr = currencyCodeToLabel(g.currency_type);
+                const curr = g.currency_type;
                 const restante = g.amount - g.payed_quotas * g.amount_per_quota;
 
                 if (g.type === 'INGRESO') {

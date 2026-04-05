@@ -1,4 +1,7 @@
-export default function Cuota({ icon, title, monto, paid, next }) {
+export default function Cuota({ icon, title, monto, currency, paymentDate, paid, next }) {
+    const formattedDate = paymentDate
+        ? new Date(paymentDate).toLocaleString('es-AR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+        : null;
     const base = 'flex items-center justify-between p-4 rounded-lg shadow-sm bg-[#111714]';
     const mods = paid ? 'opacity-60' : next ? 'border border-primary/50' : '';
 
@@ -16,14 +19,17 @@ export default function Cuota({ icon, title, monto, paid, next }) {
                         {title}
                     </p>
                     <p className="text-sm text-[#9eb7a8]">
-                        {paid ? 'Pagada' : next ? 'Proxima' : 'Pendiente'}
+                        {paid ? `Pagada el ${formattedDate}` : next ? 'Proxima' : 'Pendiente'}
                     </p>
                 </div>
             </div>
 
-            <p className={`font-semibold ${paid ? 'line-through text-white' : 'text-white'}`}>
-                {monto}
-            </p>
+            <div className="flex flex-col items-end">
+                <p className={`font-semibold ${paid ? 'line-through text-white' : 'text-white'}`}>
+                    {monto}
+                </p>
+                <span className="text-xs text-[#9eb7a8]">{currency}</span>
+            </div>
         </div>
     );
 }

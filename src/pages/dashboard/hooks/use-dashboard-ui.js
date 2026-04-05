@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import useAuth from '@/hooks/use-auth';
-import { currencyCodeToLabel } from '@/pages/Configuracion';
+import { Currency } from '@/utils/enums';
+
+const CURRENCY_VALUES = Object.values(Currency);
 
 export function useDashboardUI() {
     const { user } = useAuth();
 
-    const [currency, setCurrency] = useState('ARS');
+    const [currency, setCurrency] = useState(Currency.ARS);
     const [query, setQuery] = useState('');
     const [openNewExpense, setOpenNewExpense] = useState(false);
 
@@ -15,8 +17,7 @@ export function useDashboardUI() {
         const pref =
             user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
 
-        const label = pref ? currencyCodeToLabel(pref) : 'ARS';
-        setCurrency(label);
+        setCurrency(CURRENCY_VALUES[pref] ?? Currency.ARS);
     }, [user]);
 
     return {

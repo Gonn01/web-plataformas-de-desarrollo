@@ -9,7 +9,8 @@ import useAuth from '@/hooks/use-auth';
 
 import { useState } from 'react';
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
-import { currencyCodeToLabel } from '@/pages/Configuracion';
+import { Currency } from '@/utils/enums';
+import { formatMoney } from '@/utils/FormatMoney';
 
 export default function ActiveExpenses({
     query,
@@ -46,13 +47,13 @@ export default function ActiveExpenses({
 
                     {/* Currency Toggle */}
                     <div className="flex flex-wrap gap-2">
-                        {['ARS', 'USD', 'EUR'].map((cur) => (
+                        {Object.values(Currency).map((cur) => (
                             <button
                                 key={cur}
                                 type="button"
                                 className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === cur
-                                    ? 'bg-primary text-black border-primary'
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
+                                        ? 'bg-primary text-black border-primary'
+                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
                                     }`}
                                 onClick={() => onCurrencyChange?.(cur)}
                             >
@@ -136,7 +137,7 @@ export default function ActiveExpenses({
                                             {/* RIGHT */}
                                             <div className="flex flex-col items-end gap-2 text-right">
                                                 <p className="text-sm font-medium text-slate-700 dark:text-slate-200 whitespace-nowrap">
-                                                    {`${currencyCodeToLabel(it.currency_type)} $${it.amount_per_quota.toFixed(2)}`}
+                                                    {formatMoney(it.amount_per_quota, it.currency_type)}
                                                 </p>
 
                                                 {it.fixed_expense ? (
@@ -145,7 +146,7 @@ export default function ActiveExpenses({
                                                     </p>
                                                 ) : (
                                                     <p className="text-xs text-slate-500 dark:text-slate-400">
-                                                        {`de ${currencyCodeToLabel(it.currency_type)} $${it.amount.toFixed(2)} · ${it.payed_quotas}/${it.number_of_quotas} cuotas`}
+                                                        {`de ${formatMoney(it.amount, it.currency_type)} · ${it.payed_quotas}/${it.number_of_quotas} cuotas`}
                                                     </p>
                                                 )}
                                             </div>
@@ -166,6 +167,9 @@ export default function ActiveExpenses({
                                                     style={{ width: `${it.progress}%` }}
                                                 />
                                             </div>
+                                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 w-9 text-right shrink-0">
+                                                {it.progress.toFixed(0)}%
+                                            </span>
 
                                             <button
                                                 className="text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors flex items-center gap-2"
