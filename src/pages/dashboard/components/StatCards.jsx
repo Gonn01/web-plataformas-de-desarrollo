@@ -23,12 +23,12 @@ export default function StatCards({ summary, currency = 'ARS' }) {
                     : 'text-red-500 dark:text-red-400',
         },
         {
-            label: `Total Debo (${currency})`,
+            label: `Total EGRESO (${currency})`,
             value: formatMoney(total_debo, currency),
             tone: 'text-red-500 dark:text-red-400',
         },
         {
-            label: `Total Me deben (${currency})`,
+            label: `Total INGRESO (${currency})`,
             value: formatMoney(total_me_deben, currency),
             tone: 'text-emerald-600 dark:text-emerald-400',
         },

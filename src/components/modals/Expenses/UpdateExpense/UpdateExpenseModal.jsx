@@ -16,7 +16,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
 
     const containerRef = useRef(null);
 
-    const [type, setType] = useState(gasto.type === 'INGRESO' ? 'Me deben' : 'Debo');
+    const [type, setType] = useState(gasto.type);
     const [name, setName] = useState(gasto.name);
     const [entity, setEntity] = useState(gasto.financial_entity_id);
 
@@ -84,7 +84,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
             first_quota_date: gasto.first_quota_date,
             fixed_expense: isFixed,
             image: gasto.image ?? null,
-            type: type === 'Me deben' ? 'INGRESO' : 'EGRESO',
+            type,
             payed_quotas: isInstallment ? Number(paidInstallments) : 0,
         };
 

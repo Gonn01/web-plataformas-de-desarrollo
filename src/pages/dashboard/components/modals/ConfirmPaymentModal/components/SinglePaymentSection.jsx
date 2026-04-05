@@ -32,7 +32,7 @@ export default function SinglePaymentSection({ item }) {
             </div>
 
             {/* Progress bar */}
-            {item.number_of_quotas > 0 && (
+            {!item.fixed_expense && item.number_of_quotas > 0 && (
                 <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
                     <div
                         className={`h-1.5 rounded-full ${item.type === 'EGRESO' ? 'bg-red-500' : 'bg-green-500'}`}

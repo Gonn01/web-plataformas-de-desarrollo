@@ -169,9 +169,11 @@ export default function ActiveExpenses({
                                                     style={{ width: `${it.progress}%` }}
                                                 />
                                             </div>
-                                            <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 w-9 text-right shrink-0">
-                                                {it.progress.toFixed(0)}%
-                                            </span>
+                                            {!it.fixed_expense && (
+                                                <span className="text-xs font-semibold text-slate-500 dark:text-slate-400 w-9 text-right shrink-0">
+                                                    {it.progress.toFixed(0)}%
+                                                </span>
+                                            )}
 
                                             <button
                                                 className="text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors flex items-center gap-2"

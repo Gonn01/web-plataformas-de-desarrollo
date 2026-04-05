@@ -6,6 +6,7 @@ import { createEntity, createCategory } from '@/services/api';
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
 import { useEntitiesStore } from '@/store/use-entities-store';
+import { ExpenseType } from '@/utils/enums';
 import { useCategoriesStore } from '@/store/use-categories-store';
 import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
@@ -21,7 +22,7 @@ export default function NewExpenseModal({
 }) {
     const { token } = useAuth();
 
-    const [type, setType] = useState('Debo');
+    const [type, setType] = useState(ExpenseType.EGRESO);
     const [name, setName] = useState('');
     const [entity, setEntity] = useState(defaultEntityId || '');
 
@@ -110,7 +111,7 @@ export default function NewExpenseModal({
             first_quota_date: null,
             fixed_expense: isFixed,
             image: null,
-            type: type === 'Me deben' ? 'INGRESO' : 'EGRESO',
+            type,
             payed_quotas: isInstallment ? Number(paidInstallments) : 0,
             category_ids: selectedCategoryIds,
         };
