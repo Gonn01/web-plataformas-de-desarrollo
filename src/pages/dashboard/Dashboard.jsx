@@ -2,11 +2,14 @@ import Icon from '../../components/Icon';
 import StatCards from './components/StatCards';
 import ActiveExpenses from './components/ActiveExpenses';
 import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
+import CuotasChart from '../detalle_entidad/components/CuotasChart';
+import MontoChart from '../detalle_entidad/components/MontoChart';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useNewExpense } from './hooks/use-new-expense';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import Loader from '@/components/Loader';
+import { useMemo, useState } from 'react';
 
 export default function Dashboard() {
     const ui = useDashboardUI();
@@ -15,6 +18,8 @@ export default function Dashboard() {
     const { rates } = useExchangeRates();
 
     const summary = data.getSummaryForCurrency(ui.currency);
+    const allItems = useMemo(() => data.groups.flatMap((g) => g.items), [data.groups]);
+    const [showCharts, setShowCharts] = useState(false);
 
     if (data.loading) {
         return <Loader />;
@@ -48,6 +53,23 @@ export default function Dashboard() {
                 preferredCurrency={ui.preferredCurrency}
                 rates={rates}
             />
+
+            {/* GRÁFICOS */}
+            <div className="mt-6">
+                <button
+                    onClick={() => setShowCharts((v) => !v)}
+                    className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer mb-3"
+                >
+                    <Icon name={showCharts ? 'expand_less' : 'expand_more'} />
+                    {showCharts ? 'Ocultar gráficos' : 'Mostrar gráficos'}
+                </button>
+                {showCharts && (
+                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+                        <CuotasChart gastos={allItems} />
+                        <MontoChart gastos={allItems} />
+                    </div>
+                )}
+            </div>
 
             {/* LISTA DE GASTOS ACTIVOS */}
             <ActiveExpenses

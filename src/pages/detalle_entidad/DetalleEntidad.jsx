@@ -10,6 +10,8 @@ import { StatCard } from './components/StatCard';
 import EditEntityModal from './components/EditEntityModal';
 
 import { useEntidadUI } from './hooks/use-entidad-ui';
+import CuotasChart from './components/CuotasChart';
+import MontoChart from './components/MontoChart';
 import Loader from '@/components/Loader';
 import PeligroEliminar from '@/components/PeligroEliminar';
 
@@ -79,6 +81,9 @@ export default function EntidadDetalle() {
                     onClick={() => setTab('finalizados')}
                 />
             </div>
+
+            <CuotasChart gastos={entity.gastos_activos} />
+            <MontoChart gastos={entity.gastos_activos} />
 
             {/* Tabs */}
             <TabHeader tab={tab} setTab={setTab} />

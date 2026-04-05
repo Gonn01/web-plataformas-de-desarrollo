@@ -13,18 +13,14 @@ export function useDashboardUI() {
 
     useEffect(() => {
         if (!user) return;
-
-        const pref =
-            user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
-
-        setCurrency(CURRENCY_VALUES[pref] ?? Currency.ARS);
+        const pref = user.preferred_currency ?? user.monedaPreferida;
+        setCurrency(CURRENCY_VALUES.includes(pref) ? pref : Currency.ARS);
     }, [user]);
 
-    const preferredCurrency = CURRENCY_VALUES[
-        user?.preferred_currency !== undefined
-            ? user.preferred_currency
-            : user?.monedaPreferida
-    ] ?? Currency.ARS;
+    const preferredCurrency = (() => {
+        const pref = user?.preferred_currency ?? user?.monedaPreferida;
+        return CURRENCY_VALUES.includes(pref) ? pref : Currency.ARS;
+    })();
 
     return {
         currency,

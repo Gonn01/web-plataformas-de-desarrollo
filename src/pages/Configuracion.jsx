@@ -19,8 +19,8 @@ export default function Configuracion() {
         setPreview(user.avatar || '');
         setNombreVisible(user.name || user.nombre || 'Usuario');
 
-        const pref = user.preferred_currency !== undefined ? user.preferred_currency : user.monedaPreferida;
-        setMoneda(CURRENCY_VALUES[pref] ?? 'ARS');
+        const pref = user.preferred_currency ?? user.monedaPreferida;
+        setMoneda(CURRENCY_VALUES.includes(pref) ? pref : 'ARS');
     }, [user]);
 
     const handleSave = async () => {
@@ -32,8 +32,6 @@ export default function Configuracion() {
         try {
             setLoading(true);
 
-            const preferred_currency = CURRENCY_VALUES.indexOf(moneda);
-
             const res = await fetch(`${baseUrl}/auth/preferred-currency`, {
                 method: 'PUT',
                 headers: {
@@ -42,7 +40,7 @@ export default function Configuracion() {
                 },
                 body: JSON.stringify({
                     user_id: user.id,
-                    preferred_currency,
+                    preferred_currency: moneda,
                 }),
             });
 
@@ -61,7 +59,7 @@ export default function Configuracion() {
                 updateUser({
                     ...(user || {}),
                     ...updatedFromApi,
-                    preferred_currency,
+                    preferred_currency: moneda,
                     monedaPreferida: moneda,
                 });
             }
