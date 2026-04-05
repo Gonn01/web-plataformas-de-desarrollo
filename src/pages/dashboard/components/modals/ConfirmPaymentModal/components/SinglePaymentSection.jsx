@@ -1,5 +1,6 @@
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
 import { formatMoney } from '@/utils/FormatMoney';
+import ProgressBar from '@/components/ProgressBar';
 
 export default function SinglePaymentSection({ item }) {
     return (
@@ -33,14 +34,16 @@ export default function SinglePaymentSection({ item }) {
 
             {/* Progress bar */}
             {!item.fixed_expense && item.number_of_quotas > 0 && (
-                <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5">
-                    <div
-                        className={`h-1.5 rounded-full ${item.type === 'EGRESO' ? 'bg-red-500' : 'bg-green-500'}`}
-                        style={{
-                            width: `${Math.min(100, (item.payed_quotas / item.number_of_quotas) * 100)}%`,
-                        }}
-                    />
-                </div>
+                <ProgressBar
+                    progress={Math.min(100, (item.payed_quotas / item.number_of_quotas) * 100)}
+                    previewProgress={Math.min(
+                        100,
+                        ((item.payed_quotas + 1) / item.number_of_quotas) * 100,
+                    )}
+                    type={item.type}
+                    fixed={false}
+                    quotas={item.number_of_quotas}
+                />
             )}
 
             <p className="text-xs text-slate-500"></p>

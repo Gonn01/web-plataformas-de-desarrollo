@@ -12,6 +12,7 @@ import { ChipTipoGasto } from '@/components/ChipTipoGasto';
 import { Currency } from '@/utils/enums';
 import CategoryBadges from '@/components/CategoryBadges';
 import { formatMoney } from '@/utils/FormatMoney';
+import ProgressBar from '@/components/ProgressBar';
 
 export default function ActiveExpenses({
     query,
@@ -156,17 +157,12 @@ export default function ActiveExpenses({
 
                                         {/* PROGRESS BAR */}
                                         <div className="flex items-center gap-4">
-                                            <div className="w-full bg-slate-200 dark:bg-slate-700 rounded-full h-1.5 flex-1 overflow-hidden">
-                                                <div
-                                                    className={`h-1.5 rounded-full transition-all duration-500
-                                                         ${it.fixed_expense
-                                                            ? 'bg-yellow-400'
-                                                            : it.type === 'INGRESO'
-                                                                ? 'bg-green-500'
-                                                                : 'bg-red-500'
-                                                        }
-                `}
-                                                    style={{ width: `${it.progress}%` }}
+                                            <div className="flex-1">
+                                                <ProgressBar
+                                                    progress={it.progress}
+                                                    type={it.type}
+                                                    fixed={it.fixed_expense}
+                                                    quotas={it.number_of_quotas}
                                                 />
                                             </div>
                                             {!it.fixed_expense && (

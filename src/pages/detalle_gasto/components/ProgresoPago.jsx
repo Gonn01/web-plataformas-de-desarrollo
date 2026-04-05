@@ -1,4 +1,5 @@
 import { formatMoney } from '@/utils/FormatMoney';
+import ProgressBar from '@/components/ProgressBar';
 
 export default function ProgresoPago({ gasto, porcentaje, totalPagado }) {
     return (
@@ -12,12 +13,13 @@ export default function ProgresoPago({ gasto, porcentaje, totalPagado }) {
                 )}
             </div>
 
-            <div className="h-2 rounded-full bg-[#3d5245]">
-                <div
-                    className={`h-2 rounded-full ${gasto.fixed_expense ? 'bg-yellow-400' : gasto.type === 'INGRESO' ? 'bg-green-500' : 'bg-red-500'}`}
-                    style={{ width: `${porcentaje}%` }}
-                />
-            </div>
+            <ProgressBar
+                progress={porcentaje}
+                type={gasto.type}
+                fixed={gasto.fixed_expense}
+                quotas={gasto.number_of_quotas}
+                height="h-2"
+            />
 
             <p className="text-sm text-[#9eb7a8]">
                 {gasto.fixed_expense
