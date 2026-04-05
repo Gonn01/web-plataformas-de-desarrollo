@@ -1,8 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
-import { pagarCuota as pagarCuota2 } from '@/services/api';
-import { fetchGastoById, updateGasto, deleteGasto } from '@/services/api';
+import { pagarCuota as pagarCuota2, refundCuota as refundCuota2, fetchGastoById, updateGasto, deleteGasto } from '@/services/api';
 
 export function useGastoData() {
     const { id } = useParams();
@@ -44,6 +43,14 @@ export function useGastoData() {
         setLoading(false);
     }
 
+    async function refundCuota() {
+        if (!gasto) return;
+        setLoading(true);
+        await refundCuota2(gasto.id, token);
+        await load();
+        setLoading(false);
+    }
+
     async function eliminar() {
         if (!gasto) return;
         setLoading(true);
@@ -55,6 +62,7 @@ export function useGastoData() {
         gasto,
         actualizar,
         pagarCuota,
+        refundCuota,
         eliminar,
         load,
         loading,

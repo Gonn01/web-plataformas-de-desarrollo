@@ -110,6 +110,15 @@ export const deleteGasto = async (gastoId, token) => {
     return true;
 };
 
+export const refundCuota = async (gastoId, token) => {
+    const { data } = await api.post(
+        `/gastos/${gastoId}/refund-cuota`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
 export const pagarCuota = async (gastoId, token) => {
     const { data } = await api.post(
         `/gastos/${gastoId}/pagar-cuota`,

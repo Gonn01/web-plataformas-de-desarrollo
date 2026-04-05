@@ -19,6 +19,7 @@ export default function DetalleGasto() {
         porcentaje,
         totalPagado,
         pagarCuota,
+        refundCuota,
         actualizar,
         eliminar,
         loading,
@@ -68,7 +69,9 @@ export default function DetalleGasto() {
                             loading={loading}
                         />
                     </div>
-                    {!gasto.fixed_expense && <CuotasSection gasto={gasto} loading={loading} />}
+                    {!gasto.fixed_expense && (
+                        <CuotasSection gasto={gasto} loading={loading} onRefund={refundCuota} />
+                    )}
 
                     {/* <AdjuntosSection
                         adjuntos={detalle.adjuntos}
