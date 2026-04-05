@@ -38,6 +38,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
         gasto.payed_quotas ? String(gasto.payed_quotas) : '0',
     );
 
+    const [saving, setSaving] = useState(false);
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
 
@@ -93,8 +94,8 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
         };
     }, [onClose]);
 
-    const handleSubmit = () => {
-        if (!canSave) return;
+    const handleSubmit = async () => {
+        if (!canSave || saving) return;
 
         const payload = {
             financial_entity_id: entity,
@@ -110,7 +111,12 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
             category_ids: selectedCategoryIds,
         };
 
-        onSave?.(payload);
+        setSaving(true);
+        try {
+            await onSave?.(payload);
+        } finally {
+            setSaving(false);
+        }
     };
 
     const modal = (
@@ -136,7 +142,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
 
                     <button
                         onClick={onClose}
-                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#29382f] text-white hover:bg-[#3d5245]"
+                        className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#29382f] text-white hover:bg-[#3d5245] cursor-pointer"
                     >
                         <Icon name="close" className="text-xl" />
                     </button>
@@ -220,19 +226,23 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
                 <footer className="sticky bottom-0 flex justify-end gap-3 border-t border-[#29382f] px-6 py-4 bg-[#111714]">
                     <button
                         onClick={onClose}
-                        className="h-11 px-4 text-sm font-bold text-[#9eb7a8] hover:bg-[#29382f] rounded-lg"
+                        disabled={saving}
+                        className="h-11 px-4 text-sm font-bold text-[#9eb7a8] hover:bg-[#29382f] rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         Cancelar
                     </button>
 
                     <button
-                        disabled={!canSave}
+                        disabled={!canSave || saving}
                         onClick={handleSubmit}
-                        className="h-11 px-4 text-sm font-bold flex items-center gap-2 rounded-lg 
-                            bg-primary text-black disabled:opacity-60"
+                        className="h-11 px-4 text-sm font-bold flex items-center gap-2 rounded-lg bg-primary text-black disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
                     >
-                        <Icon name="save" />
-                        Guardar cambios
+                        {saving ? (
+                            <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
+                        ) : (
+                            <Icon name="save" />
+                        )}
+                        {saving ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                 </footer>
             </div>

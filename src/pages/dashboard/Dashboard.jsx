@@ -21,7 +21,7 @@ export default function Dashboard() {
     }
 
     return (
-        <div className="flex flex-col flex-1 min-h-0">
+        <div className="flex flex-col flex-1 min-h-0 overflow-hidden">
             {/* HEADER */}
             <div className="flex justify-between mb-4">
                 <div>

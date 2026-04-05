@@ -4,6 +4,7 @@ import Icon from '../Icon';
 
 export default function NewEntityModal({ open, onClose, onSave }) {
     const [name, setName] = useState('');
+    const [saving, setSaving] = useState(false);
 
     useEffect(() => {
         if (!open) return;
@@ -23,10 +24,15 @@ export default function NewEntityModal({ open, onClose, onSave }) {
 
     const canSave = useMemo(() => name.trim().length > 0, [name]);
 
-    const handleSave = () => {
-        if (!canSave) return;
-        onSave?.({ name: name.trim() });
-        setName('');
+    const handleSave = async () => {
+        if (!canSave || saving) return;
+        setSaving(true);
+        try {
+            await onSave?.({ name: name.trim() });
+            setName('');
+        } finally {
+            setSaving(false);
+        }
     };
 
     if (!open) return null;
@@ -93,18 +99,22 @@ export default function NewEntityModal({ open, onClose, onSave }) {
                     <div className="flex flex-col-reverse sm:flex-row items-center justify-end gap-3 p-6 bg-[#1c2620]/60 border-t border-[#3d5245]">
                         <button
                             type="button"
-                            className="flex w-full sm:w-auto min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-[#29382f] text-white text-sm font-bold tracking-wide transition-colors duration-200 hover:bg-[#34453a]"
+                            disabled={saving}
+                            className="flex w-full sm:w-auto min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-[#29382f] text-white text-sm font-bold tracking-wide transition-colors duration-200 hover:bg-[#34453a] disabled:opacity-50 disabled:cursor-not-allowed"
                             onClick={onClose}
                         >
                             <span className="truncate">Cancelar</span>
                         </button>
                         <button
                             type="button"
-                            disabled={!canSave}
-                            className="flex w-full sm:w-auto min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-11 px-5 bg-primary text-[#111714] text-sm font-bold tracking-wide transition-opacity duration-200 hover:opacity-80 disabled:opacity-60"
+                            disabled={!canSave || saving}
+                            className="flex w-full sm:w-auto min-w-[84px] cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-lg h-11 px-5 bg-primary text-[#111714] text-sm font-bold tracking-wide transition-opacity duration-200 hover:opacity-80 disabled:opacity-60 disabled:cursor-not-allowed"
                             onClick={handleSave}
                         >
-                            <span className="truncate">Guardar Entidad</span>
+                            {saving && (
+                                <span className="w-4 h-4 border-2 border-[#111714]/30 border-t-[#111714] rounded-full animate-spin shrink-0" />
+                            )}
+                            <span className="truncate">{saving ? 'Guardando...' : 'Guardar Entidad'}</span>
                         </button>
                     </div>
                 </div>

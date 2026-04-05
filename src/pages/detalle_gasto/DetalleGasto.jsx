@@ -29,6 +29,7 @@ export default function DetalleGasto() {
     const { getEntityById } = useEntitiesStore();
     const [editOpen, setEditOpen] = useState(false);
     const [confirmOpen, setConfirmOpen] = useState(false);
+    const [confirmLoading, setConfirmLoading] = useState(false);
 
     if (loading) {
         return <Loader />;
@@ -92,9 +93,12 @@ export default function DetalleGasto() {
                 open={confirmOpen}
                 onCancel={() => setConfirmOpen(false)}
                 onConfirm={async () => {
+                    setConfirmLoading(true);
                     await pagarCuota();
+                    setConfirmLoading(false);
                     setConfirmOpen(false);
                 }}
+                loading={confirmLoading}
                 items={gasto ? [gasto] : []}
                 entityName={getEntityById(gasto?.financial_entity_id)?.name ?? ''}
             />

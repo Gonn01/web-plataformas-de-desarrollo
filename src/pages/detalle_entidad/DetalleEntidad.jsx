@@ -155,7 +155,7 @@ export default function EntidadDetalle() {
                     defaultEntityId={entity.id}
                     onClose={() => setOpenNewExpense(false)}
                     onSave={onCreateExpense}
-                    saving={true}
+                    saving={loadingCreatingExpense}
                 />
             )}
         </>

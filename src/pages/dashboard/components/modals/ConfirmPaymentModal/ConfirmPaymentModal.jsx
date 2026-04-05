@@ -13,6 +13,7 @@ export default function ConfirmInstallmentPaymentModal({
     onConfirm,
     entityName,
     items = [],
+    loading = false,
 }) {
     useEffect(() => {
         if (!open) return;
@@ -53,7 +54,7 @@ export default function ConfirmInstallmentPaymentModal({
                     <MultiPaymentSection items={items} entityName={entityName} />
                 )}
 
-                <ModalActions onCancel={onCancel} onConfirm={onConfirm} />
+                <ModalActions onCancel={onCancel} onConfirm={onConfirm} loading={loading} />
             </ModalContainer>
         </ModalOverlay>,
         document.body,

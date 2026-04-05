@@ -14,41 +14,35 @@ export function useGastoData() {
         load();
     }, [id, token]);
 
-    async function load() {
+    async function load(silent = false) {
         try {
-            setLoading(true);
+            if (!silent) setLoading(true);
             const res = await fetchGastoById(id, token);
             setGasto(res);
         } catch (err) {
             console.error('Error cargando gasto', err);
             navigate(`/app/entidades/${gasto.entidad}`);
         } finally {
-            setLoading(false);
+            if (!silent) setLoading(false);
         }
     }
 
     async function actualizar(payload) {
         if (!gasto) return;
-        setLoading(true);
         await updateGasto(gasto.id, payload, token);
-        await load();
-        setLoading(false);
+        await load(true);
     }
 
     async function pagarCuota() {
         if (!gasto) return;
-        setLoading(true);
         await pagarCuota2(gasto.id, token);
-        await load();
-        setLoading(false);
+        await load(true);
     }
 
     async function refundCuota() {
         if (!gasto) return;
-        setLoading(true);
         await refundCuota2(gasto.id, token);
-        await load();
-        setLoading(false);
+        await load(true);
     }
 
     async function eliminar() {
