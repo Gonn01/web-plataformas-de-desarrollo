@@ -119,6 +119,24 @@ export const pagarCuota = async (gastoId, token) => {
     return data.data;
 };
 
+/* ===============================
+   CATEGORIAS
+=============================== */
+
+export const fetchCategories = async (token) => {
+    const { data } = await api.get('/categorias', {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
+export const createCategory = async (payload, token) => {
+    const { data } = await api.post('/categorias', payload, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
 export const pagarCuotasLote = async (ids, token) => {
     const { data } = await api.post(
         `/gastos/pagar-lote`,

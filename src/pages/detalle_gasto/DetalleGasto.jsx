@@ -10,6 +10,7 @@ import Loader from '@/components/Loader';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import { formatMoney } from '@/utils/FormatMoney';
 import UpdateExpenseModal from '@/components/modals/Expenses/UpdateExpense/UpdateExpenseModal';
+import CategoryBadges from '@/components/CategoryBadges';
 
 export default function DetalleGasto() {
     const {
@@ -55,6 +56,8 @@ export default function DetalleGasto() {
                             />
                             <InfoItem label="Moneda" value={gasto.currency_type} />
                         </div>
+
+                        <CategoryBadges categories={gasto.categories} />
 
                         <ProgresoPago
                             gasto={gasto}

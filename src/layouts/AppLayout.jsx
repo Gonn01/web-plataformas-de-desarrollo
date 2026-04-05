@@ -2,15 +2,20 @@ import { Outlet } from 'react-router-dom';
 import Sidebar from '../components/Sidebar';
 import useAuth from '@/hooks/use-auth';
 import { useEntitiesStore } from '@/store/use-entities-store';
+import { useCategoriesStore } from '@/store/use-categories-store';
 import { useEffect } from 'react';
 
 export default function AppLayout() {
     const { token } = useAuth();
     const { loadEntities } = useEntitiesStore();
+    const { loadCategories } = useCategoriesStore();
 
     useEffect(() => {
-        if (token) loadEntities(token);
-    }, [loadEntities, token]);
+        if (token) {
+            loadEntities(token);
+            loadCategories(token);
+        }
+    }, [loadEntities, loadCategories, token]);
 
     return (
         <div className="font-display bg-background-light dark:bg-background-dark">

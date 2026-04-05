@@ -10,6 +10,7 @@ import useAuth from '@/hooks/use-auth';
 import { useState } from 'react';
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
 import { Currency } from '@/utils/enums';
+import CategoryBadges from '@/components/CategoryBadges';
 import { formatMoney } from '@/utils/FormatMoney';
 
 export default function ActiveExpenses({
@@ -132,6 +133,7 @@ export default function ActiveExpenses({
                                                     tipo={it.type}
                                                     fijo={it.fixed_expense}
                                                 />
+                                                <CategoryBadges categories={it.categories} />
                                             </div>
 
                                             {/* RIGHT */}

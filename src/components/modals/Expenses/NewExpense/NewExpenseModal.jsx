@@ -1,15 +1,17 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import useAuth from '@/hooks/use-auth';
-import { createEntity } from '@/services/api';
+import { createEntity, createCategory } from '@/services/api';
 
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
 import { useEntitiesStore } from '@/store/use-entities-store';
+import { useCategoriesStore } from '@/store/use-categories-store';
 import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
+import CategorySelector from '../components/CategorySelector';
 
 export default function NewExpenseModal({
     onClose,
@@ -35,6 +37,21 @@ export default function NewExpenseModal({
     const [paidInstallments, setPaidInstallments] = useState('0');
     const { entities, loading, addEntity } = useEntitiesStore();
     const [loadingNewEntity, setLoadingNewEntity] = useState(false);
+
+    const { categories, loading: loadingCategories, addCategory } = useCategoriesStore();
+    const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
+
+    const handleToggleCategory = (id) => {
+        setSelectedCategoryIds((prev) =>
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+        );
+    };
+
+    const handleCreateCategory = async (name) => {
+        const created = await createCategory({ name }, token);
+        addCategory(created);
+        setSelectedCategoryIds((prev) => [...prev, created.id]);
+    };
 
     useEffect(() => {
         if (!loading && entities.length === 0) {
@@ -95,6 +112,7 @@ export default function NewExpenseModal({
             image: null,
             type: type === 'Me deben' ? 'INGRESO' : 'EGRESO',
             payed_quotas: isInstallment ? Number(paidInstallments) : 0,
+            category_ids: selectedCategoryIds,
         };
 
         onSave?.(payload);
@@ -179,6 +197,14 @@ export default function NewExpenseModal({
                         newEntityName={newEntityName}
                         setNewEntityName={setNewEntityName}
                         handleCreateEntity={handleCreateEntity}
+                    />
+
+                    <CategorySelector
+                        categories={categories}
+                        selectedIds={selectedCategoryIds}
+                        onToggle={handleToggleCategory}
+                        onCreate={handleCreateCategory}
+                        loading={loadingCategories}
                     />
 
                     <TextInput
