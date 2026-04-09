@@ -52,22 +52,25 @@ export function useDashboardData() {
                 .map((entity) => {
                     const gastos = Array.isArray(entity.gastos) ? entity.gastos : [];
 
-                    const items = gastos.map((g) => ({
-                        ...g,
-                        progress: g.fixed_expense
-                            ? 100
-                            : g.number_of_quotas > 0
-                                ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
-                                : g.payed_quotas === 0
+                    const items = gastos
+                        .map((g) => ({
+                            ...g,
+                            progress: g.fixed_expense
+                                ? 100
+                                : g.number_of_quotas > 0
+                                  ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
+                                  : g.payed_quotas === 0
                                     ? 0
                                     : 100,
-                    }));
+                        }))
+                        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
                     if (items.length === 0) return null;
 
                     return { ...entity, items };
                 })
-                .filter(Boolean);
+                .filter(Boolean)
+                .sort((a, b) => a.name.localeCompare(b.name, 'es'));
 
             setGroups(mappedGroups);
             recalcSummary(mappedGroups);

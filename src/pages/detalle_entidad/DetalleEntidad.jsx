@@ -94,15 +94,17 @@ export default function EntidadDetalle() {
                     empty={entity.gastos_activos.length === 0}
                     emptyLabel="Sin gastos activos."
                 >
-                    {entity.gastos_activos.map((g) => (
-                        <ExpenseCard
-                            key={g.id}
-                            gasto={g}
-                            loading={loadingPayIds.has(g.id)}
-                            onClick={() => navigate(`/app/gastos/${g.id}`)}
-                            onPayClick={() => openPayModal(g)}
-                        />
-                    ))}
+                    {[...entity.gastos_activos]
+                        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                        .map((g) => (
+                            <ExpenseCard
+                                key={g.id}
+                                gasto={g}
+                                loading={loadingPayIds.has(g.id)}
+                                onClick={() => navigate(`/app/gastos/${g.id}`)}
+                                onPayClick={() => openPayModal(g)}
+                            />
+                        ))}
                 </ListContainer>
             )}
 
@@ -111,14 +113,16 @@ export default function EntidadDetalle() {
                     empty={entity.gastos_inactivos.length === 0}
                     emptyLabel="Sin gastos finalizados."
                 >
-                    {entity.gastos_inactivos.map((g) => (
-                        <GastoItem
-                            key={g.id}
-                            gasto={g}
-                            variant="finalizado"
-                            onClick={() => navigate(`/app/gastos/${g.id}`)}
-                        />
-                    ))}
+                    {[...entity.gastos_inactivos]
+                        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at))
+                        .map((g) => (
+                            <GastoItem
+                                key={g.id}
+                                gasto={g}
+                                variant="finalizado"
+                                onClick={() => navigate(`/app/gastos/${g.id}`)}
+                            />
+                        ))}
                 </ListContainer>
             )}
 
