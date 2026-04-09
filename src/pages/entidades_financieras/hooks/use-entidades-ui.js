@@ -11,9 +11,11 @@ export function useEntidadesUI() {
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
-        if (!q) return entities;
+        const result = q
+            ? entities.filter((e) => (e.name || '').toLowerCase().includes(q))
+            : [...entities];
 
-        return entities.filter((e) => (e.name || '').toLowerCase().includes(q));
+        return result.sort((a, b) => (b.activeExpenses ?? 0) - (a.activeExpenses ?? 0));
     }, [query, entities]);
 
     // const showEmpty = entities.length === 0 && filtered.length === 0;
