@@ -9,3 +9,12 @@ export function formatDate(dateString) {
         second: '2-digit',
     });
 }
+
+export function formatDateShort(dateString) {
+    if (!dateString) return null;
+    return new Date(dateString).toLocaleDateString('es-AR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+    });
+}

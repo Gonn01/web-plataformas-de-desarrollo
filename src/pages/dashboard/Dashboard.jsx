@@ -80,6 +80,8 @@ export default function Dashboard() {
                 currency={ui.currency}
                 onCurrencyChange={ui.setCurrency}
                 onQueryChange={ui.setQuery}
+                preferredCurrency={ui.preferredCurrency}
+                rates={rates}
             />
 
             {/* MODAL */}

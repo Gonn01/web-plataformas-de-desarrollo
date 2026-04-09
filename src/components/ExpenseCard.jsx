@@ -2,6 +2,7 @@ import { ChipTipoGasto } from '@/components/ChipTipoGasto';
 import ProgressBar from '@/components/ProgressBar';
 import CategoryBadges from '@/components/CategoryBadges';
 import { formatMoney } from '@/utils/FormatMoney';
+import { formatDateShort } from '@/utils/FormatDate';
 
 export default function ExpenseCard({ gasto, onClick, onPayClick, loading = false }) {
     const progress = gasto.fixed_expense
@@ -32,6 +33,18 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
                         <ChipTipoGasto tipo={gasto.type} fijo={gasto.fixed_expense} />
                     </div>
                     <CategoryBadges categories={gasto.categories ?? []} />
+                    <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
+                        {gasto.created_at && (
+                            <span className="text-xs text-slate-400 dark:text-slate-500">
+                                Creado: {formatDateShort(gasto.created_at)}
+                            </span>
+                        )}
+                        {gasto.last_payment_date && (
+                            <span className="text-xs text-slate-400 dark:text-slate-500">
+                                Último pago: {formatDateShort(gasto.last_payment_date)}
+                            </span>
+                        )}
+                    </div>
                 </div>
 
                 {/* Amounts */}

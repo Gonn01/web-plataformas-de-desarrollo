@@ -7,6 +7,8 @@ import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
 import { usePayments } from '../../../hooks/use-payments';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
+import WhatsAppCopyButton from '@/pages/dashboard/components/WhatsAppCopyButton';
+import GroupBalance from '@/pages/dashboard/components/GroupBalance';
 
 import { useState } from 'react';
 import { Currency } from '@/utils/enums';
@@ -18,6 +20,8 @@ export default function ActiveExpenses({
     currency,
     onCurrencyChange,
     onQueryChange,
+    preferredCurrency,
+    rates,
 }) {
     const navigate = useNavigate();
     const filtered = useActiveExpensesFilter(groups, currency, query);
@@ -58,8 +62,8 @@ export default function ActiveExpenses({
                         <button
                             type="button"
                             className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === null
-                                    ? 'bg-primary text-black border-primary'
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
+                                ? 'bg-primary text-black border-primary'
+                                : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
                                 }`}
                             onClick={() => onCurrencyChange?.(null)}
                         >
@@ -70,8 +74,8 @@ export default function ActiveExpenses({
                                 key={cur}
                                 type="button"
                                 className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === cur
-                                        ? 'bg-primary text-black border-primary'
-                                        : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
+                                    ? 'bg-primary text-black border-primary'
+                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
                                     }`}
                                 onClick={() => onCurrencyChange?.(cur)}
                             >
@@ -103,20 +107,35 @@ export default function ActiveExpenses({
                     <div key={group.id} className="flex flex-col gap-3">
                         {/* Group Header */}
                         <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
-                            <h4
-                                className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
-                                onClick={() => navigate(`/app/entidades/${group.id}`)}
-                            >
-                                {group.name}
-                            </h4>
+                            <div className="flex flex-col gap-0.5">
+                                <h4
+                                    className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
+                                    onClick={() => navigate(`/app/entidades/${group.id}`)}
+                                >
+                                    {group.name}
+                                </h4>
+                                <GroupBalance
+                                    items={group.items}
+                                    preferredCurrency={preferredCurrency}
+                                    rates={rates}
+                                />
+                            </div>
 
-                            <button
-                                className="shrink-0 text-xs cursor-pointer font-bold leading-normal tracking-wide text-primary hover:text-primary/80 transition-colors"
-                                onClick={() => modal.openGroup(group)}
-                                type="button"
-                            >
-                                Pagar/Registrar cobros
-                            </button>
+                            <div className="flex items-center gap-2 shrink-0">
+                                <WhatsAppCopyButton
+                                    group={groups.find((g) => g.id === group.id) ?? group}
+                                    selectedCurrency={currency}
+                                    preferredCurrency={preferredCurrency}
+                                    rates={rates}
+                                />
+                                <button
+                                    className="text-xs cursor-pointer font-bold leading-normal tracking-wide text-primary hover:text-primary/80 transition-colors"
+                                    onClick={() => modal.openGroup(group)}
+                                    type="button"
+                                >
+                                    Pagar/Registrar cobros
+                                </button>
+                            </div>
                         </div>
 
                         {/* Items */}
