@@ -11,20 +11,23 @@ export function useDashboardData() {
 
     const recalcSummary = useCallback((groupsToUse) => {
         const totals = {
-            ARS: { debo: 0, meDeben: 0 },
-            USD: { debo: 0, meDeben: 0 },
-            EUR: { debo: 0, meDeben: 0 },
+            ARS: { debo: 0, meDeben: 0, cuotaDebo: 0, cuotaMeDeben: 0 },
+            USD: { debo: 0, meDeben: 0, cuotaDebo: 0, cuotaMeDeben: 0 },
+            EUR: { debo: 0, meDeben: 0, cuotaDebo: 0, cuotaMeDeben: 0 },
         };
 
         groupsToUse.forEach((group) => {
             group.items.forEach((g) => {
                 const curr = g.currency_type;
                 const restante = g.amount - g.payed_quotas * g.amount_per_quota;
+                const cuota = Number(g.amount_per_quota || 0);
 
                 if (g.type === 'INGRESO') {
                     totals[curr].meDeben += restante;
+                    totals[curr].cuotaMeDeben += cuota;
                 } else {
                     totals[curr].debo += restante;
+                    totals[curr].cuotaDebo += cuota;
                 }
             });
         });
@@ -34,6 +37,9 @@ export function useDashboardData() {
                 total_debo: totals[cur].debo,
                 total_me_deben: totals[cur].meDeben,
                 total_balance: totals[cur].meDeben - totals[cur].debo,
+                cuota_debo: totals[cur].cuotaDebo,
+                cuota_me_deben: totals[cur].cuotaMeDeben,
+                cuota_balance: totals[cur].cuotaMeDeben - totals[cur].cuotaDebo,
             };
             return acc;
         }, {});
