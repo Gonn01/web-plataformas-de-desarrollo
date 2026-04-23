@@ -78,6 +78,22 @@ export const deleteFinancialEntity = async (id, token) => {
     return true;
 };
 
+export const vincularUsuarioEntidad = async (entityId, email, token) => {
+    const { data } = await api.put(
+        `/entidades-financieras/${entityId}/vincular-usuario`,
+        { email },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+export const desvincularUsuarioEntidad = async (entityId, token) => {
+    const { data } = await api.delete(`/entidades-financieras/${entityId}/vincular-usuario`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
 /* ===============================
    GASTOS
 =============================== */
@@ -150,6 +166,42 @@ export const pagarCuotasLote = async (ids, token) => {
     const { data } = await api.post(
         `/gastos/pagar-lote`,
         { purchase_ids: ids },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+/* ===============================
+   COMPARTIDOS
+=============================== */
+
+export const fetchCompartidos = async (token) => {
+    const { data } = await api.get('/compartidos', {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
+export const aprobarCompartido = async (gastoId, payload, token) => {
+    const { data } = await api.post(`/compartidos/${gastoId}/aprobar`, payload, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
+export const rechazarCompartido = async (gastoId, token) => {
+    const { data } = await api.post(
+        `/compartidos/${gastoId}/rechazar`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+export const reintentarCompartido = async (gastoId, token) => {
+    const { data } = await api.post(
+        `/compartidos/${gastoId}/reintentar`,
+        {},
         { headers: { Authorization: `Bearer ${token}` } },
     );
     return data.data;

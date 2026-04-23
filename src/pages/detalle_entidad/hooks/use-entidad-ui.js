@@ -8,14 +8,24 @@ export function useEntidadUI() {
     const navigate = useNavigate();
     const { token } = useAuth();
 
-    const { entity, stats, loading, crearGastoEntidad, actualizarEntidad, eliminarEntidad, setEntity } =
-        useEntidadData();
+    const {
+        entity,
+        stats,
+        loading,
+        crearGastoEntidad,
+        actualizarEntidad,
+        eliminarEntidad,
+        vincularUsuario,
+        desvincularUsuario,
+        setEntity,
+    } = useEntidadData();
 
     const [tab, setTab] = useState('activos');
     const [openNewExpense, setOpenNewExpense] = useState(false);
     const [openEditEntity, setOpenEditEntity] = useState(false);
     const [loadingCreatingExpense, setLoadingCreatingExpense] = useState(false);
     const [loadingUpdatingEntity, setLoadingUpdatingEntity] = useState(false);
+    const [loadingVincular, setLoadingVincular] = useState(false);
 
     // Payment modal
     const [payModalOpen, setPayModalOpen] = useState(false);
@@ -36,7 +46,6 @@ export function useEntidadUI() {
 
         await handleConfirm([payModalItem]);
 
-        // Refresh the paid quota count optimistically
         setEntity((prev) => {
             if (!prev) return prev;
             const update = (list) =>
@@ -75,6 +84,24 @@ export function useEntidadUI() {
         navigate('/app/entidades');
     }
 
+    async function onVincular(email) {
+        setLoadingVincular(true);
+        try {
+            await vincularUsuario(email);
+        } finally {
+            setLoadingVincular(false);
+        }
+    }
+
+    async function onDesvincular() {
+        setLoadingVincular(true);
+        try {
+            await desvincularUsuario();
+        } finally {
+            setLoadingVincular(false);
+        }
+    }
+
     return {
         entity,
         stats,
@@ -93,6 +120,10 @@ export function useEntidadUI() {
 
         onUpdateEntity,
         loadingUpdatingEntity,
+
+        onVincular,
+        onDesvincular,
+        loadingVincular,
 
         onDeleteEntity,
 

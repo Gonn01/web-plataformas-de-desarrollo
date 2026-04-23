@@ -4,6 +4,8 @@ import {
     createGasto,
     updateFinancialEntity,
     deleteFinancialEntity,
+    vincularUsuarioEntidad,
+    desvincularUsuarioEntidad,
 } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 import { useParams } from 'react-router-dom';
@@ -113,6 +115,29 @@ export function useEntidadData() {
         await deleteFinancialEntity(id, token);
     }, [id, token]);
 
+    const vincularUsuario = useCallback(
+        async (email) => {
+            const updated = await vincularUsuarioEntidad(id, email, token);
+            setEntity((prev) => ({
+                ...prev,
+                linked_user_id: updated.linked_user_id,
+                linked_user_name: updated.linked_user_name,
+                linked_user_email: updated.linked_user_email,
+            }));
+        },
+        [id, token],
+    );
+
+    const desvincularUsuario = useCallback(async () => {
+        await desvincularUsuarioEntidad(id, token);
+        setEntity((prev) => ({
+            ...prev,
+            linked_user_id: null,
+            linked_user_name: null,
+            linked_user_email: null,
+        }));
+    }, [id, token]);
+
     return {
         entity,
         stats,
@@ -120,6 +145,8 @@ export function useEntidadData() {
         crearGastoEntidad,
         actualizarEntidad,
         eliminarEntidad,
+        vincularUsuario,
+        desvincularUsuario,
         setEntity,
     };
 }

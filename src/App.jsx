@@ -8,6 +8,7 @@ import DetalleGasto from './pages/detalle_gasto/DetalleGasto';
 import Configuracion from './pages/Configuracion';
 import Register from './pages/auth/Register/Register';
 import Dashboard from './pages/dashboard/Dashboard';
+import Compartidos from './pages/compartidos/Compartidos';
 
 export default function App() {
     return (
@@ -30,6 +31,7 @@ export default function App() {
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
                 <Route path="gastos/:id" element={<DetalleGasto />} />
+                <Route path="compartidos" element={<Compartidos />} />
                 <Route path="configuracion" element={<Configuracion />} />
             </Route>
         </Routes>

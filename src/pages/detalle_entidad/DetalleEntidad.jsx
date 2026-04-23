@@ -29,7 +29,9 @@ export default function EntidadDetalle() {
         onCreateExpense,
         loadingCreatingExpense,
         onUpdateEntity,
-        // loadingUpdatingEntity,
+        onVincular,
+        onDesvincular,
+        loadingVincular,
         navigate,
         onDeleteEntity,
         payModalOpen,
@@ -155,6 +157,9 @@ export default function EntidadDetalle() {
                     onClose={() => setOpenEditEntity(false)}
                     onSave={onUpdateEntity}
                     saving={loadingCreatingExpense}
+                    onVincular={onVincular}
+                    onDesvincular={onDesvincular}
+                    loadingVincular={loadingVincular}
                 />
             )}
 
