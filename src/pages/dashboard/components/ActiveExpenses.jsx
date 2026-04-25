@@ -24,7 +24,9 @@ export default function ActiveExpenses({
     rates,
 }) {
     const navigate = useNavigate();
-    const filtered = useActiveExpensesFilter(groups, currency, query);
+    const [typeFilter, setTypeFilter] = useState(null);
+    const [fixedFilter, setFixedFilter] = useState(null);
+    const filtered = useActiveExpensesFilter(groups, currency, query, typeFilter, fixedFilter);
     const modal = useActiveExpensesModal();
 
     const countByCurrency = Object.values(Currency).reduce((acc, cur) => {
@@ -51,42 +53,11 @@ export default function ActiveExpenses({
     return (
         <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 min-h-0 flex-1">
             {/* HEADER */}
-            <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div className="flex flex-col gap-2">
-                    <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
-                        Gastos Activos
-                    </h3>
-
-                    {/* Currency Toggle */}
-                    <div className="flex flex-wrap gap-2">
-                        <button
-                            type="button"
-                            className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === null
-                                ? 'bg-primary text-black border-primary'
-                                : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
-                                }`}
-                            onClick={() => onCurrencyChange?.(null)}
-                        >
-                            Todos ({totalCount})
-                        </button>
-                        {Object.values(Currency).map((cur) => (
-                            <button
-                                key={cur}
-                                type="button"
-                                className={`px-4 py-2 rounded-lg text-xs font-bold border transition-colors ${currency === cur
-                                    ? 'bg-primary text-black border-primary'
-                                    : 'bg-slate-200 dark:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-300 dark:border-slate-600'
-                                    }`}
-                                onClick={() => onCurrencyChange?.(cur)}
-                            >
-                                {cur} ({countByCurrency[cur]})
-                            </button>
-                        ))}
-                    </div>
-                </div>
-
-                {/* Search */}
-                <div className="relative w-full sm:max-w-xs">
+            <div className="flex items-center justify-between gap-4">
+                <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] shrink-0">
+                    Gastos Activos
+                </h3>
+                <div className="relative w-full max-w-xs">
                     <Icon
                         name="search"
                         className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"
@@ -99,6 +70,60 @@ export default function ActiveExpenses({
                         onChange={(e) => onQueryChange?.(e.target.value)}
                     />
                 </div>
+            </div>
+
+            {/* FILTERS */}
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-2 border-y border-black/10 dark:border-white/10">
+                <FilterGroup label="Moneda">
+                    <ToggleButton active={currency === null} onClick={() => onCurrencyChange?.(null)}>
+                        Todos ({totalCount})
+                    </ToggleButton>
+                    {Object.values(Currency).map((cur) => (
+                        <ToggleButton
+                            key={cur}
+                            active={currency === cur}
+                            onClick={() => onCurrencyChange?.(cur)}
+                        >
+                            {cur} ({countByCurrency[cur]})
+                        </ToggleButton>
+                    ))}
+                </FilterGroup>
+
+                <div className="w-px h-5 bg-black/10 dark:bg-white/10 shrink-0" />
+
+                <FilterGroup label="Tipo">
+                    {[
+                        { value: null, label: 'Todos' },
+                        { value: 'EGRESO', label: 'Egreso' },
+                        { value: 'INGRESO', label: 'Ingreso' },
+                    ].map(({ value, label }) => (
+                        <ToggleButton
+                            key={label}
+                            active={typeFilter === value}
+                            onClick={() => setTypeFilter(value)}
+                        >
+                            {label}
+                        </ToggleButton>
+                    ))}
+                </FilterGroup>
+
+                <div className="w-px h-5 bg-black/10 dark:bg-white/10 shrink-0" />
+
+                <FilterGroup label="Frecuencia">
+                    {[
+                        { value: null, label: 'Todos' },
+                        { value: true, label: 'Fijos' },
+                        { value: false, label: 'Variables' },
+                    ].map(({ value, label }) => (
+                        <ToggleButton
+                            key={label}
+                            active={fixedFilter === value}
+                            onClick={() => setFixedFilter(value)}
+                        >
+                            {label}
+                        </ToggleButton>
+                    ))}
+                </FilterGroup>
             </div>
 
             {/* LIST */}
@@ -179,5 +204,34 @@ export default function ActiveExpenses({
                 }}
             />
         </div>
+    );
+}
+
+function FilterGroup({ label, children }) {
+    return (
+        <div className="flex items-center gap-2">
+            <span className="text-xs font-medium text-slate-400 dark:text-slate-500 shrink-0">
+                {label}
+            </span>
+            <div className="flex gap-1 p-0.5 rounded-lg bg-slate-100 dark:bg-white/5">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+function ToggleButton({ active, onClick, children }) {
+    return (
+        <button
+            type="button"
+            onClick={onClick}
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
+                active
+                    ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+            }`}
+        >
+            {children}
+        </button>
     );
 }

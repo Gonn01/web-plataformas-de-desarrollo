@@ -79,18 +79,6 @@ export default function StatCards({
     return (
         <div className="flex flex-col gap-3">
             <div className={rowClass}>
-                {totalCards.map((c) => (
-                    <StatCard
-                        key={c.label}
-                        label={c.label}
-                        value={c.value}
-                        tone={c.tone}
-                        vertical={vertical}
-                    />
-                ))}
-            </div>
-            <hr className="border-black/10 dark:border-white/10" />
-            <div className={rowClass}>
                 {cuotaCards.map((c) => (
                     <StatCard
                         key={c.label}
@@ -98,6 +86,18 @@ export default function StatCards({
                         value={c.value}
                         tone={c.tone}
                         sub
+                        vertical={vertical}
+                    />
+                ))}
+            </div>
+            <hr className="border-black/10 dark:border-white/10" />
+            <div className={rowClass}>
+                {totalCards.map((c) => (
+                    <StatCard
+                        key={c.label}
+                        label={c.label}
+                        value={c.value}
+                        tone={c.tone}
                         vertical={vertical}
                     />
                 ))}
