@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Icon from '@/components/Icon';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import useAuth from '@/hooks/use-auth';
@@ -7,18 +7,21 @@ export default function AprobarModal({ open, gasto, onClose, onConfirm, loading 
     const { token } = useAuth();
     const { entities, loadEntities } = useEntitiesStore();
 
-    const [mode, setMode] = useState('existing'); // 'existing' | 'new'
+    const [mode, setMode] = useState('existing');
     const [selectedEntityId, setSelectedEntityId] = useState('');
     const [newEntityName, setNewEntityName] = useState('');
 
-    const hasEntities = entities.length > 0;
-
-    // Carga entidades si no están
-    const handleOpen = () => {
+    useEffect(() => {
+        if (!open) return;
         if (entities.length === 0) loadEntities(token);
-    };
+        setNewEntityName('');
+        setSelectedEntityId(gasto?.suggested_entity_id?.toString() || '');
+        setMode('existing');
+    }, [open]);
 
     if (!open) return null;
+
+    const hasEntities = entities.length > 0;
 
     const canConfirm =
         !loading && (mode === 'existing' ? !!selectedEntityId : newEntityName.trim().length > 0);
@@ -32,10 +35,7 @@ export default function AprobarModal({ open, gasto, onClose, onConfirm, loading 
     };
 
     return (
-        <div
-            className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-            onClick={handleOpen}
-        >
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div
                 className="bg-white dark:bg-zinc-900 rounded-xl shadow-xl w-full max-w-md p-6"
                 onClick={(e) => e.stopPropagation()}

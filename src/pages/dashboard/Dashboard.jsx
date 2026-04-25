@@ -14,7 +14,9 @@ import { useMemo, useState } from 'react';
 export default function Dashboard() {
     const ui = useDashboardUI();
     const data = useDashboardData();
-    const { saveExpense } = useNewExpense(data.loadDashboard, () => ui.setOpenNewExpense(false));
+    const { saveExpense, saving } = useNewExpense(data.loadDashboard, () =>
+        ui.setOpenNewExpense(false),
+    );
     const { rates } = useExchangeRates();
 
     const summary = data.getSummaryForCurrency(ui.currency);
@@ -86,7 +88,11 @@ export default function Dashboard() {
 
             {/* MODAL */}
             {ui.openNewExpense && (
-                <NewExpenseModal onClose={() => ui.setOpenNewExpense(false)} onSave={saveExpense} />
+                <NewExpenseModal
+                    onClose={() => ui.setOpenNewExpense(false)}
+                    onSave={saveExpense}
+                    saving={saving}
+                />
             )}
         </div>
     );
