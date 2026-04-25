@@ -1,29 +1,49 @@
-import { useState } from 'react';
 import { useCompartidos } from './hooks/use-compartidos';
 import RecibidoCard from './components/RecibidoCard';
 import EmitidoCard from './components/EmitidoCard';
 import AprobarModal from './components/AprobarModal';
 import Loader from '@/components/Loader';
 import Icon from '@/components/Icon';
+import { useState } from 'react';
 
 export default function Compartidos() {
     const { compartidos, loading, loadingAction, aprobar, rechazar, reintentar } = useCompartidos();
-
-    const [tab, setTab] = useState('recibidos');
+    const [section, setSection] = useState('pendientes');
     const [aprobarTarget, setAprobarTarget] = useState(null);
 
-    const pendingCount = compartidos.recibidos.filter((r) => r.status === 'PENDING_APPROVAL').length;
+    const pendingItems = compartidos.recibidos.filter((r) => r.status === 'PENDING_APPROVAL');
+    const resolvedItems = compartidos.recibidos.filter((r) => r.status !== 'PENDING_APPROVAL');
 
     const handleAprobar = async (entityId, newEntityName) => {
         await aprobar(aprobarTarget.id, entityId, newEntityName);
         setAprobarTarget(null);
     };
 
-    const tabBase =
-        'flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors';
-    const tabActive = 'bg-primary/20 text-primary';
-    const tabIdle =
-        'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800';
+    const tabs = [
+        {
+            key: 'pendientes',
+            label: 'Pendientes',
+            icon: 'pending_actions',
+            count: pendingItems.length,
+            badgeClass: pendingItems.length > 0 ? 'bg-amber-500 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
+        },
+        {
+            key: 'recibidos',
+            label: 'Recibidos',
+            icon: 'inbox',
+            count: resolvedItems.length,
+            badgeClass: 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
+        },
+        {
+            key: 'enviados',
+            label: 'Enviados',
+            icon: 'send',
+            count: compartidos.emitidos.length,
+            badgeClass: 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
+        },
+    ];
+
+    if (loading) return <Loader />;
 
     return (
         <>
@@ -34,79 +54,67 @@ export default function Compartidos() {
                 </p>
             </div>
 
-            {/* TABS */}
-            <div className="flex gap-2 mb-6">
-                <button
-                    onClick={() => setTab('recibidos')}
-                    className={`${tabBase} ${tab === 'recibidos' ? tabActive : tabIdle}`}
-                >
-                    <Icon name="inbox" className="text-base" />
-                    Recibidos
-                    {pendingCount > 0 && (
-                        <span className="bg-primary text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
-                            {pendingCount}
+            {/* TOGGLE BUTTONS */}
+            <div className="inline-flex rounded-xl border border-zinc-200 dark:border-zinc-800 p-1 gap-1 mb-6">
+                {tabs.map((t) => (
+                    <button
+                        key={t.key}
+                        onClick={() => setSection(t.key)}
+                        className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-colors cursor-pointer ${
+                            section === t.key
+                                ? 'bg-primary/20 text-primary'
+                                : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800'
+                        }`}
+                    >
+                        <Icon name={t.icon} className="text-base" />
+                        {t.label}
+                        <span className={`text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1 ${t.badgeClass}`}>
+                            {t.count}
                         </span>
-                    )}
-                </button>
-                <button
-                    onClick={() => setTab('emitidos')}
-                    className={`${tabBase} ${tab === 'emitidos' ? tabActive : tabIdle}`}
-                >
-                    <Icon name="send" className="text-base" />
-                    Emitidos
-                    {compartidos.emitidos.length > 0 && (
-                        <span className="bg-zinc-300 dark:bg-zinc-700 text-zinc-700 dark:text-zinc-300 text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
-                            {compartidos.emitidos.length}
-                        </span>
-                    )}
-                </button>
+                    </button>
+                ))}
             </div>
 
-            {loading ? (
-                <Loader />
-            ) : (
-                <>
-                    {tab === 'recibidos' && (
-                        <div className="flex flex-col gap-3">
-                            {compartidos.recibidos.length === 0 ? (
-                                <EmptyState
-                                    icon="inbox"
-                                    message="No tenés gastos recibidos"
-                                />
-                            ) : (
-                                compartidos.recibidos.map((item) => (
-                                    <RecibidoCard
-                                        key={item.id}
-                                        item={item}
-                                        loadingId={loadingAction}
-                                        onAprobar={(g) => setAprobarTarget(g)}
-                                        onRechazar={(id) => rechazar(id)}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    )}
+            {/* CONTENIDO */}
+            {section === 'pendientes' && (
+                <Section emptyIcon="pending_actions" emptyMessage="No tenés solicitudes pendientes">
+                    {pendingItems.map((item) => (
+                        <RecibidoCard
+                            key={item.id}
+                            item={item}
+                            loadingId={loadingAction}
+                            onAprobar={(g) => setAprobarTarget(g)}
+                            onRechazar={(id) => rechazar(id)}
+                        />
+                    ))}
+                </Section>
+            )}
 
-                    {tab === 'emitidos' && (
-                        <div className="flex flex-col gap-3">
-                            {compartidos.emitidos.length === 0 ? (
-                                <EmptyState
-                                    icon="send"
-                                    message="No enviaste gastos compartidos"
-                                />
-                            ) : (
-                                compartidos.emitidos.map((item) => (
-                                    <EmitidoCard
-                                        key={item.id}
-                                        item={item}
-                                        loadingId={loadingAction}
-                                        onReintentar={(id) => reintentar(id)}
-                                    />
-                                ))
-                            )}
-                        </div>
-                    )}
-                </>
+            {section === 'recibidos' && (
+                <Section emptyIcon="inbox" emptyMessage="No tenés gastos recibidos">
+                    {resolvedItems.map((item) => (
+                        <RecibidoCard
+                            key={item.id}
+                            item={item}
+                            loadingId={loadingAction}
+                            onAprobar={(g) => setAprobarTarget(g)}
+                            onRechazar={(id) => rechazar(id)}
+                        />
+                    ))}
+                </Section>
+            )}
+
+            {section === 'enviados' && (
+                <Section emptyIcon="send" emptyMessage="No enviaste gastos compartidos">
+                    {compartidos.emitidos.map((item) => (
+                        <EmitidoCard
+                            key={item.id}
+                            item={item}
+                            loadingId={loadingAction}
+                            onReintentar={(id) => reintentar(id)}
+                        />
+                    ))}
+                </Section>
             )}
 
             {aprobarTarget && (
@@ -122,11 +130,17 @@ export default function Compartidos() {
     );
 }
 
-function EmptyState({ icon, message }) {
-    return (
-        <div className="flex flex-col items-center justify-center py-16 text-zinc-400 dark:text-zinc-600">
-            <Icon name={icon} className="text-5xl mb-3" />
-            <p className="text-sm">{message}</p>
-        </div>
-    );
+function Section({ emptyIcon, emptyMessage, children }) {
+    const items = Array.isArray(children) ? children.filter(Boolean) : children ? [children] : [];
+
+    if (items.length === 0) {
+        return (
+            <div className="flex items-center gap-2 py-6 text-zinc-400 dark:text-zinc-600 text-sm">
+                <Icon name={emptyIcon} className="text-base" />
+                {emptyMessage}
+            </div>
+        );
+    }
+
+    return <div className="flex flex-col gap-3">{children}</div>;
 }

@@ -10,7 +10,8 @@
       "Read(//c/Users/gonza/OneDrive/Escritorio/Repos/api-plataformas-de-desarrollo/utils//**)",
       "WebFetch(domain:dolarapi.com)",
       "Bash(npm install:*)",
-      "Bash(node -e ':*)"
+      "Bash(node -e ':*)",
+      "Bash(xargs cat *)"
     ]
   }
 }

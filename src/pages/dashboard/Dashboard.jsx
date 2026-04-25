@@ -1,3 +1,5 @@
+import { createPortal } from 'react-dom';
+import { useMemo, useState } from 'react';
 import Icon from '../../components/Icon';
 import StatCards from './components/StatCards';
 import ActiveExpenses from './components/ActiveExpenses';
@@ -9,7 +11,6 @@ import { useDashboardData } from './hooks/use-dashboard-data';
 import { useNewExpense } from './hooks/use-new-expense';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import Loader from '@/components/Loader';
-import { useMemo, useState } from 'react';
 
 export default function Dashboard() {
     const ui = useDashboardUI();
@@ -47,46 +48,44 @@ export default function Dashboard() {
                 </button>
             </div>
 
-            {/* BALANCE */}
-            <StatCards
-                summary={summary}
-                currency={ui.currency}
-                summaryByCurrency={data.summaryByCurrency}
-                preferredCurrency={ui.preferredCurrency}
-                rates={rates}
-            />
+            {/* MAIN LAYOUT */}
+            <div className="flex flex-row flex-1 gap-6 min-h-0 overflow-hidden">
+                {/* LEFT: StatCards + botón gráficos */}
+                <div className="flex flex-col gap-4 w-52 shrink-0 overflow-y-auto">
+                    <StatCards
+                        summary={summary}
+                        currency={ui.currency}
+                        summaryByCurrency={data.summaryByCurrency}
+                        preferredCurrency={ui.preferredCurrency}
+                        rates={rates}
+                        vertical
+                    />
+                    <button
+                        onClick={() => setShowCharts(true)}
+                        className="cursor-pointer flex items-center justify-center gap-2 h-10 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-colors"
+                    >
+                        <Icon name="bar_chart" />
+                        Ver gráficos
+                    </button>
+                </div>
 
-            {/* GRÁFICOS */}
-            <div className="mt-6">
-                <button
-                    onClick={() => setShowCharts((v) => !v)}
-                    className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors cursor-pointer mb-3"
-                >
-                    <Icon name={showCharts ? 'expand_less' : 'expand_more'} />
-                    {showCharts ? 'Ocultar gráficos' : 'Mostrar gráficos'}
-                </button>
-                {showCharts && (
-                    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
-                        <CuotasChart gastos={allItems} />
-                        <MontoChart gastos={allItems} />
-                    </div>
-                )}
+                {/* RIGHT: Active Expenses */}
+                <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
+                    <ActiveExpenses
+                        query={ui.query}
+                        groups={data.groups}
+                        setGroups={data.setGroups}
+                        updateAfterPayment={data.updateAfterPayment}
+                        currency={ui.currency}
+                        onCurrencyChange={ui.setCurrency}
+                        onQueryChange={ui.setQuery}
+                        preferredCurrency={ui.preferredCurrency}
+                        rates={rates}
+                    />
+                </div>
             </div>
 
-            {/* LISTA DE GASTOS ACTIVOS */}
-            <ActiveExpenses
-                query={ui.query}
-                groups={data.groups}
-                setGroups={data.setGroups}
-                updateAfterPayment={data.updateAfterPayment}
-                currency={ui.currency}
-                onCurrencyChange={ui.setCurrency}
-                onQueryChange={ui.setQuery}
-                preferredCurrency={ui.preferredCurrency}
-                rates={rates}
-            />
-
-            {/* MODAL */}
+            {/* MODAL: Nuevo gasto */}
             {ui.openNewExpense && (
                 <NewExpenseModal
                     onClose={() => ui.setOpenNewExpense(false)}
@@ -94,6 +93,39 @@ export default function Dashboard() {
                     saving={saving}
                 />
             )}
+
+            {/* MODAL: Gráficos */}
+            {showCharts && <ChartsModal gastos={allItems} onClose={() => setShowCharts(false)} />}
         </div>
+    );
+}
+
+function ChartsModal({ gastos, onClose }) {
+    return createPortal(
+        <div
+            className="fixed inset-0 z-50 flex items-center justify-center"
+            onMouseDown={(e) => e.target === e.currentTarget && onClose()}
+        >
+            <div className="fixed inset-0 bg-black/60" />
+            <div className="relative z-10 w-[92vw] max-w-4xl max-h-[85vh] overflow-y-auto rounded-2xl shadow-xl bg-[#111714] border border-[#29382f]">
+                <header className="sticky top-0 flex items-center justify-between border-b border-[#29382f] px-6 py-4 bg-[#111714]">
+                    <div className="flex items-center gap-3 text-white">
+                        <Icon name="bar_chart" className="text-primary" />
+                        <h2 className="text-white text-lg font-bold">Gráficos</h2>
+                    </div>
+                    <button
+                        onClick={onClose}
+                        className="cursor-pointer text-slate-400 hover:text-white transition-colors"
+                    >
+                        <Icon name="close" />
+                    </button>
+                </header>
+                <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-4">
+                    <CuotasChart gastos={gastos} />
+                    <MontoChart gastos={gastos} />
+                </div>
+            </div>
+        </div>,
+        document.body,
     );
 }

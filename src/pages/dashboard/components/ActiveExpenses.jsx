@@ -49,7 +49,7 @@ export default function ActiveExpenses({
     const clearLoading = () => setLoadingIds(new Set());
 
     return (
-        <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 mt-6 min-h-0 flex-1">
+        <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 min-h-0 flex-1">
             {/* HEADER */}
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
                 <div className="flex flex-col gap-2">

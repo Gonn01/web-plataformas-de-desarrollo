@@ -2,13 +2,21 @@ import { formatMoney } from '../../../utils/FormatMoney';
 import { convertCurrency } from '@/utils/convert-currency';
 import { Currency } from '@/utils/enums';
 
-export default function StatCards({ summary, currency, summaryByCurrency, preferredCurrency, rates }) {
+export default function StatCards({
+    summary,
+    currency,
+    summaryByCurrency,
+    preferredCurrency,
+    rates,
+    vertical = false,
+}) {
     if (currency === null) {
         return (
             <StatCardsBreakdown
                 summaryByCurrency={summaryByCurrency}
                 preferredCurrency={preferredCurrency}
                 rates={rates}
+                vertical={vertical}
             />
         );
     }
@@ -66,26 +74,42 @@ export default function StatCards({ summary, currency, summaryByCurrency, prefer
         },
     ];
 
+    const rowClass = vertical ? 'flex flex-col gap-3' : 'flex flex-row gap-4 flex-wrap';
+
     return (
         <div className="flex flex-col gap-3">
-            <div className="flex flex-row gap-4 flex-wrap">
+            <div className={rowClass}>
                 {totalCards.map((c) => (
-                    <StatCard key={c.label} label={c.label} value={c.value} tone={c.tone} />
+                    <StatCard
+                        key={c.label}
+                        label={c.label}
+                        value={c.value}
+                        tone={c.tone}
+                        vertical={vertical}
+                    />
                 ))}
             </div>
-            <div className="flex flex-row gap-4 flex-wrap">
+            <hr className="border-black/10 dark:border-white/10" />
+            <div className={rowClass}>
                 {cuotaCards.map((c) => (
-                    <StatCard key={c.label} label={c.label} value={c.value} tone={c.tone} sub />
+                    <StatCard
+                        key={c.label}
+                        label={c.label}
+                        value={c.value}
+                        tone={c.tone}
+                        sub
+                        vertical={vertical}
+                    />
                 ))}
             </div>
         </div>
     );
 }
 
-function StatCard({ label, value, tone, sub = false }) {
+function StatCard({ label, value, tone, sub = false, vertical = false }) {
     return (
         <div
-            className={`flex min-w-[180px] flex-1 flex-col gap-2 rounded-xl p-4 border ${
+            className={`flex ${vertical ? 'w-full' : 'min-w-[180px] flex-1'} flex-col gap-2 rounded-xl p-3 border ${
                 sub
                     ? 'border-black/5 dark:border-white/5 bg-zinc-50 dark:bg-white/3'
                     : 'border-black/10 dark:border-white/10 bg-white dark:bg-white/5'
@@ -94,18 +118,28 @@ function StatCard({ label, value, tone, sub = false }) {
             <p className="text-slate-600 dark:text-slate-300 text-sm font-medium leading-normal">
                 {label}
             </p>
-            <p className={`${tone} tracking-tight ${sub ? 'text-xl' : 'text-2xl'} font-bold leading-tight`}>
+            <p
+                className={`${tone} tracking-tight ${sub ? 'text-lg' : 'text-lg'} font-bold leading-tight`}
+            >
                 {value}
             </p>
         </div>
     );
 }
 
-function BreakdownRow({ summaryByCurrency, preferredCurrency, rates, cardDefs, sub = false }) {
+function BreakdownRow({
+    summaryByCurrency,
+    preferredCurrency,
+    rates,
+    cardDefs,
+    sub = false,
+    vertical = false,
+}) {
     const currencies = Object.values(Currency);
+    const rowClass = vertical ? 'flex flex-col gap-3' : 'flex flex-row gap-4 flex-wrap';
 
     return (
-        <div className="flex flex-row gap-4 flex-wrap">
+        <div className={rowClass}>
             {cardDefs.map((card) => {
                 const total = currencies.reduce((sum, cur) => {
                     const val = summaryByCurrency[cur]?.[card.key] ?? 0;
@@ -116,7 +150,7 @@ function BreakdownRow({ summaryByCurrency, preferredCurrency, rates, cardDefs, s
                 return (
                     <div
                         key={card.label}
-                        className={`flex min-w-[180px] flex-1 flex-col gap-2 rounded-xl p-4 border ${
+                        className={`flex ${vertical ? 'w-full' : 'min-w-[180px] flex-1'} flex-col gap-2 rounded-xl p-4 border ${
                             sub
                                 ? 'border-black/5 dark:border-white/5 bg-zinc-50 dark:bg-white/3'
                                 : 'border-black/10 dark:border-white/10 bg-white dark:bg-white/5'
@@ -131,7 +165,10 @@ function BreakdownRow({ summaryByCurrency, preferredCurrency, rates, cardDefs, s
                                 const val = summaryByCurrency[cur]?.[card.key] ?? 0;
                                 const isEmpty = val === 0;
                                 return (
-                                    <div key={cur} className="flex items-center justify-between gap-2">
+                                    <div
+                                        key={cur}
+                                        className="flex items-center justify-between gap-2"
+                                    >
                                         <span
                                             className={`text-xs font-semibold w-8 ${isEmpty ? 'text-slate-600 dark:text-slate-700' : 'text-slate-400 dark:text-slate-500'}`}
                                         >
@@ -155,7 +192,9 @@ function BreakdownRow({ summaryByCurrency, preferredCurrency, rates, cardDefs, s
                                 <span className="text-xs text-slate-400 dark:text-slate-500">
                                     Total en {preferredCurrency}
                                 </span>
-                                <span className={`${card.tone(total)} text-sm font-bold tracking-tight`}>
+                                <span
+                                    className={`${card.tone(total)} text-sm font-bold tracking-tight`}
+                                >
                                     {formatMoney(total, preferredCurrency)}
                                 </span>
                             </div>
@@ -167,7 +206,7 @@ function BreakdownRow({ summaryByCurrency, preferredCurrency, rates, cardDefs, s
     );
 }
 
-function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates }) {
+function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates, vertical = false }) {
     if (!summaryByCurrency) return null;
 
     const totalDefs = [
@@ -175,7 +214,9 @@ function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates }) {
             label: 'Balance general',
             key: 'total_balance',
             tone: (v) =>
-                v >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400',
+                v >= 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-red-500 dark:text-red-400',
         },
         {
             label: 'Total EGRESO',
@@ -194,7 +235,9 @@ function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates }) {
             label: 'Balance por cuota',
             key: 'cuota_balance',
             tone: (v) =>
-                v >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500 dark:text-red-400',
+                v >= 0
+                    ? 'text-emerald-600 dark:text-emerald-400'
+                    : 'text-red-500 dark:text-red-400',
         },
         {
             label: 'Cuota EGRESO',
@@ -215,13 +258,16 @@ function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates }) {
                 preferredCurrency={preferredCurrency}
                 rates={rates}
                 cardDefs={totalDefs}
+                vertical={vertical}
             />
+            <hr className="border-black/10 dark:border-white/10" />
             <BreakdownRow
                 summaryByCurrency={summaryByCurrency}
                 preferredCurrency={preferredCurrency}
                 rates={rates}
                 cardDefs={cuotaDefs}
                 sub
+                vertical={vertical}
             />
         </div>
     );
