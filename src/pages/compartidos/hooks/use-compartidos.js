@@ -7,9 +7,10 @@ import {
 } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
 import { useCompartidosStore } from '@/store/use-compartidos-store';
+import { usePusherChannel } from '@/hooks/use-pusher-channel';
 
 export function useCompartidos() {
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const { setPendingCount } = useCompartidosStore();
 
     const [compartidos, setCompartidos] = useState({ recibidos: [], emitidos: [] });
@@ -34,6 +35,12 @@ export function useCompartidos() {
     useEffect(() => {
         load();
     }, [load]);
+
+    usePusherChannel(`compartidos-${user?.id}`, {
+        'compartido.nuevo': load,
+        'compartido.aprobado': load,
+        'compartido.rechazado': load,
+    });
 
     const aprobar = useCallback(
         async (gastoId, financialEntityId, newEntityName) => {

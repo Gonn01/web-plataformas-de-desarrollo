@@ -1,9 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useEffect } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import Icon from './Icon';
 import useAuth from '@/hooks/use-auth';
 import { useCompartidosStore } from '@/store/use-compartidos-store';
 import { fetchCompartidos } from '@/services/api';
+import { usePusherChannel } from '@/hooks/use-pusher-channel';
+import Snackbar from './Snackbar';
 
 export default function Sidebar() {
     const base = 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium leading-normal';
@@ -13,6 +15,7 @@ export default function Sidebar() {
     const { user, logout, token } = useAuth();
     const navigate = useNavigate();
     const { pendingCount, setPendingCount } = useCompartidosStore();
+    const [notification, setNotification] = useState(null);
 
     useEffect(() => {
         if (!token) return;
@@ -24,6 +27,15 @@ export default function Sidebar() {
             .catch(() => {});
     }, [token, setPendingCount]);
 
+    const handleNuevo = useCallback(() => {
+        setPendingCount((c) => c + 1);
+        setNotification('Recibiste un nuevo gasto compartido');
+    }, [setPendingCount]);
+
+    usePusherChannel(`compartidos-${user?.id}`, {
+        'compartido.nuevo': handleNuevo,
+    });
+
     const handleLogout = () => {
         logout();
         navigate('/login', { replace: true });
@@ -34,6 +46,10 @@ export default function Sidebar() {
     const email = user?.email;
 
     return (
+        <>
+        {notification && (
+            <Snackbar message={notification} onClose={() => setNotification(null)} />
+        )}
         <aside className="flex w-64 flex-col border-r border-black/10 dark:border-white/10 p-4 bg-white/50 dark:bg-background-dark">
             <div className="flex flex-col gap-4">
                 {/* Perfil del usuario */}
@@ -103,5 +119,6 @@ export default function Sidebar() {
                 </button>
             </div>
         </aside>
+        </>
     );
 }
