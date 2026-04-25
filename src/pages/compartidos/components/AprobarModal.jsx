@@ -13,11 +13,11 @@ export default function AprobarModal({ open, gasto, onClose, onConfirm, loading 
 
     useEffect(() => {
         if (!open) return;
-        if (entities.length === 0) loadEntities(token);
+        loadEntities(token);
         setNewEntityName('');
         setSelectedEntityId(gasto?.suggested_entity_id?.toString() || '');
         setMode('existing');
-    }, [open]);
+    }, [open, gasto?.suggested_entity_id, loadEntities, token]);
 
     if (!open) return null;
 

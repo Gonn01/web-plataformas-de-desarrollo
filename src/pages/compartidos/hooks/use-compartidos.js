@@ -57,12 +57,18 @@ export function useCompartidos() {
             setLoadingAction(gastoId);
             try {
                 await rechazarCompartido(gastoId, token);
-                await load();
+                setCompartidos((prev) => {
+                    const recibidos = prev.recibidos.map((r) =>
+                        r.id === gastoId ? { ...r, status: 'REJECTED' } : r,
+                    );
+                    setPendingCount(recibidos.filter((r) => r.status === 'PENDING_APPROVAL').length);
+                    return { ...prev, recibidos };
+                });
             } finally {
                 setLoadingAction(null);
             }
         },
-        [token, load],
+        [token, setPendingCount],
     );
 
     const reintentar = useCallback(
