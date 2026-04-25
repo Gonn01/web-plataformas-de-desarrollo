@@ -6,7 +6,7 @@ export default function Register() {
     return (
         <div className="min-h-dvh w-full flex justify-center items-center bg-background-dark text-white px-4 py-16 font-display">
             <div className="w-full max-w-lg bg-emerald-950/40 border border-emerald-900/40 rounded-2xl p-6 sm:p-8 shadow backdrop-blur-sm">
-                <BrandHeader title="Mis Cuentas" subtitle="Crea tu cuenta nueva." />
+                <BrandHeader title="Expense Manager" subtitle="Crea tu cuenta nueva." />
 
                 <div className="rounded-xl border border-gray-700/50 bg-black/20 p-6 sm:p-8">
                     <RegisterForm />
