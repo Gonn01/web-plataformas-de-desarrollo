@@ -1,14 +1,12 @@
 import Icon from '../../../components/Icon';
 import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal/ConfirmPaymentModal';
-import ExpenseCard from '@/components/ExpenseCard';
+import ActiveFinancialEntity from './ActiveFinancialEntity';
 
 import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
 import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
 import { usePayments } from '../../../hooks/use-payments';
 import { useNavigate } from 'react-router-dom';
 import useAuth from '@/hooks/use-auth';
-import WhatsAppCopyButton from '@/pages/dashboard/components/WhatsAppCopyButton';
-import GroupBalance from '@/pages/dashboard/components/GroupBalance';
 
 import { useState } from 'react';
 import { Currency } from '@/utils/enums';
@@ -26,7 +24,13 @@ export default function ActiveExpenses({
     const navigate = useNavigate();
     const [typeFilter, setTypeFilter] = useState(null);
     const [fixedFilter, setFixedFilter] = useState(null);
-    const filtered = useActiveExpensesFilter(groups, currency, query, typeFilter, fixedFilter);
+    const filteredEntities = useActiveExpensesFilter(
+        groups,
+        currency,
+        query,
+        typeFilter,
+        fixedFilter,
+    );
     const modal = useActiveExpensesModal();
 
     const countByCurrency = Object.values(Currency).reduce((acc, cur) => {
@@ -128,58 +132,22 @@ export default function ActiveExpenses({
 
             {/* LIST */}
             <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0">
-                {filtered.map((group) => (
-                    <div key={group.id} className="flex flex-col gap-3">
-                        {/* Group Header */}
-                        <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
-                            <div className="flex flex-col gap-0.5">
-                                <h4
-                                    className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
-                                    onClick={() => navigate(`/app/entidades/${group.id}`)}
-                                >
-                                    {group.name}
-                                </h4>
-                                <GroupBalance
-                                    items={group.items}
-                                    preferredCurrency={preferredCurrency}
-                                    rates={rates}
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                                <WhatsAppCopyButton
-                                    group={groups.find((g) => g.id === group.id) ?? group}
-                                    selectedCurrency={currency}
-                                    preferredCurrency={preferredCurrency}
-                                    rates={rates}
-                                />
-                                <button
-                                    className="text-xs cursor-pointer font-bold leading-normal tracking-wide text-primary hover:text-primary/80 transition-colors"
-                                    onClick={() => modal.openGroup(group)}
-                                    type="button"
-                                >
-                                    Pagar/Registrar cobros
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Items */}
-                        <ul className="flex flex-col gap-1">
-                            {group.items.map((it) => (
-                                <li key={it.id}>
-                                    <ExpenseCard
-                                        gasto={it}
-                                        loading={loadingIds.has(it.id)}
-                                        onClick={() => navigate(`/app/gastos/${it.id}`)}
-                                        onPayClick={() => modal.openItem(group, it)}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                {filteredEntities.map((group) => (
+                    <ActiveFinancialEntity
+                        key={group.id}
+                        group={group}
+                        groups={groups}
+                        currency={currency}
+                        preferredCurrency={preferredCurrency}
+                        rates={rates}
+                        loadingIds={loadingIds}
+                        onOpenGroup={modal.openGroup}
+                        onItemClick={(it) => navigate(`/app/gastos/${it.id}`)}
+                        onPayClick={(g, it) => modal.openItem(g, it)}
+                    />
                 ))}
 
-                {filtered.length === 0 && (
+                {filteredEntities.length === 0 && (
                     <div className="text-center text-sm text-slate-500 dark:text-slate-400 py-8">
                         No se encontraron gastos activos.
                     </div>
@@ -226,8 +194,8 @@ function ToggleButton({ active, onClick, children }) {
             type="button"
             onClick={onClick}
             className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${active
-                    ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
                 }`}
         >
             {children}
