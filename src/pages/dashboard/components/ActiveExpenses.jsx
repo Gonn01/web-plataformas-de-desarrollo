@@ -196,8 +196,8 @@ export default function ActiveExpenses({
                     modal.setModalOpen(false);
                     markLoading(modal.modalItems);
 
-                    await handleConfirm(modal.modalItems);
-                    updateAfterPayment(modal.modalItems);
+                    const updatedItems = await handleConfirm(modal.modalItems);
+                    updateAfterPayment(updatedItems);
 
                     clearLoading();
                     modal.setModalOpen(false);
@@ -225,11 +225,10 @@ function ToggleButton({ active, onClick, children }) {
         <button
             type="button"
             onClick={onClick}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                active
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${active
                     ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
                     : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-            }`}
+                }`}
         >
             {children}
         </button>

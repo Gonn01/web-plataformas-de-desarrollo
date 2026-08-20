@@ -88,28 +88,27 @@ export function useDashboardData() {
     }, [token, recalcSummary]);
 
     const updateAfterPayment = useCallback(
-        (paidItems) => {
-            const paidIds = new Set(paidItems.map((i) => i.id));
+        (updatedItems) => {
+            const updatedById = new Map(updatedItems.map((it) => [String(it.id), it]));
 
             const newGroups = groups
                 .map((group) => {
                     const newItems = group.items
                         .map((it) => {
-                            if (!paidIds.has(it.id)) return it;
-
-                            const newPaid = it.payed_quotas + 1;
+                            const server = updatedById.get(String(it.id));
+                            if (!server) return it;
 
                             const updated = {
                                 ...it,
-                                payed_quotas: newPaid,
-                                progress: it.fixed_expense
+                                ...server,
+                                progress: server.fixed_expense
                                     ? 100
-                                    : Math.min((newPaid / it.number_of_quotas) * 100, 100),
+                                    : Math.min((server.payed_quotas / server.number_of_quotas) * 100, 100),
                             };
 
-                            if (it.fixed_expense) return updated;
+                            if (server.fixed_expense) return updated;
 
-                            if (newPaid >= it.number_of_quotas) return null;
+                            if (server.payed_quotas >= server.number_of_quotas) return null;
 
                             return updated;
                         })

@@ -44,18 +44,16 @@ export function useEntidadUI() {
         setPayModalOpen(false);
         setLoadingPayIds((prev) => new Set([...prev, payModalItem.id]));
 
-        await handleConfirm([payModalItem]);
+        const [updated] = await handleConfirm([payModalItem]);
 
-        setEntity((prev) => {
-            if (!prev) return prev;
-            const update = (list) =>
-                list.map((g) =>
-                    g.id === payModalItem.id
-                        ? { ...g, payed_quotas: g.payed_quotas + 1 }
-                        : g,
-                );
-            return { ...prev, gastos_activos: update(prev.gastos_activos) };
-        });
+        if (updated) {
+            setEntity((prev) => {
+                if (!prev) return prev;
+                const update = (list) =>
+                    list.map((g) => (String(g.id) === String(updated.id) ? { ...g, ...updated } : g));
+                return { ...prev, gastos_activos: update(prev.gastos_activos) };
+            });
+        }
 
         setLoadingPayIds((prev) => {
             const next = new Set(prev);
