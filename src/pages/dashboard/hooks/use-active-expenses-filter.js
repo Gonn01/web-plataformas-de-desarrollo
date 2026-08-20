@@ -12,8 +12,12 @@ export function useActiveExpensesFilter(
 
         return groups
             .map((g) => {
+                const matchEntityName = q ? g.name.toLowerCase().includes(q) : false;
+
                 const items = g.items.filter((it) => {
-                    const matchTitle = q ? it.name.toLowerCase().includes(q) : true;
+                    const matchTitle = q
+                        ? matchEntityName || it.name.toLowerCase().includes(q)
+                        : true;
                     const matchCurrency = currency === null || it.currency_type === currency;
                     const matchType = typeFilter === null || it.type === typeFilter;
                     const matchFixed = fixedFilter === null || it.fixed_expense === fixedFilter;
