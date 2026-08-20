@@ -64,10 +64,10 @@ export function useDashboardData() {
                             progress: g.fixed_expense
                                 ? 100
                                 : g.number_of_quotas > 0
-                                  ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
-                                  : g.payed_quotas === 0
-                                    ? 0
-                                    : 100,
+                                    ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
+                                    : g.payed_quotas === 0
+                                        ? 0
+                                        : 100,
                         }))
                         .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 

@@ -79,9 +79,14 @@ export default function ActiveExpenses({
             {/* FILTERS */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-2 border-y border-black/10 dark:border-white/10">
                 <FilterGroup label="Moneda">
-                    <ToggleButton active={currency === null} onClick={() => onCurrencyChange?.(null)}>
+
+                    <ToggleButton
+                        active={currency === null}
+                        onClick={() => onCurrencyChange?.(null)}
+                    >
                         Todos ({totalCount})
                     </ToggleButton>
+
                     {Object.values(Currency).map((cur) => (
                         <ToggleButton
                             key={cur}
