@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { fetchDashboardData, createGasto } from '@/services/api';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 import { usePayments } from '@/hooks/use-payments';
 
 export function useDashboardData() {

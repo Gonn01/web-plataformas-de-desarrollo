@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
+import { updatePreferredCurrency } from '@/services/api';
 import { Currency } from '@/utils/enums';
 
 const CURRENCY_VALUES = Object.values(Currency);
@@ -10,8 +11,6 @@ export default function Configuracion() {
     const [nombreVisible, setNombreVisible] = useState('Usuario');
     const [moneda, setMoneda] = useState('ARS');
     const [loading, setLoading] = useState(false);
-
-    const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
     useEffect(() => {
         if (!user) return;
@@ -32,37 +31,13 @@ export default function Configuracion() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${baseUrl}/auth/preferred-currency`, {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    user_id: user.id,
-                    preferred_currency: moneda,
-                }),
+            const updated = await updatePreferredCurrency(user.id, moneda, token);
+
+            updateUser({
+                ...updated,
+                preferred_currency: moneda,
+                monedaPreferida: moneda,
             });
-
-            if (!res.ok) {
-                const errText = await res.text();
-                console.error('Error actualizando moneda preferida:', res.status, errText);
-                alert('No se pudieron guardar los cambios.');
-                setLoading(false);
-                return;
-            }
-
-            const json = await res.json();
-            const updatedFromApi = json.data || json.user || json;
-
-            if (typeof updateUser === 'function') {
-                updateUser({
-                    ...(user || {}),
-                    ...updatedFromApi,
-                    preferred_currency: moneda,
-                    monedaPreferida: moneda,
-                });
-            }
 
             alert('Moneda preferida actualizada.');
         } catch (err) {

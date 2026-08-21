@@ -7,7 +7,7 @@ import {
     vincularUsuarioEntidad,
     desvincularUsuarioEntidad,
 } from '@/services/api';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 import { usePayments } from '@/hooks/use-payments';
 import { useParams } from 'react-router-dom';
 

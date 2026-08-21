@@ -2,7 +2,7 @@ import Heading from './components/Heading';
 import SearchBox from './components/SearchBox';
 import EntitiesList from './components/EntitiesList';
 import EmptyState from './components/EmptyState';
-import NewEntityModal from '../../components/modals/NewEntityModal';
+import NewEntityModal from '@/components/modals/NewEntityModal';
 import Loader from '@/components/Loader';
 
 import { useEntidadesUI } from './hooks/use-entidades-ui';

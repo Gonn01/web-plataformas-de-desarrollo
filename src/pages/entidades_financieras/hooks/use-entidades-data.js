@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { fetchFinancialEntities, createEntity, deleteFinancialEntity } from '@/services/api';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 import { useEntitiesStore } from '@/store/use-entities-store';
 
 export function useEntidadesData() {

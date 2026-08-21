@@ -9,7 +9,7 @@ import {
     Legend,
 } from 'recharts';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 import { convertCurrency } from '@/utils/convert-currency';
 import { formatMoney } from '@/utils/FormatMoney';
 import { Currency } from '@/utils/enums';

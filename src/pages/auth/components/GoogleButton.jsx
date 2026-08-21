@@ -1,12 +1,8 @@
-import { useGoogleAuth } from '../hooks/use-google-auth';
-
-export default function GoogleButton() {
-    const { loginGoogle, loading } = useGoogleAuth();
-
+export default function GoogleButton({ loading, onClick }) {
     return (
         <button
             type="button"
-            onClick={loginGoogle}
+            onClick={onClick}
             className="flex w-full justify-center items-center gap-3 rounded-lg border border-gray-700 px-3 py-2.5 text-sm text-gray-300"
         >
             <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24">

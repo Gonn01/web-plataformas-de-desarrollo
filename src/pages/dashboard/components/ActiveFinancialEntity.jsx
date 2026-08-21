@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Icon from '../../../components/Icon';
+import Icon from '@/components/Icon';
 import ExpenseCard from '@/components/ExpenseCard';
 import WhatsAppCopyButton from '@/pages/dashboard/components/WhatsAppCopyButton';
 import GroupBalance from '@/pages/dashboard/components/GroupBalance';

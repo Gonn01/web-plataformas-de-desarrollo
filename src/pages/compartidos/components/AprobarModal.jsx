@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import Icon from '@/components/Icon';
 import { useEntitiesStore } from '@/store/use-entities-store';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 
 export default function AprobarModal({ open, gasto, onClose, onConfirm, loading }) {
     const { token } = useAuth();

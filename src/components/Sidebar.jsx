@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useEffect, useState, useCallback } from 'react';
 import Icon from './Icon';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 import { useCompartidosStore } from '@/store/use-compartidos-store';
 import { usePusherChannel } from '@/hooks/use-pusher-channel';
 import Snackbar from './Snackbar';

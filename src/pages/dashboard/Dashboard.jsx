@@ -1,19 +1,19 @@
 import { createPortal } from 'react-dom';
 import { useMemo, useState } from 'react';
-import Icon from '../../components/Icon';
+import Icon from '@/components/Icon';
 import StatCards from './components/StatCards';
 import ActiveExpenses from './components/ActiveExpenses';
-import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
-import CuotasChart from '../detalle_entidad/components/CuotasChart';
-import MontoChart from '../detalle_entidad/components/MontoChart';
+import NewExpenseModal from '@/components/modals/Expenses/NewExpense/NewExpenseModal';
+import CuotasChart from '@/components/CuotasChart';
+import MontoChart from '@/components/MontoChart';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import Loader from '@/components/Loader';
 
 export default function Dashboard() {
-    const ui = useDashboardUI();
     const data = useDashboardData();
+    const ui = useDashboardUI(data.groups, data.pagarCuotas);
     const { rates } = useExchangeRates();
 
     const handleCreateExpense = async (payload) => {
@@ -82,14 +82,20 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
                     <ActiveExpenses
                         query={ui.query}
+                        onQueryChange={ui.setQuery}
                         groups={data.groups}
-                        setGroups={data.setGroups}
-                        onPagar={data.pagarCuotas}
+                        filteredGroups={ui.filteredGroups}
                         currency={ui.currency}
                         onCurrencyChange={ui.setCurrency}
-                        onQueryChange={ui.setQuery}
+                        typeFilter={ui.typeFilter}
+                        onTypeFilterChange={ui.setTypeFilter}
+                        fixedFilter={ui.fixedFilter}
+                        onFixedFilterChange={ui.setFixedFilter}
                         preferredCurrency={ui.preferredCurrency}
                         rates={rates}
+                        payModal={ui.payModal}
+                        loadingPayIds={ui.loadingPayIds}
+                        onConfirmPay={ui.onConfirmPay}
                     />
                 </div>
             </div>

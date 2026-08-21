@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import TextInput from '../../../../components/TextInput';
+import TextInput from '@/components/TextInput';
 import PasswordInput from '../../components/PasswordInput';
 import ErrorMessage from '../../components/ErrorMessage';
-import SubmitButton from '../../../../components/SubmitButton';
-import { useRegister } from '../hooks/user-register';
+import SubmitButton from '@/components/SubmitButton';
 
-export default function RegisterForm() {
-    const { loading, error, setError, handleRegister } = useRegister();
-
+export default function RegisterForm({ loading, error, onErrorClear, onSubmit }) {
     const [form, setForm] = useState({
         name: '',
         email: '',
@@ -16,16 +13,16 @@ export default function RegisterForm() {
 
     const onChange = (key, value) => {
         setForm({ ...form, [key]: value });
-        if (error) setError('');
+        if (error) onErrorClear();
     };
 
-    const onSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        await handleRegister(form);
+        await onSubmit(form);
     };
 
     return (
-        <form onSubmit={onSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <TextInput
                 label="Nombre"
                 value={form.name}

@@ -1,35 +1,28 @@
-import Icon from '../../../components/Icon';
-import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal/ConfirmPaymentModal';
+import Icon from '@/components/Icon';
+import ConfirmInstallmentPaymentModal from '@/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
 import ActiveFinancialEntity from './ActiveFinancialEntity';
 
-import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
-import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
 import { useNavigate } from 'react-router-dom';
-
-import { useState } from 'react';
 import { Currency } from '@/utils/enums';
 
 export default function ActiveExpenses({
     query,
+    onQueryChange,
     groups,
-    onPagar,
+    filteredGroups,
     currency,
     onCurrencyChange,
-    onQueryChange,
+    typeFilter,
+    onTypeFilterChange,
+    fixedFilter,
+    onFixedFilterChange,
     preferredCurrency,
     rates,
+    payModal,
+    loadingPayIds,
+    onConfirmPay,
 }) {
     const navigate = useNavigate();
-    const [typeFilter, setTypeFilter] = useState(null);
-    const [fixedFilter, setFixedFilter] = useState(null);
-    const filteredEntities = useActiveExpensesFilter(
-        groups,
-        currency,
-        query,
-        typeFilter,
-        fixedFilter,
-    );
-    const modal = useActiveExpensesModal();
 
     const countByCurrency = Object.values(Currency).reduce((acc, cur) => {
         acc[cur] = groups.reduce(
@@ -39,15 +32,6 @@ export default function ActiveExpenses({
         return acc;
     }, {});
     const totalCount = groups.reduce((sum, g) => sum + g.items.length, 0);
-
-    const [loadingIds, setLoadingIds] = useState(new Set());
-
-    const markLoading = (items) => {
-        const ids = items.map((i) => i.id);
-        setLoadingIds((prev) => new Set([...prev, ...ids]));
-    };
-
-    const clearLoading = () => setLoadingIds(new Set());
 
     return (
         <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 min-h-0 flex-1">
@@ -104,7 +88,7 @@ export default function ActiveExpenses({
                         <ToggleButton
                             key={label}
                             active={typeFilter === value}
-                            onClick={() => setTypeFilter(value)}
+                            onClick={() => onTypeFilterChange(value)}
                         >
                             {label}
                         </ToggleButton>
@@ -122,7 +106,7 @@ export default function ActiveExpenses({
                         <ToggleButton
                             key={label}
                             active={fixedFilter === value}
-                            onClick={() => setFixedFilter(value)}
+                            onClick={() => onFixedFilterChange(value)}
                         >
                             {label}
                         </ToggleButton>
@@ -132,7 +116,7 @@ export default function ActiveExpenses({
 
             {/* LIST */}
             <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0">
-                {filteredEntities.map((group) => (
+                {filteredGroups.map((group) => (
                     <ActiveFinancialEntity
                         key={group.id}
                         group={group}
@@ -140,14 +124,14 @@ export default function ActiveExpenses({
                         currency={currency}
                         preferredCurrency={preferredCurrency}
                         rates={rates}
-                        loadingIds={loadingIds}
-                        onOpenGroup={modal.openGroup}
+                        loadingIds={loadingPayIds}
+                        onOpenGroup={payModal.openGroup}
                         onItemClick={(it) => navigate(`/app/gastos/${it.id}`)}
-                        onPayClick={(g, it) => modal.openItem(g, it)}
+                        onPayClick={(g, it) => payModal.openItem(g, it)}
                     />
                 ))}
 
-                {filteredEntities.length === 0 && (
+                {filteredGroups.length === 0 && (
                     <div className="text-center text-sm text-slate-500 dark:text-slate-400 py-8">
                         No se encontraron gastos activos.
                     </div>
@@ -156,19 +140,11 @@ export default function ActiveExpenses({
 
             {/* MODAL */}
             <ConfirmInstallmentPaymentModal
-                open={modal.modalOpen}
-                entityName={modal.modalEntity}
-                items={modal.modalItems}
-                onCancel={() => modal.setModalOpen(false)}
-                onConfirm={async () => {
-                    modal.setModalOpen(false);
-                    markLoading(modal.modalItems);
-
-                    await onPagar(modal.modalItems);
-
-                    clearLoading();
-                    modal.setModalOpen(false);
-                }}
+                open={payModal.modalOpen}
+                entityName={payModal.modalEntity}
+                items={payModal.modalItems}
+                onCancel={() => payModal.setModalOpen(false)}
+                onConfirm={onConfirmPay}
             />
         </div>
     );

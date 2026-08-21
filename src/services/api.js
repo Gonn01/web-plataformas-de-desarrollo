@@ -26,6 +26,15 @@ export const loginWithFirebase = async (firebaseData) => {
     return data.data;
 };
 
+export const updatePreferredCurrency = async (userId, preferredCurrency, token) => {
+    const { data } = await api.put(
+        '/auth/preferred-currency',
+        { user_id: userId, preferred_currency: preferredCurrency },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data[0];
+};
+
 /* ===============================
    DASHBOARD (solo lectura)
 =============================== */

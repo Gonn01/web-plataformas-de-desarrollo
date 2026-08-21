@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { buildWhatsAppText } from '@/utils/buildWhatsAppText';
+import { buildWhatsAppText } from '@/utils/build-whats-app-text';
 
 export default function WhatsAppCopyButton({ group, selectedCurrency, preferredCurrency, rates }) {
     const [copied, setCopied] = useState(false);

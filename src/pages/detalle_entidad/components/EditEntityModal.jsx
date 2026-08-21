@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
-import Icon from '../../../components/Icon';
+import Icon from '@/components/Icon';
 
 export default function EditEntityModal({
     open,

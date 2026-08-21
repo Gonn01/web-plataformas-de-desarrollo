@@ -5,7 +5,7 @@ import {
     rechazarCompartido,
     reintentarCompartido,
 } from '@/services/api';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
 import { useCompartidosStore } from '@/store/use-compartidos-store';
 import { usePusherChannel } from '@/hooks/use-pusher-channel';
 

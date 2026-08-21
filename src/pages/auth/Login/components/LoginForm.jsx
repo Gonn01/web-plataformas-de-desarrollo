@@ -1,13 +1,10 @@
 import { useState } from 'react';
-import TextInput from '../../../../components/TextInput';
+import TextInput from '@/components/TextInput';
 import PasswordInput from '../../components/PasswordInput';
 import ErrorMessage from '../../components/ErrorMessage';
-import SubmitButton from '../../../../components/SubmitButton';
-import { useLogin } from '../hooks/use-login';
+import SubmitButton from '@/components/SubmitButton';
 
-export default function LoginForm() {
-    const { loading, error, setError, handleLogin } = useLogin();
-
+export default function LoginForm({ loading, error, onErrorClear, onSubmit }) {
     const [form, setForm] = useState({
         email: '',
         password: '',
@@ -15,16 +12,16 @@ export default function LoginForm() {
 
     const onChange = (key, value) => {
         setForm({ ...form, [key]: value });
-        if (error) setError('');
+        if (error) onErrorClear();
     };
 
-    const onSubmit = async (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        await handleLogin(form);
+        await onSubmit(form);
     };
 
     return (
-        <form onSubmit={onSubmit} className="mt-8 space-y-6">
+        <form onSubmit={handleSubmit} className="mt-8 space-y-6">
             <TextInput
                 label="Email"
                 type="email"
