@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { fetchFinancialEntities } from '@/services/api';
+import { fetchFinancialEntities, createEntity as apiCreateEntity } from '@/services/api';
 
 export const useEntitiesStore = create((set, get) => ({
     entities: [],
@@ -15,6 +15,12 @@ export const useEntitiesStore = create((set, get) => ({
         } finally {
             set({ loading: false });
         }
+    },
+
+    createEntity: async (name, token) => {
+        const created = await apiCreateEntity({ name }, token);
+        set((state) => ({ entities: [...state.entities, created] }));
+        return created;
     },
 
     getEntityById: (id) => {

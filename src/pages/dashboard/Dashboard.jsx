@@ -8,17 +8,26 @@ import CuotasChart from '../detalle_entidad/components/CuotasChart';
 import MontoChart from '../detalle_entidad/components/MontoChart';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
-import { useNewExpense } from './hooks/use-new-expense';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import Loader from '@/components/Loader';
 
 export default function Dashboard() {
     const ui = useDashboardUI();
     const data = useDashboardData();
-    const { saveExpense, saving } = useNewExpense(data.loadDashboard, () =>
-        ui.setOpenNewExpense(false),
-    );
     const { rates } = useExchangeRates();
+
+    const handleCreateExpense = async (payload) => {
+        ui.setLoadingCreatingExpense(true);
+        try {
+            await data.crearGasto(payload);
+            ui.setOpenNewExpense(false);
+        } catch (err) {
+            console.error('Error creando gasto:', err);
+            alert('No se pudo crear el gasto.');
+        } finally {
+            ui.setLoadingCreatingExpense(false);
+        }
+    };
 
     const summary = data.getSummaryForCurrency(ui.currency);
     const allItems = useMemo(() => data.groups.flatMap((g) => g.items), [data.groups]);
@@ -75,7 +84,7 @@ export default function Dashboard() {
                         query={ui.query}
                         groups={data.groups}
                         setGroups={data.setGroups}
-                        updateAfterPayment={data.updateAfterPayment}
+                        onPagar={data.pagarCuotas}
                         currency={ui.currency}
                         onCurrencyChange={ui.setCurrency}
                         onQueryChange={ui.setQuery}
@@ -89,8 +98,8 @@ export default function Dashboard() {
             {ui.openNewExpense && (
                 <NewExpenseModal
                     onClose={() => ui.setOpenNewExpense(false)}
-                    onSave={saveExpense}
-                    saving={saving}
+                    onSave={handleCreateExpense}
+                    saving={ui.loadingCreatingExpense}
                 />
             )}
 

@@ -4,7 +4,6 @@ import useAuth from '@/hooks/use-auth';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
-import { createEntity, createCategory } from '@/services/api';
 import ExpenseTypeSelector from '../components/ExpenseTypeSelector';
 import EntitySelector from '../components/EntitySelector';
 import ExpenseAmountSection from '../components/ExpenseAmountSection';
@@ -15,7 +14,7 @@ import { useCategoriesStore } from '@/store/use-categories-store';
 
 export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const { token } = useAuth();
-    const { entities, setEntities } = useEntitiesStore();
+    const { entities, createEntity } = useEntitiesStore();
 
     const containerRef = useRef(null);
 
@@ -42,7 +41,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
 
-    const { categories, loading: loadingCategories, addCategory } = useCategoriesStore();
+    const { categories, loading: loadingCategories, createCategory } = useCategoriesStore();
     const [selectedCategoryIds, setSelectedCategoryIds] = useState(
         (gasto.categories ?? []).map((c) => c.id)
     );
@@ -54,8 +53,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     };
 
     const handleCreateCategory = async (name) => {
-        const created = await createCategory({ name }, token);
-        addCategory(created);
+        const created = await createCategory(name, token);
         setSelectedCategoryIds((prev) => [...prev, created.id]);
     };
 
@@ -71,8 +69,7 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
         if (!newEntityName.trim()) return;
 
         try {
-            const created = await createEntity({ name: newEntityName.trim() }, token);
-            setEntities((prev) => [...prev, created]);
+            const created = await createEntity(newEntityName.trim(), token);
             setEntity(created.id);
             setShowNewEntity(false);
             setNewEntityName('');

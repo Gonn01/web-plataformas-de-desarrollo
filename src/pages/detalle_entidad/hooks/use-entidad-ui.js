@@ -1,12 +1,9 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEntidadData } from './use-entidad-data';
-import { usePayments } from '@/hooks/use-payments';
-import useAuth from '@/hooks/use-auth';
 
 export function useEntidadUI() {
     const navigate = useNavigate();
-    const { token } = useAuth();
 
     const {
         entity,
@@ -17,7 +14,7 @@ export function useEntidadUI() {
         eliminarEntidad,
         vincularUsuario,
         desvincularUsuario,
-        setEntity,
+        pagarCuota,
     } = useEntidadData();
 
     const [tab, setTab] = useState('activos');
@@ -32,8 +29,6 @@ export function useEntidadUI() {
     const [payModalItem, setPayModalItem] = useState(null);
     const [loadingPayIds, setLoadingPayIds] = useState(new Set());
 
-    const { handleConfirm } = usePayments(token);
-
     function openPayModal(gasto) {
         setPayModalItem(gasto);
         setPayModalOpen(true);
@@ -44,16 +39,7 @@ export function useEntidadUI() {
         setPayModalOpen(false);
         setLoadingPayIds((prev) => new Set([...prev, payModalItem.id]));
 
-        const [updated] = await handleConfirm([payModalItem]);
-
-        if (updated) {
-            setEntity((prev) => {
-                if (!prev) return prev;
-                const update = (list) =>
-                    list.map((g) => (String(g.id) === String(updated.id) ? { ...g, ...updated } : g));
-                return { ...prev, gastos_activos: update(prev.gastos_activos) };
-            });
-        }
+        await pagarCuota(payModalItem);
 
         setLoadingPayIds((prev) => {
             const next = new Set(prev);

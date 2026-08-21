@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchDashboardData } from '@/services/api';
+import { fetchDashboardData, createGasto } from '@/services/api';
 import useAuth from '@/hooks/use-auth';
+import { usePayments } from '@/hooks/use-payments';
 
 export function useDashboardData() {
     const { token } = useAuth();
+    const { handleConfirm } = usePayments(token);
 
     const [summaryByCurrency, setSummaryByCurrency] = useState(null);
     const [groups, setGroups] = useState([]);
@@ -124,6 +126,23 @@ export function useDashboardData() {
         [groups, recalcSummary],
     );
 
+    const pagarCuotas = useCallback(
+        async (items) => {
+            const updatedItems = await handleConfirm(items);
+            updateAfterPayment(updatedItems);
+            return updatedItems;
+        },
+        [handleConfirm, updateAfterPayment],
+    );
+
+    const crearGasto = useCallback(
+        async (payload) => {
+            await createGasto(payload, token);
+            await loadDashboard();
+        },
+        [token, loadDashboard],
+    );
+
     useEffect(() => {
         loadDashboard();
     }, [loadDashboard]);
@@ -134,7 +153,8 @@ export function useDashboardData() {
         summaryByCurrency,
         loadDashboard,
         getSummaryForCurrency: (currency) => summaryByCurrency?.[currency] ?? null,
-        updateAfterPayment,
+        pagarCuotas,
+        crearGasto,
         loading,
     };
 }

@@ -4,9 +4,7 @@ import ActiveFinancialEntity from './ActiveFinancialEntity';
 
 import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
 import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
-import { usePayments } from '../../../hooks/use-payments';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '@/hooks/use-auth';
 
 import { useState } from 'react';
 import { Currency } from '@/utils/enums';
@@ -14,7 +12,7 @@ import { Currency } from '@/utils/enums';
 export default function ActiveExpenses({
     query,
     groups,
-    updateAfterPayment,
+    onPagar,
     currency,
     onCurrencyChange,
     onQueryChange,
@@ -41,9 +39,6 @@ export default function ActiveExpenses({
         return acc;
     }, {});
     const totalCount = groups.reduce((sum, g) => sum + g.items.length, 0);
-
-    const { token } = useAuth();
-    const { handleConfirm } = usePayments(token);
 
     const [loadingIds, setLoadingIds] = useState(new Set());
 
@@ -169,8 +164,7 @@ export default function ActiveExpenses({
                     modal.setModalOpen(false);
                     markLoading(modal.modalItems);
 
-                    const updatedItems = await handleConfirm(modal.modalItems);
-                    updateAfterPayment(updatedItems);
+                    await onPagar(modal.modalItems);
 
                     clearLoading();
                     modal.setModalOpen(false);

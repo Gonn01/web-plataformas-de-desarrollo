@@ -10,6 +10,7 @@ export function useDashboardUI() {
     const [currency, setCurrency] = useState(null);
     const [query, setQuery] = useState('');
     const [openNewExpense, setOpenNewExpense] = useState(false);
+    const [loadingCreatingExpense, setLoadingCreatingExpense] = useState(false);
 
     const preferredCurrency = (() => {
         const pref = user?.preferred_currency ?? user?.monedaPreferida;
@@ -24,5 +25,7 @@ export function useDashboardUI() {
         setQuery,
         openNewExpense,
         setOpenNewExpense,
+        loadingCreatingExpense,
+        setLoadingCreatingExpense,
     };
 }

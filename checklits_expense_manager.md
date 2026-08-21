@@ -9,9 +9,6 @@
 - [x] el filtrado no tiene en cuenta los nombres de las entidades
 - [x] que el dashboard no tenga en cuenta la moneda de preferencia para el filtrado, que por defecto sea "todos"
 - [x] hacer verificacion de vinculacion duplicada, si ya tenes un mail vinculado a una entidad no se puede usar en otra
-
-- [ ] posibilidad de marcar entidades como privadas y que al querer ver datos de la misma haya que poner una contraseña
-- [ ] modo daltonismo
 - [ ] lugar de ingreso de sueldo, y en el balance mensual ver el resumen en contraste
 - [ ] un lugar para agregar aumentos
 - [ ] modo hacer cuentas: modo de checkbox temporales en los que cada vez que pagas una entidad se marque automaticamente/manual el checbox de pagado en esta sesion, y hay que ver la manera de evitar que se pierda la informacion cuando navegas a la entidad o al gasto
@@ -68,3 +65,5 @@
 
 - [ ] imagenes para entidades y para gastos
 - [ ] integrar mp mediante link
+- [ ] modo daltonismo
+- [ ] posibilidad de marcar entidades como privadas y que al querer ver datos de la misma haya que poner una contraseña

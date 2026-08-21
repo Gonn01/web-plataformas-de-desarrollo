@@ -3,7 +3,6 @@ import { useEffect, useState, useCallback } from 'react';
 import Icon from './Icon';
 import useAuth from '@/hooks/use-auth';
 import { useCompartidosStore } from '@/store/use-compartidos-store';
-import { fetchCompartidos } from '@/services/api';
 import { usePusherChannel } from '@/hooks/use-pusher-channel';
 import Snackbar from './Snackbar';
 
@@ -14,18 +13,12 @@ export default function Sidebar() {
 
     const { user, logout, token } = useAuth();
     const navigate = useNavigate();
-    const { pendingCount, setPendingCount } = useCompartidosStore();
+    const { pendingCount, setPendingCount, loadPendingCount } = useCompartidosStore();
     const [notification, setNotification] = useState(null);
 
     useEffect(() => {
-        if (!token) return;
-        fetchCompartidos(token)
-            .then((data) => {
-                const count = data.recibidos.filter((r) => r.status === 'PENDING_APPROVAL').length;
-                setPendingCount(count);
-            })
-            .catch(() => {});
-    }, [token, setPendingCount]);
+        loadPendingCount(token);
+    }, [token, loadPendingCount]);
 
     const handleNuevo = useCallback(() => {
         setPendingCount((c) => c + 1);
