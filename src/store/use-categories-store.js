@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import { fetchCategories } from '@/services/api';
+import { fetchCategories, createCategory as apiCreateCategory } from '@/services/api';
 
 export const useCategoriesStore = create((set) => ({
     categories: [],
@@ -15,6 +15,12 @@ export const useCategoriesStore = create((set) => ({
         } finally {
             set({ loading: false });
         }
+    },
+
+    createCategory: async (name, token) => {
+        const created = await apiCreateCategory({ name }, token);
+        set((state) => ({ categories: [...state.categories, created] }));
+        return created;
     },
 
     addCategory: (category) => {

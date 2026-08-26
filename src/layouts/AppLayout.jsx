@@ -1,6 +1,6 @@
 import { Outlet } from 'react-router-dom';
-import Sidebar from '../components/Sidebar';
-import useAuth from '@/hooks/use-auth';
+import Sidebar from '@/components/Sidebar';
+import useAuth from '@/store/use-auth-store';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import { useCategoriesStore } from '@/store/use-categories-store';
 import { useEffect } from 'react';

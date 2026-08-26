@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useState } from 'react';
-import { fetchDashboardData } from '@/services/api';
-import useAuth from '@/hooks/use-auth';
+import { fetchDashboardData, createGasto } from '@/services/api';
+import useAuth from '@/store/use-auth-store';
+import { usePayments } from '@/hooks/use-payments';
 
 export function useDashboardData() {
     const { token } = useAuth();
+    const { handleConfirm } = usePayments(token);
 
     const [summaryByCurrency, setSummaryByCurrency] = useState(null);
     const [groups, setGroups] = useState([]);
@@ -64,10 +66,10 @@ export function useDashboardData() {
                             progress: g.fixed_expense
                                 ? 100
                                 : g.number_of_quotas > 0
-                                  ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
-                                  : g.payed_quotas === 0
-                                    ? 0
-                                    : 100,
+                                    ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
+                                    : g.payed_quotas === 0
+                                        ? 0
+                                        : 100,
                         }))
                         .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
 
@@ -88,28 +90,27 @@ export function useDashboardData() {
     }, [token, recalcSummary]);
 
     const updateAfterPayment = useCallback(
-        (paidItems) => {
-            const paidIds = new Set(paidItems.map((i) => i.id));
+        (updatedItems) => {
+            const updatedById = new Map(updatedItems.map((it) => [String(it.id), it]));
 
             const newGroups = groups
                 .map((group) => {
                     const newItems = group.items
                         .map((it) => {
-                            if (!paidIds.has(it.id)) return it;
-
-                            const newPaid = it.payed_quotas + 1;
+                            const server = updatedById.get(String(it.id));
+                            if (!server) return it;
 
                             const updated = {
                                 ...it,
-                                payed_quotas: newPaid,
-                                progress: it.fixed_expense
+                                ...server,
+                                progress: server.fixed_expense
                                     ? 100
-                                    : Math.min((newPaid / it.number_of_quotas) * 100, 100),
+                                    : Math.min((server.payed_quotas / server.number_of_quotas) * 100, 100),
                             };
 
-                            if (it.fixed_expense) return updated;
+                            if (server.fixed_expense) return updated;
 
-                            if (newPaid >= it.number_of_quotas) return null;
+                            if (server.payed_quotas >= server.number_of_quotas) return null;
 
                             return updated;
                         })
@@ -125,6 +126,23 @@ export function useDashboardData() {
         [groups, recalcSummary],
     );
 
+    const pagarCuotas = useCallback(
+        async (items) => {
+            const updatedItems = await handleConfirm(items);
+            updateAfterPayment(updatedItems);
+            return updatedItems;
+        },
+        [handleConfirm, updateAfterPayment],
+    );
+
+    const crearGasto = useCallback(
+        async (payload) => {
+            await createGasto(payload, token);
+            await loadDashboard();
+        },
+        [token, loadDashboard],
+    );
+
     useEffect(() => {
         loadDashboard();
     }, [loadDashboard]);
@@ -135,7 +153,8 @@ export function useDashboardData() {
         summaryByCurrency,
         loadDashboard,
         getSummaryForCurrency: (currency) => summaryByCurrency?.[currency] ?? null,
-        updateAfterPayment,
+        pagarCuotas,
+        crearGasto,
         loading,
     };
 }

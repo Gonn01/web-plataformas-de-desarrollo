@@ -4,14 +4,14 @@ import HeaderDetalle from './components/HeaderDetalle';
 import InfoItem from './components/InfoItem';
 import ProgresoPago from './components/ProgresoPago';
 import CuotasSection from './components/CuotasSection';
-import PeligroEliminar from '../../components/PeligroEliminar';
+import PeligroEliminar from '@/components/PeligroEliminar';
 import { useGastoUI } from './hooks/use-gasto-ui';
 import Loader from '@/components/Loader';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import { formatMoney } from '@/utils/FormatMoney';
 import UpdateExpenseModal from '@/components/modals/Expenses/UpdateExpense/UpdateExpenseModal';
 import CategoryBadges from '@/components/CategoryBadges';
-import ConfirmInstallmentPaymentModal from '@/pages/dashboard/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
+import ConfirmInstallmentPaymentModal from '@/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
 
 export default function DetalleGasto() {
     const {

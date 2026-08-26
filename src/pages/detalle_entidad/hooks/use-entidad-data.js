@@ -7,12 +7,14 @@ import {
     vincularUsuarioEntidad,
     desvincularUsuarioEntidad,
 } from '@/services/api';
-import useAuth from '@/hooks/use-auth';
+import useAuth from '@/store/use-auth-store';
+import { usePayments } from '@/hooks/use-payments';
 import { useParams } from 'react-router-dom';
 
 export function useEntidadData() {
     const { id } = useParams();
     const { token } = useAuth();
+    const { handleConfirm } = usePayments(token);
 
     const [entity, setEntity] = useState(null);
     const [loading, setLoading] = useState(true);
@@ -138,6 +140,24 @@ export function useEntidadData() {
         }));
     }, [id, token]);
 
+    const pagarCuota = useCallback(
+        async (gasto) => {
+            const [updated] = await handleConfirm([gasto]);
+
+            if (updated) {
+                setEntity((prev) => {
+                    if (!prev) return prev;
+                    const update = (list) =>
+                        list.map((g) => (String(g.id) === String(updated.id) ? { ...g, ...updated } : g));
+                    return { ...prev, gastos_activos: update(prev.gastos_activos) };
+                });
+            }
+
+            return updated;
+        },
+        [handleConfirm],
+    );
+
     return {
         entity,
         stats,
@@ -147,6 +167,7 @@ export function useEntidadData() {
         eliminarEntidad,
         vincularUsuario,
         desvincularUsuario,
+        pagarCuota,
         setEntity,
     };
 }

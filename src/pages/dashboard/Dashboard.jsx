@@ -1,24 +1,33 @@
 import { createPortal } from 'react-dom';
 import { useMemo, useState } from 'react';
-import Icon from '../../components/Icon';
+import Icon from '@/components/Icon';
 import StatCards from './components/StatCards';
 import ActiveExpenses from './components/ActiveExpenses';
-import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
-import CuotasChart from '../detalle_entidad/components/CuotasChart';
-import MontoChart from '../detalle_entidad/components/MontoChart';
+import NewExpenseModal from '@/components/modals/Expenses/NewExpense/NewExpenseModal';
+import CuotasChart from '@/components/CuotasChart';
+import MontoChart from '@/components/MontoChart';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
-import { useNewExpense } from './hooks/use-new-expense';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
 import Loader from '@/components/Loader';
 
 export default function Dashboard() {
-    const ui = useDashboardUI();
     const data = useDashboardData();
-    const { saveExpense, saving } = useNewExpense(data.loadDashboard, () =>
-        ui.setOpenNewExpense(false),
-    );
+    const ui = useDashboardUI(data.groups, data.pagarCuotas);
     const { rates } = useExchangeRates();
+
+    const handleCreateExpense = async (payload) => {
+        ui.setLoadingCreatingExpense(true);
+        try {
+            await data.crearGasto(payload);
+            ui.setOpenNewExpense(false);
+        } catch (err) {
+            console.error('Error creando gasto:', err);
+            alert('No se pudo crear el gasto.');
+        } finally {
+            ui.setLoadingCreatingExpense(false);
+        }
+    };
 
     const summary = data.getSummaryForCurrency(ui.currency);
     const allItems = useMemo(() => data.groups.flatMap((g) => g.items), [data.groups]);
@@ -73,14 +82,20 @@ export default function Dashboard() {
                 <div className="flex-1 min-w-0 overflow-hidden flex flex-col">
                     <ActiveExpenses
                         query={ui.query}
+                        onQueryChange={ui.setQuery}
                         groups={data.groups}
-                        setGroups={data.setGroups}
-                        updateAfterPayment={data.updateAfterPayment}
+                        filteredGroups={ui.filteredGroups}
                         currency={ui.currency}
                         onCurrencyChange={ui.setCurrency}
-                        onQueryChange={ui.setQuery}
+                        typeFilter={ui.typeFilter}
+                        onTypeFilterChange={ui.setTypeFilter}
+                        fixedFilter={ui.fixedFilter}
+                        onFixedFilterChange={ui.setFixedFilter}
                         preferredCurrency={ui.preferredCurrency}
                         rates={rates}
+                        payModal={ui.payModal}
+                        loadingPayIds={ui.loadingPayIds}
+                        onConfirmPay={ui.onConfirmPay}
                     />
                 </div>
             </div>
@@ -89,8 +104,8 @@ export default function Dashboard() {
             {ui.openNewExpense && (
                 <NewExpenseModal
                     onClose={() => ui.setOpenNewExpense(false)}
-                    onSave={saveExpense}
-                    saving={saving}
+                    onSave={handleCreateExpense}
+                    saving={ui.loadingCreatingExpense}
                 />
             )}
 

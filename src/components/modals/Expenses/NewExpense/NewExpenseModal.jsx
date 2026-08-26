@@ -1,7 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
-import useAuth from '@/hooks/use-auth';
-import { createEntity, createCategory } from '@/services/api';
+import useAuth from '@/store/use-auth-store';
 
 import Icon from '@/components/Icon';
 import TextInput from '@/components/TextInput';
@@ -38,10 +37,10 @@ export default function NewExpenseModal({
     const [isInstallment, setIsInstallment] = useState(false);
     const [isPaid, setIsPaid] = useState(false);
     const [paidInstallments, setPaidInstallments] = useState('0');
-    const { entities, loading, addEntity } = useEntitiesStore();
+    const { entities, loading, createEntity } = useEntitiesStore();
     const [loadingNewEntity, setLoadingNewEntity] = useState(false);
 
-    const { categories, loading: loadingCategories, addCategory } = useCategoriesStore();
+    const { categories, loading: loadingCategories, createCategory } = useCategoriesStore();
     const [selectedCategoryIds, setSelectedCategoryIds] = useState([]);
 
     const handleToggleCategory = (id) => {
@@ -51,8 +50,7 @@ export default function NewExpenseModal({
     };
 
     const handleCreateCategory = async (name) => {
-        const created = await createCategory({ name }, token);
-        addCategory(created);
+        const created = await createCategory(name, token);
         setSelectedCategoryIds((prev) => [...prev, created.id]);
     };
 
@@ -76,8 +74,7 @@ export default function NewExpenseModal({
         if (!newEntityName.trim()) return;
         setLoadingNewEntity(true);
         try {
-            const created = await createEntity({ name: newEntityName.trim() }, token);
-            addEntity(created);
+            const created = await createEntity(newEntityName.trim(), token);
             setEntity(created.id);
             setShowNewEntity(false);
             setNewEntityName('');

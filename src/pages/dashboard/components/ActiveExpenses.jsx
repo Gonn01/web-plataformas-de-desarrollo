@@ -1,33 +1,28 @@
-import Icon from '../../../components/Icon';
-import ConfirmInstallmentPaymentModal from './modals/ConfirmPaymentModal/ConfirmPaymentModal';
-import ExpenseCard from '@/components/ExpenseCard';
+import Icon from '@/components/Icon';
+import ConfirmInstallmentPaymentModal from '@/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
+import ActiveFinancialEntity from './ActiveFinancialEntity';
 
-import { useActiveExpensesFilter } from '../hooks/use-active-expenses-filter';
-import { useActiveExpensesModal } from '../hooks/use-active-expenses-modal';
-import { usePayments } from '../../../hooks/use-payments';
 import { useNavigate } from 'react-router-dom';
-import useAuth from '@/hooks/use-auth';
-import WhatsAppCopyButton from '@/pages/dashboard/components/WhatsAppCopyButton';
-import GroupBalance from '@/pages/dashboard/components/GroupBalance';
-
-import { useState } from 'react';
 import { Currency } from '@/utils/enums';
 
 export default function ActiveExpenses({
     query,
+    onQueryChange,
     groups,
-    updateAfterPayment,
+    filteredGroups,
     currency,
     onCurrencyChange,
-    onQueryChange,
+    typeFilter,
+    onTypeFilterChange,
+    fixedFilter,
+    onFixedFilterChange,
     preferredCurrency,
     rates,
+    payModal,
+    loadingPayIds,
+    onConfirmPay,
 }) {
     const navigate = useNavigate();
-    const [typeFilter, setTypeFilter] = useState(null);
-    const [fixedFilter, setFixedFilter] = useState(null);
-    const filtered = useActiveExpensesFilter(groups, currency, query, typeFilter, fixedFilter);
-    const modal = useActiveExpensesModal();
 
     const countByCurrency = Object.values(Currency).reduce((acc, cur) => {
         acc[cur] = groups.reduce(
@@ -37,18 +32,6 @@ export default function ActiveExpenses({
         return acc;
     }, {});
     const totalCount = groups.reduce((sum, g) => sum + g.items.length, 0);
-
-    const { token } = useAuth();
-    const { handleConfirm } = usePayments(token);
-
-    const [loadingIds, setLoadingIds] = useState(new Set());
-
-    const markLoading = (items) => {
-        const ids = items.map((i) => i.id);
-        setLoadingIds((prev) => new Set([...prev, ...ids]));
-    };
-
-    const clearLoading = () => setLoadingIds(new Set());
 
     return (
         <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 min-h-0 flex-1">
@@ -75,9 +58,14 @@ export default function ActiveExpenses({
             {/* FILTERS */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-2 border-y border-black/10 dark:border-white/10">
                 <FilterGroup label="Moneda">
-                    <ToggleButton active={currency === null} onClick={() => onCurrencyChange?.(null)}>
+
+                    <ToggleButton
+                        active={currency === null}
+                        onClick={() => onCurrencyChange?.(null)}
+                    >
                         Todos ({totalCount})
                     </ToggleButton>
+
                     {Object.values(Currency).map((cur) => (
                         <ToggleButton
                             key={cur}
@@ -100,7 +88,7 @@ export default function ActiveExpenses({
                         <ToggleButton
                             key={label}
                             active={typeFilter === value}
-                            onClick={() => setTypeFilter(value)}
+                            onClick={() => onTypeFilterChange(value)}
                         >
                             {label}
                         </ToggleButton>
@@ -118,7 +106,7 @@ export default function ActiveExpenses({
                         <ToggleButton
                             key={label}
                             active={fixedFilter === value}
-                            onClick={() => setFixedFilter(value)}
+                            onClick={() => onFixedFilterChange(value)}
                         >
                             {label}
                         </ToggleButton>
@@ -128,58 +116,22 @@ export default function ActiveExpenses({
 
             {/* LIST */}
             <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0">
-                {filtered.map((group) => (
-                    <div key={group.id} className="flex flex-col gap-3">
-                        {/* Group Header */}
-                        <div className="flex items-center justify-between gap-4 py-2 border-b border-black/10 dark:border-white/10">
-                            <div className="flex flex-col gap-0.5">
-                                <h4
-                                    className="text-base font-semibold text-slate-800 dark:text-slate-100 cursor-pointer hover:underline"
-                                    onClick={() => navigate(`/app/entidades/${group.id}`)}
-                                >
-                                    {group.name}
-                                </h4>
-                                <GroupBalance
-                                    items={group.items}
-                                    preferredCurrency={preferredCurrency}
-                                    rates={rates}
-                                />
-                            </div>
-
-                            <div className="flex items-center gap-2 shrink-0">
-                                <WhatsAppCopyButton
-                                    group={groups.find((g) => g.id === group.id) ?? group}
-                                    selectedCurrency={currency}
-                                    preferredCurrency={preferredCurrency}
-                                    rates={rates}
-                                />
-                                <button
-                                    className="text-xs cursor-pointer font-bold leading-normal tracking-wide text-primary hover:text-primary/80 transition-colors"
-                                    onClick={() => modal.openGroup(group)}
-                                    type="button"
-                                >
-                                    Pagar/Registrar cobros
-                                </button>
-                            </div>
-                        </div>
-
-                        {/* Items */}
-                        <ul className="flex flex-col gap-1">
-                            {group.items.map((it) => (
-                                <li key={it.id}>
-                                    <ExpenseCard
-                                        gasto={it}
-                                        loading={loadingIds.has(it.id)}
-                                        onClick={() => navigate(`/app/gastos/${it.id}`)}
-                                        onPayClick={() => modal.openItem(group, it)}
-                                    />
-                                </li>
-                            ))}
-                        </ul>
-                    </div>
+                {filteredGroups.map((group) => (
+                    <ActiveFinancialEntity
+                        key={group.id}
+                        group={group}
+                        groups={groups}
+                        currency={currency}
+                        preferredCurrency={preferredCurrency}
+                        rates={rates}
+                        loadingIds={loadingPayIds}
+                        onOpenGroup={payModal.openGroup}
+                        onItemClick={(it) => navigate(`/app/gastos/${it.id}`)}
+                        onPayClick={(g, it) => payModal.openItem(g, it)}
+                    />
                 ))}
 
-                {filtered.length === 0 && (
+                {filteredGroups.length === 0 && (
                     <div className="text-center text-sm text-slate-500 dark:text-slate-400 py-8">
                         No se encontraron gastos activos.
                     </div>
@@ -188,20 +140,11 @@ export default function ActiveExpenses({
 
             {/* MODAL */}
             <ConfirmInstallmentPaymentModal
-                open={modal.modalOpen}
-                entityName={modal.modalEntity}
-                items={modal.modalItems}
-                onCancel={() => modal.setModalOpen(false)}
-                onConfirm={async () => {
-                    modal.setModalOpen(false);
-                    markLoading(modal.modalItems);
-
-                    await handleConfirm(modal.modalItems);
-                    updateAfterPayment(modal.modalItems);
-
-                    clearLoading();
-                    modal.setModalOpen(false);
-                }}
+                open={payModal.modalOpen}
+                entityName={payModal.modalEntity}
+                items={payModal.modalItems}
+                onCancel={() => payModal.setModalOpen(false)}
+                onConfirm={onConfirmPay}
             />
         </div>
     );
@@ -225,11 +168,10 @@ function ToggleButton({ active, onClick, children }) {
         <button
             type="button"
             onClick={onClick}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
-                active
-                    ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
-                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-            }`}
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${active
+                ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
+                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+                }`}
         >
             {children}
         </button>

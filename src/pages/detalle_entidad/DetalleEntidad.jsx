@@ -1,6 +1,6 @@
-import Icon from '../../components/Icon';
-import NewExpenseModal from '../../components/modals/Expenses/NewExpense/NewExpenseModal';
-import ConfirmInstallmentPaymentModal from '../dashboard/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
+import Icon from '@/components/Icon';
+import NewExpenseModal from '@/components/modals/Expenses/NewExpense/NewExpenseModal';
+import ConfirmInstallmentPaymentModal from '@/components/modals/ConfirmPaymentModal/ConfirmPaymentModal';
 import ExpenseCard from '@/components/ExpenseCard';
 
 import { TabHeader } from './components/TabHeader';
@@ -10,8 +10,8 @@ import { StatCard } from './components/StatCard';
 import EditEntityModal from './components/EditEntityModal';
 
 import { useEntidadUI } from './hooks/use-entidad-ui';
-import CuotasChart from './components/CuotasChart';
-import MontoChart from './components/MontoChart';
+import CuotasChart from '@/components/CuotasChart';
+import MontoChart from '@/components/MontoChart';
 import Loader from '@/components/Loader';
 import PeligroEliminar from '@/components/PeligroEliminar';
 

@@ -5,19 +5,24 @@ export function usePayments(token, onPaid) {
     const handleConfirm = useCallback(
         async (items) => {
             try {
-                if (!items.length) return;
+                if (!items.length) return [];
 
+                let updatedItems;
                 if (items.length === 1) {
-                    await pagarCuota(items[0].id, token);
+                    updatedItems = [await pagarCuota(items[0].id, token)];
                 } else {
                     const ids = items.map((it) => it.id);
-                    await pagarCuotasLote(ids, token);
+
+                    const { updated } = await pagarCuotasLote(ids, token);
+                    updatedItems = updated;
                 }
 
                 onPaid?.();
+                return updatedItems;
             } catch (err) {
                 console.error('Error pagando cuotas:', err);
                 alert('No se pudo registrar el pago.');
+                return [];
             }
         },
         [onPaid, token],
