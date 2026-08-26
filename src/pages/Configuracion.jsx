@@ -9,7 +9,9 @@ export default function Configuracion() {
     const [preview, setPreview] = useState('');
     const [nombreVisible, setNombreVisible] = useState('Usuario');
     const [moneda, setMoneda] = useState('ARS');
+    const [sueldo, setSueldo] = useState('');
     const [loading, setLoading] = useState(false);
+    const [loadingSueldo, setLoadingSueldo] = useState(false);
 
     const baseUrl = import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api';
 
@@ -19,8 +21,11 @@ export default function Configuracion() {
         setPreview(user.avatar || '');
         setNombreVisible(user.name || user.nombre || 'Usuario');
 
-        const pref = user.preferred_currency ?? user.monedaPreferida;
+        const pref = user.preferred_currency;
         setMoneda(CURRENCY_VALUES.includes(pref) ? pref : 'ARS');
+
+        const sueldoActual = user.sueldo;
+        setSueldo(sueldoActual === null || sueldoActual === undefined ? '' : String(sueldoActual));
     }, [user]);
 
     const handleSave = async () => {
@@ -32,14 +37,13 @@ export default function Configuracion() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${baseUrl}/auth/preferred-currency`, {
+            const res = await fetch(`${baseUrl}/user/preferred-currency`, {
                 method: 'PUT',
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${token}`,
                 },
                 body: JSON.stringify({
-                    user_id: user.id,
                     preferred_currency: moneda,
                 }),
             });
@@ -60,7 +64,6 @@ export default function Configuracion() {
                     ...(user || {}),
                     ...updatedFromApi,
                     preferred_currency: moneda,
-                    monedaPreferida: moneda,
                 });
             }
 
@@ -70,6 +73,60 @@ export default function Configuracion() {
             alert('Ocurrió un error al guardar los cambios.');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleSaveSueldo = async () => {
+        if (!user?.id) {
+            alert('No se encontró el ID de usuario.');
+            return;
+        }
+
+        const sueldoNumber = Number(sueldo);
+
+        if (sueldo === '' || !Number.isFinite(sueldoNumber) || sueldoNumber < 0) {
+            alert('Ingresá un sueldo válido (número mayor o igual a 0).');
+            return;
+        }
+
+        try {
+            setLoadingSueldo(true);
+
+            const res = await fetch(`${baseUrl}/user/sueldo`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`,
+                },
+                body: JSON.stringify({
+                    sueldo: sueldoNumber,
+                }),
+            });
+
+            if (!res.ok) {
+                const errText = await res.text();
+                console.error('Error actualizando sueldo:', res.status, errText);
+                alert('No se pudo guardar el sueldo.');
+                return;
+            }
+
+            const json = await res.json();
+            const updatedFromApi = json.data || json.user || json;
+
+            if (typeof updateUser === 'function') {
+                updateUser({
+                    ...(user || {}),
+                    ...updatedFromApi,
+                    sueldo: sueldoNumber,
+                });
+            }
+
+            alert('Sueldo actualizado.');
+        } catch (err) {
+            console.error('Error guardando sueldo:', err);
+            alert('Ocurrió un error al guardar el sueldo.');
+        } finally {
+            setLoadingSueldo(false);
         }
     };
 
@@ -147,6 +204,40 @@ export default function Configuracion() {
                             disabled={loading}
                         >
                             {loading ? 'Guardando...' : 'Guardar cambios'}
+                        </button>
+                    </form>
+                </div>
+
+                {/* SUELDO */}
+                <div className="rounded-2xl border border-black/10 dark:border-white/10 p-4 bg-white/70 dark:bg-background-dark/70">
+                    <h2 className="text-base font-medium mb-3 text-slate-900 dark:text-white">
+                        Sueldo
+                    </h2>
+
+                    <form className="space-y-4 text-sm" onSubmit={(e) => e.preventDefault()}>
+                        <div className="flex flex-col gap-1">
+                            <label className="text-slate-600 dark:text-slate-300" htmlFor="sueldo">
+                                Sueldo mensual
+                            </label>
+                            <input
+                                id="sueldo"
+                                type="number"
+                                min="0"
+                                step="0.01"
+                                placeholder="0.00"
+                                className="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark px-3 py-2 text-sm text-slate-900 dark:text-white"
+                                value={sueldo}
+                                onChange={(e) => setSueldo(e.target.value)}
+                            />
+                        </div>
+
+                        <button
+                            type="button"
+                            className="mt-2 inline-flex items-center justify-center rounded-lg px-4 py-2 text-sm font-medium bg-primary text-white hover:bg-primary/90 transition disabled:opacity-60 disabled:cursor-not-allowed"
+                            onClick={handleSaveSueldo}
+                            disabled={loadingSueldo}
+                        >
+                            {loadingSueldo ? 'Guardando...' : 'Guardar sueldo'}
                         </button>
                     </form>
                 </div>
