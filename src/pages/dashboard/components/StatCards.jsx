@@ -24,7 +24,6 @@ export default function StatCards({
     if (!summary) return null;
 
     const {
-        total_balance = 0,
         total_debo = 0,
         total_me_deben = 0,
         cuota_debo = 0,
@@ -33,14 +32,6 @@ export default function StatCards({
     } = summary;
 
     const totalCards = [
-        {
-            label: `Balance general (${currency})`,
-            value: formatMoney(total_balance, currency),
-            tone:
-                total_balance >= 0
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-red-500 dark:text-red-400',
-        },
         {
             label: `Total EGRESO (${currency})`,
             value: formatMoney(total_debo, currency),
@@ -210,14 +201,6 @@ function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates, verti
     if (!summaryByCurrency) return null;
 
     const totalDefs = [
-        {
-            label: 'Balance general',
-            key: 'total_balance',
-            tone: (v) =>
-                v >= 0
-                    ? 'text-emerald-600 dark:text-emerald-400'
-                    : 'text-red-500 dark:text-red-400',
-        },
         {
             label: 'Total EGRESO',
             key: 'total_debo',

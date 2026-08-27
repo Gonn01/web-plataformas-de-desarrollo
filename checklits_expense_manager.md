@@ -11,7 +11,7 @@
 - [x] hacer verificacion de vinculacion duplicada, si ya tenes un mail vinculado a una entidad no se puede usar en otra
 - [x] lugar de ingreso de sueldo
 - [ ] en el balance mensual ver el resumen en contraste
-- [ ] un lugar para agregar aumentos
+- [x] un lugar para agregar aumentos
 - [ ] modo hacer cuentas: modo de checkbox temporales en los que cada vez que pagas una entidad se marque automaticamente/manual el checbox de pagado en esta sesion, y hay que ver la manera de evitar que se pierda la informacion cuando navegas a la entidad o al gasto
 - [ ] para el modo hacer cuentas es necesario hacer que tenga limite de tiempo esa info guardada, por defecto 4h, pero que tambien sea editable
 - [ ] boton exportar que tome toda la informacion del modo hacer cuentas
