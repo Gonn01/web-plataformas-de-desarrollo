@@ -3,7 +3,7 @@
 ## DASHBOARD
 
 - [x] Al pagar/registrar cobro no se actualiza la fecha del ultimo pago
-- [ ] hacer verificacion de entidad duplicada por nombre
+- [x] hacer verificacion de entidad duplicada por nombre
 - [ ] mejorar la ui del dashboard
 - [x] posibilidad de desplegar/achicar las entidades
 - [x] el filtrado no tiene en cuenta los nombres de las entidades
