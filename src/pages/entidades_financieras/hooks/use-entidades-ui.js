@@ -28,7 +28,7 @@ export function useEntidadesUI() {
             navigate('/app/entidades');
         } catch (err) {
             console.error('Error creating entity:', err);
-            alert('No se pudo crear la entidad.');
+            alert(err?.response?.data?.error || 'No se pudo crear la entidad.');
         }
     }
 

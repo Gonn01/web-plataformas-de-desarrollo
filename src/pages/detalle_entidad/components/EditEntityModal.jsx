@@ -15,12 +15,23 @@ export default function EditEntityModal({
     const [name, setName] = useState(initialName);
     const [emailInput, setEmailInput] = useState('');
     const [vincularError, setVincularError] = useState('');
+    const [nameError, setNameError] = useState('');
 
     useEffect(() => {
         setName(entity?.name || '');
         setEmailInput('');
         setVincularError('');
+        setNameError('');
     }, [entity]);
+
+    const handleSaveName = async () => {
+        setNameError('');
+        try {
+            await onSave(name.trim());
+        } catch (err) {
+            setNameError(err?.response?.data?.error || 'No se pudo actualizar la entidad.');
+        }
+    };
 
     const canSave = useMemo(() => {
         if (saving) return false;
@@ -77,9 +88,13 @@ export default function EditEntityModal({
                         type="text"
                         value={name}
                         disabled={saving}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => {
+                            setName(e.target.value);
+                            setNameError('');
+                        }}
                         className="w-full mt-1 px-3 py-2 rounded-lg border dark:border-zinc-700 bg-transparent dark:text-white disabled:opacity-60 disabled:cursor-not-allowed"
                     />
+                    {nameError && <p className="text-xs text-red-500 mt-1">{nameError}</p>}
                 </div>
 
                 {/* DIVIDER */}
@@ -162,10 +177,10 @@ export default function EditEntityModal({
                     </button>
                     <button
                         disabled={!canSave}
-                        onClick={() => onSave(name.trim())}
+                        onClick={handleSaveName}
                         className="px-4 py-2 rounded-lg bg-primary text-white flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                     >
-                        Guardar nombre
+                        Guardar
                     </button>
                 </div>
             </div>

@@ -58,9 +58,12 @@ export function useEntidadUI() {
 
     async function onUpdateEntity(newName) {
         setLoadingUpdatingEntity(true);
-        await actualizarEntidad(newName);
-        setLoadingUpdatingEntity(false);
-        setOpenEditEntity(false);
+        try {
+            await actualizarEntidad(newName);
+            setOpenEditEntity(false);
+        } finally {
+            setLoadingUpdatingEntity(false);
+        }
     }
 
     async function onDeleteEntity() {
