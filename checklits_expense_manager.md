@@ -25,6 +25,7 @@
 - [ ] el orden del dashboard tiene que venir ordenado por, cada entidad tiene un ultimo gasto, y las entidades se ordenan por quien tiene el gasto mas actual, y dentro de la entidad por gastos mas actuales
 - [ ] pago con entidad
 - [ ] checkbox de entra el mes siguiente
+- [x] Se elimina balance general
 
 ## ENTIDADES FINANCIERAS
 
