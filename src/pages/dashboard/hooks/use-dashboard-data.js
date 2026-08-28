@@ -71,14 +71,14 @@ export function useDashboardData() {
                                         ? 0
                                         : 100,
                         }))
-                        .sort((a, b) => new Date(a.created_at) - new Date(b.created_at));
+                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
                     if (items.length === 0) return null;
 
                     return { ...entity, items };
                 })
                 .filter(Boolean)
-                .sort((a, b) => a.name.localeCompare(b.name, 'es'));
+                .sort((a, b) => new Date(b.items[0].created_at) - new Date(a.items[0].created_at));
 
             setGroups(mappedGroups);
             recalcSummary(mappedGroups);

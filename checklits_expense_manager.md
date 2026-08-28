@@ -22,7 +22,7 @@
 - [ ] al activar boton hacer cuentas que aparezca un boton terminar, que guarde los datos resumen para posteriores metricas,
 - [ ] el grafico del dashboard debe tener en cuenta si el usuario ya hizo las cuentas este mes, para saber en que mes empieza el grafico
 - [ ] en los graficos hay que eliminar el ultimo punto y en el anteultimo hay que ponerle que se termina, para que no quede un punto de cuota 0, y en la de cuota 1 diga ULTIMA
-- [ ] el orden del dashboard tiene que venir ordenado por, cada entidad tiene un ultimo gasto, y las entidades se ordenan por quien tiene el gasto mas actual, y dentro de la entidad por gastos mas actuales
+- [x] el orden del dashboard tiene que venir ordenado por, cada entidad tiene un ultimo gasto, y las entidades se ordenan por quien tiene el gasto mas actual, y dentro de la entidad por gastos mas actuales
 - [ ] pago con entidad
 - [ ] checkbox de entra el mes siguiente
 - [x] Se elimina balance general
