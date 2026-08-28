@@ -23,26 +23,7 @@ export default function StatCards({
 
     if (!summary) return null;
 
-    const {
-        total_debo = 0,
-        total_me_deben = 0,
-        cuota_debo = 0,
-        cuota_me_deben = 0,
-        cuota_balance = 0,
-    } = summary;
-
-    const totalCards = [
-        {
-            label: `Total EGRESO (${currency})`,
-            value: formatMoney(total_debo, currency),
-            tone: 'text-red-500 dark:text-red-400',
-        },
-        {
-            label: `Total INGRESO (${currency})`,
-            value: formatMoney(total_me_deben, currency),
-            tone: 'text-emerald-600 dark:text-emerald-400',
-        },
-    ];
+    const { cuota_debo = 0, cuota_me_deben = 0, cuota_balance = 0 } = summary;
 
     const cuotaCards = [
         {
@@ -77,18 +58,6 @@ export default function StatCards({
                         value={c.value}
                         tone={c.tone}
                         sub
-                        vertical={vertical}
-                    />
-                ))}
-            </div>
-            <hr className="border-black/10 dark:border-white/10" />
-            <div className={rowClass}>
-                {totalCards.map((c) => (
-                    <StatCard
-                        key={c.label}
-                        label={c.label}
-                        value={c.value}
-                        tone={c.tone}
                         vertical={vertical}
                     />
                 ))}
@@ -200,19 +169,6 @@ function BreakdownRow({
 function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates, vertical = false }) {
     if (!summaryByCurrency) return null;
 
-    const totalDefs = [
-        {
-            label: 'Total EGRESO',
-            key: 'total_debo',
-            tone: () => 'text-red-500 dark:text-red-400',
-        },
-        {
-            label: 'Total INGRESO',
-            key: 'total_me_deben',
-            tone: () => 'text-emerald-600 dark:text-emerald-400',
-        },
-    ];
-
     const cuotaDefs = [
         {
             label: 'Balance por cuota',
@@ -236,14 +192,6 @@ function StatCardsBreakdown({ summaryByCurrency, preferredCurrency, rates, verti
 
     return (
         <div className="flex flex-col gap-3">
-            <BreakdownRow
-                summaryByCurrency={summaryByCurrency}
-                preferredCurrency={preferredCurrency}
-                rates={rates}
-                cardDefs={totalDefs}
-                vertical={vertical}
-            />
-            <hr className="border-black/10 dark:border-white/10" />
             <BreakdownRow
                 summaryByCurrency={summaryByCurrency}
                 preferredCurrency={preferredCurrency}
