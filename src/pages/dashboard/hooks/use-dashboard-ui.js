@@ -16,7 +16,7 @@ export function useDashboardUI(groups = [], pagarCuotas) {
     const [loadingPayIds, setLoadingPayIds] = useState(new Set());
 
     const preferredCurrency = (() => {
-        const pref = user?.preferred_currency ?? user?.monedaPreferida;
+        const pref = user?.preferred_currency;
         return CURRENCY_VALUES.includes(pref) ? pref : Currency.ARS;
     })();
 

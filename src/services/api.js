@@ -36,6 +36,19 @@ export const updatePreferredCurrency = async (userId, preferredCurrency, token) 
 };
 
 /* ===============================
+   USUARIO
+=============================== */
+
+export const updateSueldo = async (sueldo, token) => {
+    const { data } = await api.put(
+        '/user/sueldo',
+        { sueldo },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+/* ===============================
    DASHBOARD (solo lectura)
 =============================== */
 

@@ -129,7 +129,7 @@ export default function MontoChart({ gastos }) {
     const { rates } = useExchangeRates();
     const { user } = useAuth();
 
-    const pref = user?.preferred_currency ?? user?.monedaPreferida;
+    const pref = user?.preferred_currency;
     const preferredCurrency = CURRENCY_VALUES.includes(pref) ? pref : Currency.ARS;
 
     const data = buildChartData(gastos, preferredCurrency, rates);
