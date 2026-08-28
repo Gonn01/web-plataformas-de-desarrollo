@@ -2,7 +2,7 @@ import { useState } from 'react';
 import EntityCard from '@/pages/entidades_financieras/components/EntityCard';
 import ConfirmDeleteModal from '@/components/modals/ConfirmDeleteModal';
 
-export default function EntitiesList({ filtered, query, navigate, onDelete, showEmpty }) {
+export default function EntitiesList({ filtered, query, navigate, onDelete, showEmpty, viewMode }) {
     const [modalOpen, setModalOpen] = useState(false);
     const [selected, setSelected] = useState(null);
 
@@ -17,9 +17,12 @@ export default function EntitiesList({ filtered, query, navigate, onDelete, show
         setSelected(null);
     };
 
+    const containerClass =
+        viewMode === 'grid' ? 'grid grid-cols-2 md:grid-cols-3 gap-4' : 'flex flex-col gap-4';
+
     return (
         <>
-            <div className="flex flex-col gap-4">
+            <div className={containerClass}>
                 {filtered.map((e) => (
                     <EntityCard
                         key={e.id}

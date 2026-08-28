@@ -8,6 +8,7 @@ export function useEntidadesUI() {
 
     const [query, setQuery] = useState('');
     const [openNew, setOpenNew] = useState(false);
+    const [viewMode, setViewMode] = useState('list');
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();
@@ -46,6 +47,8 @@ export function useEntidadesUI() {
         setQuery,
         openNew,
         setOpenNew,
+        viewMode,
+        setViewMode,
         filtered,
         showEmpty,
         loading,
