@@ -6,6 +6,7 @@ import ActiveExpenses from './components/ActiveExpenses';
 import NewExpenseModal from '@/components/modals/Expenses/NewExpense/NewExpenseModal';
 import CuotasChart from '@/components/CuotasChart';
 import MontoChart from '@/components/MontoChart';
+import CategoriaChart from '@/components/CategoriaChart';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
@@ -138,6 +139,7 @@ function ChartsModal({ gastos, onClose }) {
                 <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-4">
                     <CuotasChart gastos={gastos} />
                     <MontoChart gastos={gastos} />
+                    <CategoriaChart gastos={gastos} />
                 </div>
             </div>
         </div>,
