@@ -16,25 +16,36 @@ import { Currency } from '@/utils/enums';
 
 const CURRENCY_VALUES = Object.values(Currency);
 
-function addMonths(date, n) {
-    return new Date(date.getFullYear(), date.getMonth() + n, 1);
+function currentMonthIndex() {
+    const today = new Date();
+    return today.getFullYear() * 12 + today.getMonth();
 }
 
-function keyFromDate(d) {
-    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+function monthIndexFromDateString(dateStr) {
+    const match = /^(\d{4})-(\d{2})/.exec(String(dateStr));
+    if (!match) {
+        const d = new Date(dateStr);
+        return d.getFullYear() * 12 + d.getMonth();
+    }
+    return Number(match[1]) * 12 + (Number(match[2]) - 1);
+}
+
+function keyFromMonthIndex(idx) {
+    const year = Math.floor(idx / 12);
+    const month = idx % 12;
+    return `${year}-${String(month + 1).padStart(2, '0')}`;
 }
 
 function labelFromKey(key) {
     const [year, month] = key.split('-');
     return new Date(Number(year), Number(month) - 1, 1).toLocaleDateString('es-AR', {
         month: 'short',
-        year: '2-digit',
+        year: 'numeric',
     });
 }
 
 function accumulateAmounts(gastos, type, amounts, preferredCurrency, rates) {
-    const today = new Date();
-    const currentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const currentMonth = currentMonthIndex();
 
     for (const g of gastos) {
         if (g.fixed_expense || g.type !== type) continue;
@@ -55,26 +66,23 @@ function accumulateAmounts(gastos, type, amounts, preferredCurrency, rates) {
 
         let nextMonth;
         if (g.first_quota_date) {
-            const first = new Date(g.first_quota_date);
-            nextMonth = addMonths(first, paid);
+            nextMonth = monthIndexFromDateString(g.first_quota_date) + paid;
             if (nextMonth < currentMonth) nextMonth = currentMonth;
         } else {
             nextMonth = currentMonth;
         }
 
         for (let i = 0; i < remaining; i++) {
-            const key = keyFromDate(addMonths(nextMonth, i));
+            const key = keyFromMonthIndex(nextMonth + i);
             amounts[key] = (amounts[key] || 0) + converted;
         }
     }
 }
 
-function lastKeyPlusOne(counts) {
+function firstAndLastKeys(counts) {
     const keys = Object.keys(counts).sort();
-    if (keys.length === 0) return null;
-    const last = keys.at(-1);
-    const [y, m] = last.split('-');
-    return keyFromDate(new Date(Number(y), Number(m), 1));
+    if (keys.length === 0) return { first: null, last: null };
+    return { first: keys[0], last: keys.at(-1) };
 }
 
 function buildChartData(gastos, preferredCurrency, rates) {
@@ -84,23 +92,23 @@ function buildChartData(gastos, preferredCurrency, rates) {
     accumulateAmounts(gastos, 'EGRESO', egreso, preferredCurrency, rates);
     accumulateAmounts(gastos, 'INGRESO', ingreso, preferredCurrency, rates);
 
-    const egresoEnd = lastKeyPlusOne(egreso);
-    const ingresoEnd = lastKeyPlusOne(ingreso);
+    const egresoRange = firstAndLastKeys(egreso);
+    const ingresoRange = firstAndLastKeys(ingreso);
 
-    const allKeys = new Set([
-        ...Object.keys(egreso),
-        ...Object.keys(ingreso),
-        ...(egresoEnd ? [egresoEnd] : []),
-        ...(ingresoEnd ? [ingresoEnd] : []),
-    ]);
+    const allKeys = new Set([...Object.keys(egreso), ...Object.keys(ingreso)]);
 
     if (allKeys.size === 0) return [];
 
-    return [...allKeys].sort().map((key) => ({
-        label: labelFromKey(key),
-        egreso: egresoEnd && key <= egresoEnd ? (egreso[key] ?? 0) : null,
-        ingreso: ingresoEnd && key <= ingresoEnd ? (ingreso[key] ?? 0) : null,
-    }));
+    return [...allKeys].sort().map((key) => {
+        const hasEgreso = egresoRange.last && key >= egresoRange.first && key <= egresoRange.last;
+        const hasIngreso =
+            ingresoRange.last && key >= ingresoRange.first && key <= ingresoRange.last;
+        return {
+            label: labelFromKey(key),
+            egreso: hasEgreso ? (egreso[key] ?? 0) : null,
+            ingreso: hasIngreso ? (ingreso[key] ?? 0) : null,
+        };
+    });
 }
 
 function formatAxis(value) {

@@ -39,10 +39,10 @@ export const updatePreferredCurrency = async (userId, preferredCurrency, token) 
    USUARIO
 =============================== */
 
-export const updateSueldo = async (sueldo, token) => {
+export const updateSueldo = async (sueldo, sueldoCurrency, token) => {
     const { data } = await api.put(
         '/user/sueldo',
-        { sueldo },
+        { sueldo, sueldo_currency: sueldoCurrency },
         { headers: { Authorization: `Bearer ${token}` } },
     );
     return data.data;

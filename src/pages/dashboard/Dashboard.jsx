@@ -136,7 +136,7 @@ function ChartsModal({ gastos, onClose }) {
                         <Icon name="close" />
                     </button>
                 </header>
-                <div className="p-6 grid grid-cols-1 xl:grid-cols-2 gap-4">
+                <div className="p-6 grid grid-cols-1 gap-4">
                     <CuotasChart gastos={gastos} />
                     <MontoChart gastos={gastos} />
                     <CategoriaChart gastos={gastos} />

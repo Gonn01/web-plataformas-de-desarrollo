@@ -8,12 +8,14 @@ export function useConfiguracionUI() {
         nombreVisible,
         monedaActual,
         sueldoActual,
+        sueldoMonedaActual,
         guardarMoneda,
         guardarSueldo,
     } = useConfiguracionData();
 
     const [moneda, setMoneda] = useState(monedaActual);
     const [sueldo, setSueldo] = useState(sueldoActual === '' ? '' : String(sueldoActual));
+    const [sueldoMoneda, setSueldoMoneda] = useState(sueldoMonedaActual);
     const [loadingMoneda, setLoadingMoneda] = useState(false);
     const [loadingSueldo, setLoadingSueldo] = useState(false);
     const [snackbar, setSnackbar] = useState(null);
@@ -25,6 +27,10 @@ export function useConfiguracionUI() {
     useEffect(() => {
         setSueldo(sueldoActual === '' ? '' : String(sueldoActual));
     }, [sueldoActual]);
+
+    useEffect(() => {
+        setSueldoMoneda(sueldoMonedaActual);
+    }, [sueldoMonedaActual]);
 
     const showSnackbar = (message, type = 'success') => setSnackbar({ message, type });
     const closeSnackbar = () => setSnackbar(null);
@@ -52,7 +58,7 @@ export function useConfiguracionUI() {
 
         try {
             setLoadingSueldo(true);
-            await guardarSueldo(sueldoNumber);
+            await guardarSueldo(sueldoNumber, sueldoMoneda);
             showSnackbar('Sueldo actualizado.');
         } catch (err) {
             console.error('Error guardando sueldo:', err);
@@ -74,6 +80,8 @@ export function useConfiguracionUI() {
 
         sueldo,
         setSueldo,
+        sueldoMoneda,
+        setSueldoMoneda,
         loadingSueldo,
         onSaveSueldo,
 

@@ -17,6 +17,8 @@ export default function Configuracion() {
 
         sueldo,
         setSueldo,
+        sueldoMoneda,
+        setSueldoMoneda,
         loadingSueldo,
         onSaveSueldo,
 
@@ -52,6 +54,8 @@ export default function Configuracion() {
                 <SueldoCard
                     sueldo={sueldo}
                     setSueldo={setSueldo}
+                    moneda={sueldoMoneda}
+                    setMoneda={setSueldoMoneda}
                     loading={loadingSueldo}
                     onSave={onSaveSueldo}
                 />

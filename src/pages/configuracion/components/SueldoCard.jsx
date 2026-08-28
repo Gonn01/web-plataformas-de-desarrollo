@@ -1,6 +1,34 @@
 import { useState } from 'react';
+import { Currency } from '@/utils/enums';
 
-export function SueldoCard({ sueldo, setSueldo, loading, onSave }) {
+const CURRENCY_LABELS = {
+    [Currency.ARS]: 'ARS (Pesos Argentinos)',
+    [Currency.USD]: 'USD (Dólares)',
+    [Currency.EUR]: 'EUR (Euros)',
+};
+
+function parseAmountInput(raw) {
+    let cleaned = raw.replace(/\./g, '').replace(',', '.');
+    cleaned = cleaned.replace(/[^0-9.]/g, '');
+
+    const firstDot = cleaned.indexOf('.');
+    if (firstDot !== -1) {
+        cleaned = cleaned.slice(0, firstDot + 1) + cleaned.slice(firstDot + 1).replace(/\./g, '');
+    }
+
+    return cleaned;
+}
+
+function formatAmountForDisplay(value) {
+    if (value === '') return '';
+
+    const [intPart, decPart] = String(value).split('.');
+    const formattedInt = intPart === '' ? '' : Number(intPart).toLocaleString('es-AR');
+
+    return decPart !== undefined ? `${formattedInt},${decPart}` : formattedInt;
+}
+
+export function SueldoCard({ sueldo, setSueldo, moneda, setMoneda, loading, onSave }) {
     const [aumento, setAumento] = useState('');
 
     const porcentaje = Number(aumento);
@@ -28,16 +56,30 @@ export function SueldoCard({ sueldo, setSueldo, loading, onSave }) {
                     <label className="text-slate-600 dark:text-slate-300" htmlFor="sueldo">
                         Sueldo mensual
                     </label>
-                    <input
-                        id="sueldo"
-                        type="number"
-                        min="0"
-                        step="0.01"
-                        placeholder="0.00"
-                        className="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark px-3 py-2 text-sm text-slate-900 dark:text-white"
-                        value={sueldo}
-                        onChange={(e) => setSueldo(e.target.value)}
-                    />
+                    <div className="flex gap-2">
+                        <input
+                            id="sueldo"
+                            type="text"
+                            inputMode="decimal"
+                            placeholder="0,00"
+                            className="flex-1 rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark px-3 py-2 text-sm text-slate-900 dark:text-white"
+                            value={formatAmountForDisplay(sueldo)}
+                            onChange={(e) => setSueldo(parseAmountInput(e.target.value))}
+                        />
+                        <select
+                            id="sueldo-moneda"
+                            aria-label="Moneda del sueldo"
+                            className="rounded-lg border border-black/10 dark:border-white/10 bg-white dark:bg-background-dark px-3 py-2 text-sm text-slate-900 dark:text-white"
+                            value={moneda}
+                            onChange={(e) => setMoneda(e.target.value)}
+                        >
+                            {Object.values(Currency).map((c) => (
+                                <option key={c} value={c}>
+                                    {CURRENCY_LABELS[c]}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
                 </div>
 
                 <div className="flex flex-col gap-1 pt-3 border-t border-black/10 dark:border-white/10">

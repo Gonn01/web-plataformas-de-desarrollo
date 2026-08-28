@@ -22,6 +22,9 @@ export function useConfiguracionData() {
         : Currency.ARS;
 
     const sueldoActual = user?.sueldo ?? '';
+    const sueldoMonedaActual = CURRENCY_VALUES.includes(user?.sueldo_currency)
+        ? user.sueldo_currency
+        : monedaActual;
 
     const guardarMoneda = useCallback(
         async (moneda) => {
@@ -34,11 +37,11 @@ export function useConfiguracionData() {
     );
 
     const guardarSueldo = useCallback(
-        async (sueldoNumber) => {
+        async (sueldoNumber, sueldoCurrency) => {
             if (!user?.id) throw new Error('No se encontró el ID de usuario.');
 
-            const updated = await updateSueldo(sueldoNumber, token);
-            updateUser({ ...updated, sueldo: sueldoNumber });
+            const updated = await updateSueldo(sueldoNumber, sueldoCurrency, token);
+            updateUser({ ...updated, sueldo: sueldoNumber, sueldo_currency: sueldoCurrency });
         },
         [user, token, updateUser],
     );
@@ -49,6 +52,7 @@ export function useConfiguracionData() {
         nombreVisible,
         monedaActual,
         sueldoActual,
+        sueldoMonedaActual,
         guardarMoneda,
         guardarSueldo,
     };

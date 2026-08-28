@@ -5,6 +5,7 @@ import useAuth from '@/store/use-auth-store';
 import { useCompartidosStore } from '@/store/use-compartidos-store';
 import { usePusherChannel } from '@/hooks/use-pusher-channel';
 import Snackbar from './Snackbar';
+import ConfirmDeleteModal from './modals/ConfirmDeleteModal';
 
 export default function Sidebar() {
     const base = 'flex items-center gap-3 px-3 py-2 rounded-lg text-sm font-medium leading-normal';
@@ -15,6 +16,7 @@ export default function Sidebar() {
     const navigate = useNavigate();
     const { pendingCount, setPendingCount, loadPendingCount } = useCompartidosStore();
     const [notification, setNotification] = useState(null);
+    const [confirmLogoutOpen, setConfirmLogoutOpen] = useState(false);
 
     useEffect(() => {
         loadPendingCount(token);
@@ -32,6 +34,11 @@ export default function Sidebar() {
     const handleLogout = () => {
         logout();
         navigate('/login', { replace: true });
+    };
+
+    const handleConfirmLogout = () => {
+        setConfirmLogoutOpen(false);
+        handleLogout();
     };
 
     const avatar = user?.avatar;
@@ -106,12 +113,25 @@ export default function Sidebar() {
                     <Icon name="settings" className="text-2xl" />
                     <p>Configuración</p>
                 </NavLink>
-                <button onClick={handleLogout} className={`${base} ${idle} text-left w-full`}>
+                <button
+                    onClick={() => setConfirmLogoutOpen(true)}
+                    className={`${base} ${idle} text-left w-full`}
+                >
                     <Icon name="logout" className="text-2xl" />
                     <p>Cerrar sesión</p>
                 </button>
             </div>
         </aside>
+
+        <ConfirmDeleteModal
+            open={confirmLogoutOpen}
+            title="¿Cerrar sesión?"
+            message="Vas a tener que volver a iniciar sesión para acceder a tu cuenta."
+            confirmLabel="Cerrar sesión"
+            cancelLabel="Cancelar"
+            onConfirm={handleConfirmLogout}
+            onCancel={() => setConfirmLogoutOpen(false)}
+        />
         </>
     );
 }
