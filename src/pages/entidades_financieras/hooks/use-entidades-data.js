@@ -1,5 +1,10 @@
 import { useEffect, useState } from 'react';
-import { fetchFinancialEntities, createEntity, deleteFinancialEntity } from '@/services/api';
+import {
+    fetchFinancialEntities,
+    createEntity,
+    deleteFinancialEntity,
+    vincularUsuarioEntidad,
+} from '@/services/api';
 import useAuth from '@/store/use-auth-store';
 import { useEntitiesStore } from '@/store/use-entities-store';
 
@@ -35,11 +40,24 @@ export function useEntidadesData() {
 
         load();
     }, [token]);
-    async function crearEntidad({ name }) {
-        const newEntity = await createEntity({ name }, token);
-        setEntities((prev) => [newEntity, ...prev]);
-        addEntity(newEntity);
-        return newEntity;
+    async function crearEntidad({ name, email }) {
+        const created = await createEntity({ name }, token);
+
+        let finalEntity = created;
+        let linkError = null;
+
+        if (email) {
+            try {
+                finalEntity = await vincularUsuarioEntidad(created.id, email, token);
+            } catch (err) {
+                linkError = err;
+            }
+        }
+
+        setEntities((prev) => [finalEntity, ...prev]);
+        addEntity(finalEntity);
+
+        return { entity: finalEntity, linkError };
     }
 
     async function eliminarEntidad(id) {

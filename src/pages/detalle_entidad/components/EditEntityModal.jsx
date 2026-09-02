@@ -46,6 +46,7 @@ export default function EditEntityModal({
         try {
             await onVincular(emailInput.trim());
             setEmailInput('');
+            onClose();
         } catch (err) {
             setVincularError(err?.response?.data?.error || 'Error al vincular usuario');
         }
@@ -55,6 +56,7 @@ export default function EditEntityModal({
         setVincularError('');
         try {
             await onDesvincular();
+            onClose();
         } catch (err) {
             setVincularError(err?.response?.data?.error || 'Error al desvincular usuario');
         }

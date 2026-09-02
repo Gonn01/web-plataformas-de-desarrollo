@@ -22,11 +22,20 @@ export function useEntidadesUI() {
     // const showEmpty = entities.length === 0 && filtered.length === 0;
     const showEmpty = !loading && entities.length === 0 && filtered.length === 0;
 
-    async function handleSaveNew({ name }) {
+    async function handleSaveNew({ name, email }) {
         try {
-            await crearEntidad({ name });
+            const { linkError } = await crearEntidad({ name, email });
             setOpenNew(false);
             navigate('/app/entidades');
+
+            if (linkError) {
+                console.error('Error vinculando usuario:', linkError);
+                alert(
+                    linkError?.response?.data?.error
+                        ? `La entidad se creó, pero no se pudo vincular el usuario: ${linkError.response.data.error}`
+                        : 'La entidad se creó, pero no se pudo vincular el usuario. Revisá el email.',
+                );
+            }
         } catch (err) {
             console.error('Error creating entity:', err);
             alert(err?.response?.data?.error || 'No se pudo crear la entidad.');
