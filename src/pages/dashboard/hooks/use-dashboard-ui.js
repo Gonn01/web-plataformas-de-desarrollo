@@ -71,10 +71,11 @@ export function useDashboardUI(groups = [], pagarCuotas) {
     async function onConfirmPay() {
         payModal.setModalOpen(false);
 
-        const ids = payModal.modalItems.map((i) => i.id);
+        const itemsToPay = payModal.modalItems;
+        const ids = itemsToPay.map((i) => i.id);
         setLoadingPayIds((prev) => new Set([...prev, ...ids]));
 
-        await pagarCuotas(payModal.modalItems);
+        await pagarCuotas(itemsToPay);
 
         setLoadingPayIds(new Set());
     }

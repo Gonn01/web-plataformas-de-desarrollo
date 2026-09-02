@@ -9,6 +9,8 @@ import Configuracion from './pages/configuracion/Configuracion';
 import Register from './pages/auth/Register/Register';
 import Dashboard from './pages/dashboard/Dashboard';
 import Compartidos from './pages/compartidos/Compartidos';
+import Cuentas from './pages/cuentas/Cuentas';
+import CuentaDetalle from './pages/cuentas/CuentaDetalle';
 
 export default function App() {
     return (
@@ -28,6 +30,8 @@ export default function App() {
             >
                 <Route index element={<Navigate to="dashboard" replace />} />
                 <Route path="dashboard" element={<Dashboard />} />
+                <Route path="cuentas" element={<Cuentas />} />
+                <Route path="cuentas/:id" element={<CuentaDetalle />} />
                 <Route path="entidades" element={<EntidadesFinancieras />} />
                 <Route path="entidades/:id" element={<EntidadDetalle />} />
                 <Route path="gastos/:id" element={<DetalleGasto />} />

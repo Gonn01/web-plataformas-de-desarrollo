@@ -1,22 +1,27 @@
 import { ChipTipoGasto } from '@/components/ChipTipoGasto';
 import ProgressBar from '@/components/ProgressBar';
 import CategoryBadges from '@/components/CategoryBadges';
+import Icon from '@/components/Icon';
 import { formatMoney } from '@/utils/FormatMoney';
 import { formatDateShort } from '@/utils/FormatDate';
+import { useReconcileStore } from '@/store/use-reconcile-store';
 
-export default function ExpenseCard({ gasto, onClick, onPayClick, loading = false }) {
+export default function ExpenseCard({ gasto, onClick, onPayClick, loading = false, entityName }) {
+    const reconcileActive = useReconcileStore((s) => s.active);
+    const reconcileChecked = useReconcileStore((s) => Boolean(s.checkedExpenses[String(gasto.id)]));
+    const toggleReconcile = useReconcileStore((s) => s.toggleExpense);
     const progress = gasto.fixed_expense
         ? 100
         : gasto.number_of_quotas > 0
-            ? (gasto.payed_quotas / gasto.number_of_quotas) * 100
-            : (gasto.progress ?? 0);
+          ? (gasto.payed_quotas / gasto.number_of_quotas) * 100
+          : (gasto.progress ?? 0);
 
     const cur = gasto.currency_type;
     const paidTotal = (gasto.payed_quotas ?? 0) * (gasto.amount_per_quota ?? 0);
 
     return (
         <div
-            className={`flex flex-col gap-2 rounded-lg p-3 transition-all cursor-pointer relative hover:bg-black/5 dark:hover:bg-white/5 ${loading ? 'pointer-events-none' : ''}`}
+            className={`flex flex-col gap-2 rounded-lg p-3 transition-all cursor-pointer relative hover:bg-black/5 dark:hover:bg-white/5 ${loading ? 'pointer-events-none' : ''} ${reconcileActive && reconcileChecked ? 'bg-primary/5 dark:bg-primary/10' : ''}`}
             onClick={onClick}
         >
             {loading && (
@@ -25,7 +30,30 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
 
             {/* Top row */}
             <div className="flex items-start justify-between gap-4">
-                <div className="flex flex-col gap-1.5 flex-1">
+                {reconcileActive && (
+                    <button
+                        type="button"
+                        aria-label={
+                            reconcileChecked
+                                ? 'Desmarcar pago de esta sesión'
+                                : 'Marcar como pagado en esta sesión'
+                        }
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            toggleReconcile(gasto, entityName);
+                        }}
+                        className={`shrink-0 mt-0.5 flex h-5 w-5 items-center justify-center rounded-md border transition-colors cursor-pointer ${
+                            reconcileChecked
+                                ? 'border-primary bg-primary text-background-dark'
+                                : 'border-slate-300 dark:border-slate-600 text-transparent hover:border-primary'
+                        }`}
+                    >
+                        <Icon name="check" className="text-base" />
+                    </button>
+                )}
+                <div
+                    className={`flex flex-col gap-1.5 flex-1 ${reconcileActive && reconcileChecked ? 'opacity-60' : ''}`}
+                >
                     <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
                         {gasto.name}
                     </p>
@@ -90,8 +118,15 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
 
                 {onPayClick && (
                     <button
-                        className="text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors flex items-center gap-2 shrink-0"
+                        className={`text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors flex items-center gap-2 shrink-0 ${
+                            reconcileActive ? '' : 'opacity-50'
+                        }`}
                         disabled={loading}
+                        title={
+                            reconcileActive
+                                ? undefined
+                                : 'Activá el modo "Hacer cuentas" para registrar pagos'
+                        }
                         onClick={(e) => {
                             e.stopPropagation();
                             onPayClick(gasto);

@@ -1,7 +1,16 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import useAuth from '@/store/use-auth-store';
-import { pagarCuota as pagarCuota2, refundCuota as refundCuota2, fetchGastoById, updateGasto, deleteGasto } from '@/services/api';
+import {
+    pagarCuota as pagarCuota2,
+    refundCuota as refundCuota2,
+    fetchGastoById,
+    updateGasto,
+    deleteGasto,
+} from '@/services/api';
+import { ensureReconcileActive } from '@/hooks/use-payments';
+import { useReconcileStore } from '@/store/use-reconcile-store';
+import { useSnackbarStore } from '@/store/use-snackbar-store';
 
 export function useGastoData() {
     const { id } = useParams();
@@ -35,8 +44,24 @@ export function useGastoData() {
 
     async function pagarCuota() {
         if (!gasto) return;
-        await pagarCuota2(gasto.id, token);
-        await load(true);
+        if (!ensureReconcileActive()) return;
+        try {
+            await pagarCuota2(gasto.id, token);
+            useReconcileStore.getState().refreshAfterPayment();
+            await load(true);
+        } catch (err) {
+            if (err?.response?.data?.code === 'RECONCILE_REQUIRED') {
+                useSnackbarStore
+                    .getState()
+                    .show(
+                        'Activá el modo "Hacer cuentas" para registrar pagos.',
+                        'error',
+                        'playlist_add_check',
+                    );
+            } else {
+                useSnackbarStore.getState().show('No se pudo registrar el pago.', 'error');
+            }
+        }
     }
 
     async function refundCuota() {

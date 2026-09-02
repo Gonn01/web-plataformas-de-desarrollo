@@ -7,6 +7,7 @@ import NewExpenseModal from '@/components/modals/Expenses/NewExpense/NewExpenseM
 import CuotasChart from '@/components/CuotasChart';
 import MontoChart from '@/components/MontoChart';
 import CategoriaChart from '@/components/CategoriaChart';
+import { ReconcileToggle, ReconcileBar } from './components/ReconcileBar';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
@@ -49,14 +50,19 @@ export default function Dashboard() {
                     </p>
                 </div>
 
-                <button
-                    onClick={() => ui.setOpenNewExpense(true)}
-                    className="cursor-pointer flex items-center h-11 px-5 rounded-lg bg-primary text-background-dark font-bold"
-                >
-                    <Icon name="add_circle" className="mr-2" />
-                    Crear Gasto / Deuda
-                </button>
+                <div className="flex items-center gap-3">
+                    <ReconcileToggle />
+                    <button
+                        onClick={() => ui.setOpenNewExpense(true)}
+                        className="cursor-pointer flex items-center h-11 px-5 rounded-lg bg-primary text-background-dark font-bold"
+                    >
+                        <Icon name="add_circle" className="mr-2" />
+                        Crear Gasto / Deuda
+                    </button>
+                </div>
             </div>
+
+            <ReconcileBar totalItems={allItems.length} />
 
             {/* MAIN LAYOUT */}
             <div className="flex flex-row flex-1 gap-6 min-h-0 overflow-hidden">

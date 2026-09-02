@@ -1,11 +1,22 @@
 import { useCallback } from 'react';
 import { pagarCuota, pagarCuotasLote } from '@/services/api';
+import { useReconcileStore } from '@/store/use-reconcile-store';
+import { useSnackbarStore } from '@/store/use-snackbar-store';
+
+const RECONCILE_MSG = 'Activá el modo "Hacer cuentas" para registrar pagos.';
+
+export function ensureReconcileActive() {
+    if (useReconcileStore.getState().active) return true;
+    useSnackbarStore.getState().show(RECONCILE_MSG, 'error', 'playlist_add_check');
+    return false;
+}
 
 export function usePayments(token, onPaid) {
     const handleConfirm = useCallback(
         async (items) => {
             try {
                 if (!items.length) return [];
+                if (!ensureReconcileActive()) return [];
 
                 let updatedItems;
                 if (items.length === 1) {
@@ -17,11 +28,18 @@ export function usePayments(token, onPaid) {
                     updatedItems = updated;
                 }
 
+                // El backend ya marcó los items en la sesión; resincronizamos.
+                useReconcileStore.getState().refreshAfterPayment();
+
                 onPaid?.();
                 return updatedItems;
             } catch (err) {
                 console.error('Error pagando cuotas:', err);
-                alert('No se pudo registrar el pago.');
+                if (err?.response?.data?.code === 'RECONCILE_REQUIRED') {
+                    useSnackbarStore.getState().show(RECONCILE_MSG, 'error', 'playlist_add_check');
+                } else {
+                    useSnackbarStore.getState().show('No se pudo registrar el pago.', 'error');
+                }
                 return [];
             }
         },

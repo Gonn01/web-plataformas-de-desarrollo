@@ -12,20 +12,24 @@
 - [x] lugar de ingreso de sueldo
 - [x] en el balance mensual ver el resumen en contraste
 - [x] un lugar para agregar aumentos
-- [ ] modo hacer cuentas: modo de checkbox temporales en los que cada vez que pagas una entidad se marque automaticamente/manual el checbox de pagado en esta sesion, y hay que ver la manera de evitar que se pierda la informacion cuando navegas a la entidad o al gasto
-- [ ] para el modo hacer cuentas es necesario hacer que tenga limite de tiempo esa info guardada, por defecto 4h, pero que tambien sea editable
+- [x] modo hacer cuentas: modo de checkbox en los que cada vez que pagas una entidad se marque automaticamente/manual el checbox de pagado en esta sesion, y hay que ver la manera de evitar que se pierda la informacion cuando navegas a la entidad o al gasto (sesión + marcas persistidas en DB vía `/reconcile/*`, se retoma al volver)
+- [x] ~~limite de tiempo 4h editable~~ CAMBIO: la sesión se guarda en DB y vive hasta que tocás "Terminar", el usuario la retoma cuando quiere
+- [x] no se puede pagar/cobrar nada fuera del modo hacer cuentas (guard en frontend con snackbar + backend rechaza con 409 `RECONCILE_REQUIRED`)
+- [x] al terminar de hacer cuentas se guarda un snapshot del mes (totales por moneda/tipo + detalle por gasto) en `reconcile_snapshots` para comparar meses — pantalla "Historial de cuentas"
 - [ ] boton exportar que tome toda la informacion del modo hacer cuentas
 - [x] grafico de gastos por categoria
 - [x] metricas por categoria en relacion al sueldo, por ej, cuanto gasto de suscripciones en relacion al sueldo (11%)
 - [ ] como hacemos para explicarle al usuario como usar el sistema
 - [x] sacar balance general del dashboard
-- [ ] al activar boton hacer cuentas que aparezca un boton terminar, que guarde los datos resumen para posteriores metricas,
+- [x] al activar boton hacer cuentas que aparezca un boton terminar, que guarde los datos resumen para posteriores metricas (botón "Terminar" en el banner → snapshot)
 - [ ] el grafico del dashboard debe tener en cuenta si el usuario ya hizo las cuentas este mes, para saber en que mes empieza el grafico
 - [x] en los graficos hay que eliminar el ultimo punto y en el anteultimo hay que ponerle que se termina, para que no quede un punto de cuota 0, y en la de cuota 1 diga ULTIMA
 - [x] el orden del dashboard tiene que venir ordenado por, cada entidad tiene un ultimo gasto, y las entidades se ordenan por quien tiene el gasto mas actual, y dentro de la entidad por gastos mas actuales
 - [ ] pago con entidad
 - [ ] checkbox de entra el mes siguiente
 - [x] Se elimina balance general
+- [ ] Flechita para ocultar los balnces y tamvbien que el sidebar se oculte
+- [ ] agregar favoritos
 
 ## ENTIDADES FINANCIERAS
 
@@ -57,7 +61,7 @@
 
 ## Perfil
 
-- [ ] configurar cuanto tiempo dura el modo hacer cuentas. por defecto 4hs
+- [x] ~~configurar cuanto tiempo dura el modo hacer cuentas~~ descartado: la sesión persiste en DB hasta que se termina, sin límite de tiempo
 
 ## Metricas
 
@@ -69,3 +73,5 @@
 - [ ] integrar mp mediante link
 - [ ] modo daltonismo
 - [ ] posibilidad de marcar entidades como privadas y que al querer ver datos de la misma haya que poner una contraseña
+- [ ] MODO simple/usuario avanzado que muestre mas o menos cosas, checkear FITIA
+- [ ] dEFINIR TEMA MARKETING

@@ -194,6 +194,64 @@ export const pagarCuotasLote = async (ids, token) => {
 };
 
 /* ===============================
+   MODO HACER CUENTAS (reconcile)
+=============================== */
+
+export const fetchReconcileSession = async (token) => {
+    const { data } = await api.get('/reconcile/session', {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data; // { session, items } | null
+};
+
+export const startReconcileSession = async (token) => {
+    const { data } = await api.post(
+        '/reconcile/session',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data; // { session, items, alreadyOpen }
+};
+
+export const setReconcileItem = async ({ purchase_id, purchase_ids, checked, auto }, token) => {
+    const body = purchase_ids ? { purchase_ids, checked } : { purchase_id, checked, auto };
+    const { data } = await api.put('/reconcile/session/items', body, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data; // { session, items }
+};
+
+export const finishReconcileSession = async (token) => {
+    const { data } = await api.post(
+        '/reconcile/session/finish',
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data; // snapshot
+};
+
+export const discardReconcileSession = async (token) => {
+    const { data } = await api.delete('/reconcile/session', {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
+export const fetchReconcileSnapshots = async (token) => {
+    const { data } = await api.get('/reconcile/snapshots', {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
+export const fetchReconcileSnapshotById = async (id, token) => {
+    const { data } = await api.get(`/reconcile/snapshots/${id}`, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+    return data.data;
+};
+
+/* ===============================
    COMPARTIDOS
 =============================== */
 
