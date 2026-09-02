@@ -20,13 +20,14 @@ export default function EntityCard({ entity, onClick, onDelete }) {
                     <p className="mt-1 text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal">
                         {entity.cantidad == undefined ? 0 : entity.cantidad} gasto{entity.cantidad === 1 ? ' activo' : 's activos'}
                     </p>
-                </div>
-            </div>
 
-            <div className="shrink-0 transition-opacity group-hover:opacity-0">
-                <span className="material-symbols-outlined text-2xl text-slate-400 dark:text-slate-500">
-                    chevron_right
-                </span>
+                    {entity.linked_user_name && (
+                        <p className="mt-1 flex items-center gap-1 text-slate-500 dark:text-slate-400 text-xs font-normal leading-normal">
+                            <span className="material-symbols-outlined text-sm">person</span>
+                            Vinculada a: {entity.linked_user_name}
+                        </p>
+                    )}
+                </div>
             </div>
 
             {/* Tacho de basura */}

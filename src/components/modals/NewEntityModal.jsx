@@ -4,6 +4,7 @@ import Icon from '../Icon';
 
 export default function NewEntityModal({ open, onClose, onSave }) {
     const [name, setName] = useState('');
+    const [email, setEmail] = useState('');
     const [saving, setSaving] = useState(false);
 
     useEffect(() => {
@@ -28,8 +29,9 @@ export default function NewEntityModal({ open, onClose, onSave }) {
         if (!canSave || saving) return;
         setSaving(true);
         try {
-            await onSave?.({ name: name.trim() });
+            await onSave?.({ name: name.trim(), email: email.trim() || undefined });
             setName('');
+            setEmail('');
         } finally {
             setSaving(false);
         }
@@ -90,6 +92,19 @@ export default function NewEntityModal({ open, onClose, onSave }) {
                                     value={name}
                                     onChange={(e) => setName(e.target.value)}
                                     autoFocus
+                                />
+                            </label>
+
+                            <label className="flex flex-col w-full">
+                                <p className="text-white text-sm font-medium pb-2">
+                                    Vincular a un usuario (opcional)
+                                </p>
+                                <input
+                                    type="email"
+                                    className="form-input flex w/full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-[#3d5245] bg-[#1c2620] focus:border-primary h-12 placeholder:text-[#9eb7a8] px-4 py-3 text-base font-normal"
+                                    placeholder="Email del usuario a vincular"
+                                    value={email}
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                             </label>
                         </div>

@@ -112,10 +112,10 @@ export default function CategorySelector({ categories, selectedIds, onToggle, on
                                 <span className="text-xs text-[#9eb7a8]">{selected.length} seleccionada{selected.length !== 1 ? 's' : ''}</span>
                                 <button
                                     type="button"
-                                    onClick={() => selected.forEach((c) => onToggle(c.id))}
-                                    className="text-xs text-red-400 hover:text-red-300 cursor-pointer"
+                                    onClick={() => setOpen(false)}
+                                    className="text-xs text-primary hover:opacity-80 cursor-pointer"
                                 >
-                                    Limpiar
+                                    Aceptar
                                 </button>
                             </div>
                         )}

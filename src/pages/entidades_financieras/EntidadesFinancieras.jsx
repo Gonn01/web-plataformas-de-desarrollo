@@ -14,6 +14,8 @@ export default function EntidadesFinancieras() {
         filtered,
         openNew,
         setOpenNew,
+        viewMode,
+        setViewMode,
         showEmpty,
         loading,
         handleSaveNew,
@@ -27,7 +29,11 @@ export default function EntidadesFinancieras() {
 
     return (
         <>
-            <Heading onCreate={() => setOpenNew(true)} />
+            <Heading
+                onCreate={() => setOpenNew(true)}
+                viewMode={viewMode}
+                setViewMode={setViewMode}
+            />
 
             <SearchBox query={query} setQuery={setQuery} />
 
@@ -37,6 +43,7 @@ export default function EntidadesFinancieras() {
                 navigate={navigate}
                 onDelete={handleDelete}
                 showEmpty={showEmpty}
+                viewMode={viewMode}
             />
 
             {showEmpty && <EmptyState onCreate={() => setOpenNew(true)} />}
