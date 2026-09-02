@@ -2,8 +2,10 @@ import { useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import Icon from '@/components/Icon';
 import Loader from '@/components/Loader';
+import WhatsAppCopyButton from '@/pages/dashboard/components/WhatsAppCopyButton';
 import { formatMoney } from '@/utils/FormatMoney';
 import { formatDate, formatDateShort } from '@/utils/FormatDate';
+import { buildReconcileEntityText, buildReconcileSnapshotText } from '@/utils/build-reconcile-text';
 import { useCuentaDetalle, monthLabel } from './hooks/use-cuentas';
 
 export default function CuentaDetalle() {
@@ -52,15 +54,22 @@ export default function CuentaDetalle() {
                 Historial de cuentas
             </button>
 
-            <div className="shrink-0 mb-5">
-                <p className="text-3xl font-black text-slate-900 dark:text-white capitalize">
-                    {monthLabel(snapshot.month)}
-                </p>
-                <p className="text-slate-500 dark:text-slate-400 text-sm">
-                    Del {formatDateShort(snapshot.started_at)} al{' '}
-                    {formatDateShort(snapshot.finished_at)} · cerrado el{' '}
-                    {formatDate(snapshot.finished_at)}
-                </p>
+            <div className="shrink-0 mb-5 flex items-start justify-between gap-4">
+                <div>
+                    <p className="text-3xl font-black text-slate-900 dark:text-white capitalize">
+                        {monthLabel(snapshot.month)}
+                    </p>
+                    <p className="text-slate-500 dark:text-slate-400 text-sm">
+                        Del {formatDateShort(snapshot.started_at)} al{' '}
+                        {formatDateShort(snapshot.finished_at)} · cerrado el{' '}
+                        {formatDate(snapshot.finished_at)}
+                    </p>
+                </div>
+                <WhatsAppCopyButton
+                    label="Exportar"
+                    title="Copiar resumen del mes"
+                    getText={() => buildReconcileSnapshotText(snapshot, monthLabel(snapshot.month))}
+                />
             </div>
 
             {/* Totales */}
@@ -109,13 +118,19 @@ export default function CuentaDetalle() {
                         key={entityName}
                         className="shrink-0 rounded-xl border border-slate-200 dark:border-white/10 bg-white dark:bg-white/3 overflow-hidden"
                     >
-                        <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between">
-                            <span className="font-bold text-slate-800 dark:text-slate-100">
+                        <div className="px-4 py-2.5 bg-slate-50 dark:bg-white/4 border-b border-slate-200 dark:border-white/10 flex items-center justify-between gap-3">
+                            <span className="font-bold text-slate-800 dark:text-slate-100 min-w-0 truncate">
                                 {entityName}
                             </span>
-                            <span className="text-xs text-slate-500 dark:text-slate-400">
-                                {items.length} {items.length === 1 ? 'gasto' : 'gastos'}
-                            </span>
+                            <div className="flex items-center gap-3 shrink-0">
+                                <span className="text-xs text-slate-500 dark:text-slate-400">
+                                    {items.length} {items.length === 1 ? 'gasto' : 'gastos'}
+                                </span>
+                                <WhatsAppCopyButton
+                                    getText={() => buildReconcileEntityText(entityName, items)}
+                                    title={`Copiar resumen de ${entityName}`}
+                                />
+                            </div>
                         </div>
                         <ul className="divide-y divide-slate-100 dark:divide-white/5">
                             {items.map((it) => {

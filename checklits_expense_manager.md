@@ -4,7 +4,7 @@
 
 - [x] Al pagar/registrar cobro no se actualiza la fecha del ultimo pago
 - [x] hacer verificacion de entidad duplicada por nombre
-- [ ] mejorar la ui del dashboard
+- [x] mejorar la ui del dashboard
 - [x] posibilidad de desplegar/achicar las entidades
 - [x] el filtrado no tiene en cuenta los nombres de las entidades
 - [x] que el dashboard no tenga en cuenta la moneda de preferencia para el filtrado, que por defecto sea "todos"
@@ -16,7 +16,7 @@
 - [x] ~~limite de tiempo 4h editable~~ CAMBIO: la sesión se guarda en DB y vive hasta que tocás "Terminar", el usuario la retoma cuando quiere
 - [x] no se puede pagar/cobrar nada fuera del modo hacer cuentas (guard en frontend con snackbar + backend rechaza con 409 `RECONCILE_REQUIRED`)
 - [x] al terminar de hacer cuentas se guarda un snapshot del mes (totales por moneda/tipo + detalle por gasto) en `reconcile_snapshots` para comparar meses — pantalla "Historial de cuentas"
-- [ ] boton exportar que tome toda la informacion del modo hacer cuentas
+- [x] boton exportar que tome toda la informacion del modo hacer cuentas (botón "Exportar" en cada snapshot → resumen del mes al portapapeles + botón "Copiar" por entidad, estilo WhatsApp)
 - [x] grafico de gastos por categoria
 - [x] metricas por categoria en relacion al sueldo, por ej, cuanto gasto de suscripciones en relacion al sueldo (11%)
 - [ ] como hacemos para explicarle al usuario como usar el sistema
