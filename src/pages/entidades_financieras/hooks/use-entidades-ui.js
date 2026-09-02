@@ -1,6 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useEntidadesData } from './use-entidades-data';
+import { useUIStore } from '@/store/use-ui-store';
 
 export function useEntidadesUI() {
     const navigate = useNavigate();
@@ -8,7 +9,8 @@ export function useEntidadesUI() {
 
     const [query, setQuery] = useState('');
     const [openNew, setOpenNew] = useState(false);
-    const [viewMode, setViewMode] = useState('list');
+    const viewMode = useUIStore((s) => s.entitiesViewMode);
+    const setViewMode = useUIStore((s) => s.setEntitiesViewMode);
 
     const filtered = useMemo(() => {
         const q = query.trim().toLowerCase();

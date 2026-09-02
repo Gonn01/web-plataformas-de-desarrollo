@@ -11,12 +11,15 @@ import { ReconcileToggle, ReconcileBar } from './components/ReconcileBar';
 import { useDashboardUI } from './hooks/use-dashboard-ui';
 import { useDashboardData } from './hooks/use-dashboard-data';
 import { useExchangeRates } from '@/hooks/use-exchange-rates';
+import { useUIStore } from '@/store/use-ui-store';
 import Loader from '@/components/Loader';
 
 export default function Dashboard() {
     const data = useDashboardData();
     const ui = useDashboardUI(data.groups, data.pagarCuotas);
     const { rates } = useExchangeRates();
+    const balancesHidden = useUIStore((s) => s.balancesHidden);
+    const toggleBalances = useUIStore((s) => s.toggleBalances);
 
     const handleCreateExpense = async (payload) => {
         ui.setLoadingCreatingExpense(true);
@@ -67,23 +70,47 @@ export default function Dashboard() {
             {/* MAIN LAYOUT */}
             <div className="flex flex-row flex-1 gap-6 min-h-0 overflow-hidden">
                 {/* LEFT: StatCards + botón gráficos */}
-                <div className="flex flex-col gap-4 w-52 shrink-0 overflow-y-auto">
-                    <StatCards
-                        summary={summary}
-                        currency={ui.currency}
-                        summaryByCurrency={data.summaryByCurrency}
-                        preferredCurrency={ui.preferredCurrency}
-                        rates={rates}
-                        vertical
-                    />
+                {balancesHidden ? (
                     <button
-                        onClick={() => setShowCharts(true)}
-                        className="cursor-pointer flex items-center justify-center gap-2 h-10 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-colors"
+                        onClick={toggleBalances}
+                        aria-label="Mostrar balances"
+                        title="Mostrar balances"
+                        className="cursor-pointer flex items-start justify-center pt-2 w-6 shrink-0 text-slate-400 hover:text-primary transition-colors"
                     >
-                        <Icon name="bar_chart" />
-                        Ver gráficos
+                        <Icon name="chevron_right" />
                     </button>
-                </div>
+                ) : (
+                    <div className="flex flex-col gap-4 w-52 shrink-0 overflow-y-auto">
+                        <div className="flex items-center justify-between">
+                            <p className="text-xs font-semibold uppercase tracking-wide text-slate-400">
+                                Balances
+                            </p>
+                            <button
+                                onClick={toggleBalances}
+                                aria-label="Ocultar balances"
+                                title="Ocultar balances"
+                                className="cursor-pointer text-slate-400 hover:text-primary transition-colors"
+                            >
+                                <Icon name="chevron_left" />
+                            </button>
+                        </div>
+                        <StatCards
+                            summary={summary}
+                            currency={ui.currency}
+                            summaryByCurrency={data.summaryByCurrency}
+                            preferredCurrency={ui.preferredCurrency}
+                            rates={rates}
+                            vertical
+                        />
+                        <button
+                            onClick={() => setShowCharts(true)}
+                            className="cursor-pointer flex items-center justify-center gap-2 h-10 rounded-xl border border-black/10 dark:border-white/10 bg-white dark:bg-white/5 text-sm font-medium text-slate-600 dark:text-slate-300 hover:bg-zinc-50 dark:hover:bg-white/10 transition-colors"
+                        >
+                            <Icon name="bar_chart" />
+                            Ver gráficos
+                        </button>
+                    </div>
+                )}
 
                 {/* RIGHT: Active Expenses */}
                 <div className="flex-1 min-w-0 overflow-hidden flex flex-col">

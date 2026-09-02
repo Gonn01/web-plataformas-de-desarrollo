@@ -29,7 +29,7 @@
 - [ ] el grafico del dashboard debe tener en cuenta si el usuario ya hizo las cuentas este mes, para saber en que mes empieza el grafico
 - [x] pago con entidad
 - [ ] checkbox de entra el mes siguiente
-- [ ] Flechita para ocultar los balnces y tamvbien que el sidebar se oculte
+- [x] Flechita para ocultar los balances y también que el sidebar se oculte (flechitas individuales: una colapsa el sidebar, otra oculta la columna de balances; preferencia persistida)
 - [ ] agregar favoritos
 
 ## ENTIDADES FINANCIERAS
