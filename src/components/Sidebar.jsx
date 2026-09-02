@@ -47,91 +47,99 @@ export default function Sidebar() {
 
     return (
         <>
-        {notification && (
-            <Snackbar message={notification} onClose={() => setNotification(null)} />
-        )}
-        <aside className="flex w-64 flex-col border-r border-black/10 dark:border-white/10 p-4 bg-white/50 dark:bg-background-dark">
-            <div className="flex flex-col gap-4">
-                {/* Perfil del usuario */}
-                <div className="flex items-center gap-3">
-                    <div
-                        className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
-                        aria-label="User profile picture"
-                        style={{ backgroundImage: `url(${avatar})` }}
-                    />
-                    <div className="flex flex-col">
-                        <h1 className="text-slate-900 dark:text-white text-base font-medium leading-normal">
-                            {nombreVisible}
-                        </h1>
-                        <p className="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal truncate max-w-40">
-                            {email}
-                        </p>
+            {notification && (
+                <Snackbar message={notification} onClose={() => setNotification(null)} />
+            )}
+            <aside className="flex w-64 flex-col border-r border-black/10 dark:border-white/10 p-4 bg-white/50 dark:bg-background-dark">
+                <div className="flex flex-col gap-4">
+                    {/* Perfil del usuario */}
+                    <div className="flex items-center gap-3">
+                        <div
+                            className="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10"
+                            aria-label="User profile picture"
+                            style={{ backgroundImage: `url(${avatar})` }}
+                        />
+                        <div className="flex flex-col">
+                            <h1 className="text-slate-900 dark:text-white text-base font-medium leading-normal">
+                                {nombreVisible}
+                            </h1>
+                            <p className="text-slate-500 dark:text-slate-400 text-sm font-normal leading-normal truncate max-w-40">
+                                {email}
+                            </p>
+                        </div>
                     </div>
+
+                    {/* Navegación */}
+                    <nav className="flex flex-col gap-2 mt-4">
+                        <NavLink
+                            to="/app/dashboard"
+                            className={({ isActive }) => `${base} ${isActive ? active : idle}`}
+                        >
+                            <Icon name="dashboard" className="text-2xl" />
+                            <p>Dashboard</p>
+                        </NavLink>
+
+                        <NavLink
+                            to="/app/entidades"
+                            className={({ isActive }) =>
+                                `${base} ${isActive ? active : idle} hover:text-primary`
+                            }
+                        >
+                            <Icon name="account_balance" className="text-2xl text-primary" />
+                            <p>Entidades Financieras</p>
+                        </NavLink>
+
+                        <NavLink
+                            to="/app/cuentas"
+                            className={({ isActive }) => `${base} ${isActive ? active : idle}`}
+                        >
+                            <Icon name="history" className="text-2xl" />
+                            <p>Historial de cuentas</p>
+                        </NavLink>
+
+                        <NavLink
+                            to="/app/compartidos"
+                            className={({ isActive }) => `${base} ${isActive ? active : idle}`}
+                        >
+                            <Icon name="group" className="text-2xl" />
+                            <p className="flex-1">Compartidos</p>
+                            {pendingCount > 0 && (
+                                <span className="ml-auto bg-primary text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
+                                    {pendingCount}
+                                </span>
+                            )}
+                        </NavLink>
+                    </nav>
                 </div>
 
-                {/* Navegación */}
-                <nav className="flex flex-col gap-2 mt-4">
+                {/* Sección inferior */}
+                <div className="mt-auto flex flex-col gap-1">
                     <NavLink
-                        to="/app/dashboard"
+                        to="/app/configuracion"
                         className={({ isActive }) => `${base} ${isActive ? active : idle}`}
                     >
-                        <Icon name="dashboard" className="text-2xl" />
-                        <p>Dashboard</p>
+                        <Icon name="settings" className="text-2xl" />
+                        <p>Configuración</p>
                     </NavLink>
-
-                    <NavLink
-                        to="/app/entidades"
-                        className={({ isActive }) =>
-                            `${base} ${isActive ? active : idle} hover:text-primary`
-                        }
+                    <button
+                        onClick={() => setConfirmLogoutOpen(true)}
+                        className={`${base} ${idle} text-left w-full`}
                     >
-                        <Icon name="account_balance" className="text-2xl text-primary" />
-                        <p>Entidades Financieras</p>
-                    </NavLink>
+                        <Icon name="logout" className="text-2xl" />
+                        <p>Cerrar sesión</p>
+                    </button>
+                </div>
+            </aside>
 
-                    <NavLink
-                        to="/app/compartidos"
-                        className={({ isActive }) => `${base} ${isActive ? active : idle}`}
-                    >
-                        <Icon name="group" className="text-2xl" />
-                        <p className="flex-1">Compartidos</p>
-                        {pendingCount > 0 && (
-                            <span className="ml-auto bg-primary text-white text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1">
-                                {pendingCount}
-                            </span>
-                        )}
-                    </NavLink>
-                </nav>
-            </div>
-
-            {/* Sección inferior */}
-            <div className="mt-auto flex flex-col gap-1">
-                <NavLink
-                    to="/app/configuracion"
-                    className={({ isActive }) => `${base} ${isActive ? active : idle}`}
-                >
-                    <Icon name="settings" className="text-2xl" />
-                    <p>Configuración</p>
-                </NavLink>
-                <button
-                    onClick={() => setConfirmLogoutOpen(true)}
-                    className={`${base} ${idle} text-left w-full`}
-                >
-                    <Icon name="logout" className="text-2xl" />
-                    <p>Cerrar sesión</p>
-                </button>
-            </div>
-        </aside>
-
-        <ConfirmDeleteModal
-            open={confirmLogoutOpen}
-            title="¿Cerrar sesión?"
-            message="Vas a tener que volver a iniciar sesión para acceder a tu cuenta."
-            confirmLabel="Cerrar sesión"
-            cancelLabel="Cancelar"
-            onConfirm={handleConfirmLogout}
-            onCancel={() => setConfirmLogoutOpen(false)}
-        />
+            <ConfirmDeleteModal
+                open={confirmLogoutOpen}
+                title="¿Cerrar sesión?"
+                message="Vas a tener que volver a iniciar sesión para acceder a tu cuenta."
+                confirmLabel="Cerrar sesión"
+                cancelLabel="Cancelar"
+                onConfirm={handleConfirmLogout}
+                onCancel={() => setConfirmLogoutOpen(false)}
+            />
         </>
     );
 }

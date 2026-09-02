@@ -1,21 +1,25 @@
 import { Outlet } from 'react-router-dom';
 import Sidebar from '@/components/Sidebar';
+import GlobalSnackbar from '@/components/GlobalSnackbar';
 import useAuth from '@/store/use-auth-store';
 import { useEntitiesStore } from '@/store/use-entities-store';
 import { useCategoriesStore } from '@/store/use-categories-store';
+import { useReconcileStore } from '@/store/use-reconcile-store';
 import { useEffect } from 'react';
 
 export default function AppLayout() {
     const { token } = useAuth();
     const { loadEntities } = useEntitiesStore();
     const { loadCategories } = useCategoriesStore();
+    const loadReconcileSession = useReconcileStore((s) => s.loadSession);
 
     useEffect(() => {
         if (token) {
             loadEntities(token);
             loadCategories(token);
+            loadReconcileSession();
         }
-    }, [loadEntities, loadCategories, token]);
+    }, [loadEntities, loadCategories, loadReconcileSession, token]);
 
     return (
         <div className="font-display bg-background-light dark:bg-background-dark">
@@ -28,6 +32,7 @@ export default function AppLayout() {
                     </div>
                 </main>
             </div>
+            <GlobalSnackbar />
         </div>
     );
 }

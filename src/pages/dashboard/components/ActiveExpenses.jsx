@@ -32,14 +32,23 @@ export default function ActiveExpenses({
         return acc;
     }, {});
     const totalCount = groups.reduce((sum, g) => sum + g.items.length, 0);
+    const visibleEntities = filteredGroups.length;
+    const visibleExpenses = filteredGroups.reduce((sum, g) => sum + g.items.length, 0);
 
     return (
         <div className="lg:col-span-3 xl:col-span-3 flex flex-col gap-4 rounded-xl border border-black/10 dark:border-white/10 p-4 bg-white dark:bg-white/5 min-h-0 flex-1">
             {/* HEADER */}
             <div className="flex items-center justify-between gap-4">
-                <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] shrink-0">
-                    Gastos Activos
-                </h3>
+                <div className="shrink-0">
+                    <h3 className="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">
+                        Entidades
+                    </h3>
+                    <p className="text-xs text-slate-500 dark:text-slate-400">
+                        {visibleEntities} {visibleEntities === 1 ? 'entidad' : 'entidades'} ·{' '}
+                        {visibleExpenses}{' '}
+                        {visibleExpenses === 1 ? 'gasto activo' : 'gastos activos'}
+                    </p>
+                </div>
                 <div className="relative w-full max-w-xs">
                     <Icon
                         name="search"
@@ -58,7 +67,6 @@ export default function ActiveExpenses({
             {/* FILTERS */}
             <div className="flex flex-wrap items-center gap-x-4 gap-y-2 py-2 border-y border-black/10 dark:border-white/10">
                 <FilterGroup label="Moneda">
-
                     <ToggleButton
                         active={currency === null}
                         onClick={() => onCurrencyChange?.(null)}
@@ -115,7 +123,7 @@ export default function ActiveExpenses({
             </div>
 
             {/* LIST */}
-            <div className="flex flex-col gap-2 overflow-y-auto pr-2 flex-1 min-h-0">
+            <div className="flex flex-col gap-3 overflow-y-auto pr-2 flex-1 min-h-0">
                 {filteredGroups.map((group) => (
                     <ActiveFinancialEntity
                         key={group.id}
@@ -133,7 +141,7 @@ export default function ActiveExpenses({
 
                 {filteredGroups.length === 0 && (
                     <div className="text-center text-sm text-slate-500 dark:text-slate-400 py-8">
-                        No se encontraron gastos activos.
+                        No hay entidades con gastos activos para este filtro.
                     </div>
                 )}
             </div>
@@ -168,10 +176,11 @@ function ToggleButton({ active, onClick, children }) {
         <button
             type="button"
             onClick={onClick}
-            className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${active
-                ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
-                : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
-                }`}
+            className={`px-3 py-1 rounded-md text-xs font-semibold transition-colors cursor-pointer ${
+                active
+                    ? 'bg-white dark:bg-white/15 text-slate-900 dark:text-white shadow-sm'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200'
+            }`}
         >
             {children}
         </button>
