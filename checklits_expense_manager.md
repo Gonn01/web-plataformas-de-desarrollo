@@ -29,12 +29,12 @@
 
 ## ENTIDADES FINANCIERAS
 
-- [ ] MISMO orden que en dashboard
-- [ ] sacar la flechita en el listado, porque se oculta
-- [ ] al crear entidad se pueda vincular a un usuario
-- [ ] modo grid
-- [ ] pantalla de entidades eliminadas y boton para restaurar
-- [ ] visibilizar a quien esta vinculada
+- [x] MISMO orden que en dashboard
+- [x] sacar la flechita en el listado, porque se oculta
+- [x] al crear entidad se pueda vincular a un usuario
+- [x] modo grid
+- [] pantalla de entidades eliminadas y boton para restaurar
+- [x] visibilizar a quien esta vinculada
 
 ## Detalle entidad financiera
 
