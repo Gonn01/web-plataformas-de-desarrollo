@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Link } from 'react-router-dom';
 
 import HeaderDetalle from './components/HeaderDetalle';
 import InfoItem from './components/InfoItem';
@@ -59,6 +60,20 @@ export default function DetalleGasto() {
                                 value={formatMoney(gasto.amount, gasto.currency_type)}
                             />
                             <InfoItem label="Moneda" value={gasto.currency_type} />
+                            {gasto.linked_purchase_id && (
+                                <InfoItem
+                                    label="Pagado con"
+                                    value={
+                                        <Link
+                                            to={`/app/gastos/${gasto.linked_purchase_id}`}
+                                            className="text-primary hover:underline"
+                                        >
+                                            {getEntityById(gasto.linked_financial_entity_id)
+                                                ?.name ?? 'Otra entidad'}
+                                        </Link>
+                                    }
+                                />
+                            )}
                         </div>
 
                         <CategoryBadges categories={gasto.categories} />
@@ -80,8 +95,12 @@ export default function DetalleGasto() {
                     /> */}
 
                     <PeligroEliminar
-                        onDelete={() => {
-                            eliminar();
+                        linked={Boolean(gasto.linked_purchase_id)}
+                        linkedEntityName={
+                            getEntityById(gasto.linked_financial_entity_id)?.name ?? ''
+                        }
+                        onDelete={(deleteLinked) => {
+                            eliminar(deleteLinked);
                             volverALista();
                         }}
                     />

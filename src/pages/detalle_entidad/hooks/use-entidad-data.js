@@ -38,7 +38,7 @@ export function useEntidadData() {
     }, [id, token]);
 
     const stats = useMemo(() => {
-        if (!entity) return { amount: 0, debts: 0, fixed: 0, finalized: 0 };
+        if (!entity) return { amount: 0, debts: 0, fixed: 0, finalized: 0, pending: 0 };
 
         let totalAmount = 0;
         let fixedCount = 0;
@@ -60,6 +60,7 @@ export function useEntidadData() {
             debts: entity.gastos_activos.length,
             fixed: fixedCount,
             finalized: entity.gastos_inactivos.length,
+            pending: entity.gastos_pendientes?.length ?? 0,
         };
     }, [entity]);
 
@@ -71,6 +72,14 @@ export function useEntidadData() {
             const total = Number(nuevo.number_of_quotas || 0);
 
             setEntity((prev) => {
+                // Gasto creado en una entidad vinculada: queda pendiente de aprobación.
+                if (nuevo.status === 'PENDING_APPROVAL') {
+                    return {
+                        ...prev,
+                        gastos_pendientes: [...(prev.gastos_pendientes ?? []), nuevo],
+                    };
+                }
+
                 if (isFixed) {
                     return {
                         ...prev,
@@ -148,7 +157,9 @@ export function useEntidadData() {
                 setEntity((prev) => {
                     if (!prev) return prev;
                     const update = (list) =>
-                        list.map((g) => (String(g.id) === String(updated.id) ? { ...g, ...updated } : g));
+                        list.map((g) =>
+                            String(g.id) === String(updated.id) ? { ...g, ...updated } : g,
+                        );
                     return { ...prev, gastos_activos: update(prev.gastos_activos) };
                 });
             }

@@ -13,6 +13,7 @@ import ExpenseAmountSection from '../components/ExpenseAmountSection';
 import ExpenseInstallmentsSection from '../components/ExpenseInstallmentsSection';
 import CategorySelector from '../components/CategorySelector';
 import ExpenseModeSelector from '../components/ExpenseModeSelector';
+import PaymentEntitySection from '../components/PaymentEntitySection';
 
 export default function NewExpenseModal({
     onClose,
@@ -37,6 +38,8 @@ export default function NewExpenseModal({
     const [isInstallment, setIsInstallment] = useState(false);
     const [isPaid, setIsPaid] = useState(false);
     const [paidInstallments, setPaidInstallments] = useState('0');
+    const [payWithEntity, setPayWithEntity] = useState(false);
+    const [paymentEntity, setPaymentEntity] = useState('');
     const { entities, loading, createEntity } = useEntitiesStore();
     const [loadingNewEntity, setLoadingNewEntity] = useState(false);
 
@@ -45,7 +48,7 @@ export default function NewExpenseModal({
 
     const handleToggleCategory = (id) => {
         setSelectedCategoryIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
         );
     };
 
@@ -66,8 +69,13 @@ export default function NewExpenseModal({
     const containerRef = useRef(null);
 
     const canSave = useMemo(
-        () => name.trim() && entity && Number(amount) > 0 && currency,
-        [name, entity, amount, currency],
+        () =>
+            name.trim() &&
+            entity &&
+            Number(amount) > 0 &&
+            currency &&
+            (!payWithEntity || (paymentEntity && String(paymentEntity) !== String(entity))),
+        [name, entity, amount, currency, payWithEntity, paymentEntity],
     );
 
     const handleCreateEntity = async () => {
@@ -113,6 +121,7 @@ export default function NewExpenseModal({
             type,
             payed_quotas: isInstallment ? Number(paidInstallments) : isPaid ? 1 : 0,
             category_ids: selectedCategoryIds,
+            payment_entity_id: payWithEntity ? paymentEntity : null,
         };
 
         onSave?.(payload);
@@ -155,7 +164,10 @@ export default function NewExpenseModal({
                         onChange={({ isInstallment: i, isFixed: f }) => {
                             setIsInstallment(i);
                             setIsFixed(f);
-                            if (!i) { setInstallments(''); setPaidInstallments('0'); }
+                            if (!i) {
+                                setInstallments('');
+                                setPaidInstallments('0');
+                            }
                             setIsPaid(false);
                         }}
                     />
@@ -184,6 +196,16 @@ export default function NewExpenseModal({
                         newEntityName={newEntityName}
                         setNewEntityName={setNewEntityName}
                         handleCreateEntity={handleCreateEntity}
+                    />
+
+                    <PaymentEntitySection
+                        enabled={payWithEntity}
+                        setEnabled={setPayWithEntity}
+                        entities={entities}
+                        paymentEntity={paymentEntity}
+                        setPaymentEntity={setPaymentEntity}
+                        excludeId={entity}
+                        oppositeTypeLabel={type === ExpenseType.EGRESO ? 'ingreso' : 'egreso'}
                     />
 
                     <CategorySelector

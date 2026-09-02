@@ -114,6 +114,16 @@ export default function ActiveFinancialEntity({
                             <span>
                                 {count} {count === 1 ? 'gasto' : 'gastos'}
                             </span>
+                            {group.pending_count > 0 && (
+                                <>
+                                    <span className="text-slate-300 dark:text-slate-600">·</span>
+                                    <span className="flex items-center gap-1 font-semibold text-amber-600 dark:text-amber-400">
+                                        <Icon name="hourglass_empty" className="text-sm" />
+                                        {group.pending_count}{' '}
+                                        {group.pending_count === 1 ? 'pendiente' : 'pendientes'}
+                                    </span>
+                                </>
+                            )}
                             <span className="text-slate-300 dark:text-slate-600">·</span>
                             <GroupBalance
                                 items={group.items}

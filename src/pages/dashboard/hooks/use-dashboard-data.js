@@ -9,6 +9,7 @@ export function useDashboardData() {
 
     const [summaryByCurrency, setSummaryByCurrency] = useState(null);
     const [groups, setGroups] = useState([]);
+    const [pendingTotal, setPendingTotal] = useState(0);
     const [loading, setLoading] = useState(false);
 
     const recalcSummary = useCallback((groupsToUse) => {
@@ -56,6 +57,8 @@ export function useDashboardData() {
             setLoading(true);
             const entities = await fetchDashboardData(token);
 
+            setPendingTotal(entities.reduce((sum, e) => sum + (Number(e.pending_count) || 0), 0));
+
             const mappedGroups = entities
                 .map((entity) => {
                     const gastos = Array.isArray(entity.gastos) ? entity.gastos : [];
@@ -66,10 +69,10 @@ export function useDashboardData() {
                             progress: g.fixed_expense
                                 ? 100
                                 : g.number_of_quotas > 0
-                                    ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
-                                    : g.payed_quotas === 0
-                                        ? 0
-                                        : 100,
+                                  ? Math.min((g.payed_quotas / g.number_of_quotas) * 100, 100)
+                                  : g.payed_quotas === 0
+                                    ? 0
+                                    : 100,
                         }))
                         .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
 
@@ -105,7 +108,10 @@ export function useDashboardData() {
                                 ...server,
                                 progress: server.fixed_expense
                                     ? 100
-                                    : Math.min((server.payed_quotas / server.number_of_quotas) * 100, 100),
+                                    : Math.min(
+                                          (server.payed_quotas / server.number_of_quotas) * 100,
+                                          100,
+                                      ),
                             };
 
                             if (server.fixed_expense) return updated;
@@ -150,6 +156,7 @@ export function useDashboardData() {
     return {
         groups,
         setGroups,
+        pendingTotal,
         summaryByCurrency,
         loadDashboard,
         getSummaryForCurrency: (currency) => summaryByCurrency?.[currency] ?? null,

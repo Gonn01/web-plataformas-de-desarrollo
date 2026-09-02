@@ -11,8 +11,18 @@ export default function Compartidos() {
     const [section, setSection] = useState('pendientes');
     const [aprobarTarget, setAprobarTarget] = useState(null);
 
-    const pendingItems = compartidos.recibidos.filter((r) => r.status === 'PENDING_APPROVAL');
-    const resolvedItems = compartidos.recibidos.filter((r) => r.status !== 'PENDING_APPROVAL');
+    const recibidosPendientes = compartidos.recibidos.filter(
+        (r) => r.status === 'PENDING_APPROVAL',
+    );
+    const recibidosTerminados = compartidos.recibidos.filter(
+        (r) => r.status !== 'PENDING_APPROVAL',
+    );
+    const enviadosPendientes = compartidos.emitidos.filter(
+        (e) => e.copy_status === 'PENDING_APPROVAL',
+    );
+    const enviadosTerminados = compartidos.emitidos.filter(
+        (e) => e.copy_status !== 'PENDING_APPROVAL',
+    );
 
     const handleAprobar = async (entityId, newEntityName) => {
         await aprobar(aprobarTarget.id, entityId, newEntityName);
@@ -24,24 +34,23 @@ export default function Compartidos() {
             key: 'pendientes',
             label: 'Pendientes',
             icon: 'pending_actions',
-            count: pendingItems.length,
-            badgeClass: pendingItems.length > 0 ? 'bg-amber-500 text-white' : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
+            count: recibidosPendientes.length + enviadosPendientes.length,
+            badgeClass:
+                recibidosPendientes.length + enviadosPendientes.length > 0
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
         },
         {
-            key: 'recibidos',
-            label: 'Recibidos',
-            icon: 'inbox',
-            count: resolvedItems.length,
-            badgeClass: 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
-        },
-        {
-            key: 'enviados',
-            label: 'Enviados',
-            icon: 'send',
-            count: compartidos.emitidos.length,
+            key: 'terminados',
+            label: 'Terminados',
+            icon: 'task_alt',
+            count: recibidosTerminados.length + enviadosTerminados.length,
             badgeClass: 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
         },
     ];
+
+    const enviados = section === 'pendientes' ? enviadosPendientes : enviadosTerminados;
+    const recibidos = section === 'pendientes' ? recibidosPendientes : recibidosTerminados;
 
     if (loading) return <Loader />;
 
@@ -68,7 +77,9 @@ export default function Compartidos() {
                     >
                         <Icon name={t.icon} className="text-base" />
                         {t.label}
-                        <span className={`text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1 ${t.badgeClass}`}>
+                        <span
+                            className={`text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1 ${t.badgeClass}`}
+                        >
                             {t.count}
                         </span>
                     </button>
@@ -76,37 +87,9 @@ export default function Compartidos() {
             </div>
 
             {/* CONTENIDO */}
-            {section === 'pendientes' && (
-                <Section emptyIcon="pending_actions" emptyMessage="No tenés solicitudes pendientes">
-                    {pendingItems.map((item) => (
-                        <RecibidoCard
-                            key={item.id}
-                            item={item}
-                            loadingId={loadingAction}
-                            onAprobar={(g) => setAprobarTarget(g)}
-                            onRechazar={(id) => rechazar(id)}
-                        />
-                    ))}
-                </Section>
-            )}
-
-            {section === 'recibidos' && (
-                <Section emptyIcon="inbox" emptyMessage="No tenés gastos recibidos">
-                    {resolvedItems.map((item) => (
-                        <RecibidoCard
-                            key={item.id}
-                            item={item}
-                            loadingId={loadingAction}
-                            onAprobar={(g) => setAprobarTarget(g)}
-                            onRechazar={(id) => rechazar(id)}
-                        />
-                    ))}
-                </Section>
-            )}
-
-            {section === 'enviados' && (
-                <Section emptyIcon="send" emptyMessage="No enviaste gastos compartidos">
-                    {compartidos.emitidos.map((item) => (
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                <SubSection title="Enviados" icon="send">
+                    {enviados.map((item) => (
                         <EmitidoCard
                             key={item.id}
                             item={item}
@@ -114,8 +97,20 @@ export default function Compartidos() {
                             onReintentar={(id) => reintentar(id)}
                         />
                     ))}
-                </Section>
-            )}
+                </SubSection>
+
+                <SubSection title="Recibidos" icon="inbox">
+                    {recibidos.map((item) => (
+                        <RecibidoCard
+                            key={item.id}
+                            item={item}
+                            loadingId={loadingAction}
+                            onAprobar={(g) => setAprobarTarget(g)}
+                            onRechazar={(id) => rechazar(id)}
+                        />
+                    ))}
+                </SubSection>
+            </div>
 
             {aprobarTarget && (
                 <AprobarModal
@@ -130,17 +125,24 @@ export default function Compartidos() {
     );
 }
 
-function Section({ emptyIcon, emptyMessage, children }) {
+function SubSection({ title, icon, children }) {
     const items = Array.isArray(children) ? children.filter(Boolean) : children ? [children] : [];
 
-    if (items.length === 0) {
-        return (
-            <div className="flex items-center gap-2 py-6 text-zinc-400 dark:text-zinc-600 text-sm">
-                <Icon name={emptyIcon} className="text-base" />
-                {emptyMessage}
+    return (
+        <div className="flex flex-col gap-3">
+            <div className="flex items-center gap-2 text-sm font-bold text-zinc-700 dark:text-zinc-200">
+                <Icon name={icon} className="text-base" />
+                {title}
+                <span className="text-xs font-bold rounded-full min-w-5 h-5 flex items-center justify-center px-1 bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300">
+                    {items.length}
+                </span>
             </div>
-        );
-    }
 
-    return <div className="flex flex-col gap-3">{children}</div>;
+            {items.length === 0 ? (
+                <p className="text-sm text-zinc-400 dark:text-zinc-600 pl-6">Nada por acá.</p>
+            ) : (
+                <div className="flex flex-col gap-3">{children}</div>
+            )}
+        </div>
+    );
 }

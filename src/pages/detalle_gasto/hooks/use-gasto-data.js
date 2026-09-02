@@ -70,10 +70,10 @@ export function useGastoData() {
         await load(true);
     }
 
-    async function eliminar() {
+    async function eliminar(deleteLinked = false) {
         if (!gasto) return;
         setLoading(true);
-        await deleteGasto(gasto.id, token);
+        await deleteGasto(gasto.id, token, { deleteLinked });
         setLoading(false);
     }
 

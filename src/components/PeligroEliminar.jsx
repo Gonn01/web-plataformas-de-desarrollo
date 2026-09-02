@@ -1,8 +1,14 @@
 import { useState } from 'react';
 import ConfirmDeleteModal from './modals/ConfirmDeleteModal';
 
-export default function PeligroEliminar({ onDelete, label = 'Eliminar' }) {
+export default function PeligroEliminar({
+    onDelete,
+    label = 'Eliminar',
+    linked = false,
+    linkedEntityName = '',
+}) {
     const [open, setOpen] = useState(false);
+    const [deleteLinked, setDeleteLinked] = useState(false);
     return (
         <section className="mt-8 pt-6 border-t border-gray-800">
             <h3 className="text-lg font-bold text-red-500">Zona de Peligro</h3>
@@ -27,13 +33,34 @@ export default function PeligroEliminar({ onDelete, label = 'Eliminar' }) {
             <ConfirmDeleteModal
                 open={open}
                 title={label}
-                message="Esta acción no se puede deshacer."
+                message={
+                    linked ? (
+                        <span className="block">
+                            Esta acción no se puede deshacer.
+                            <label className="mt-4 flex items-center gap-2 cursor-pointer select-none text-white">
+                                <input
+                                    type="checkbox"
+                                    checked={deleteLinked}
+                                    onChange={(e) => setDeleteLinked(e.target.checked)}
+                                />
+                                Eliminar también el movimiento vinculado
+                                {linkedEntityName ? ` en ${linkedEntityName}` : ''}
+                            </label>
+                        </span>
+                    ) : (
+                        'Esta acción no se puede deshacer.'
+                    )
+                }
                 confirmLabel="Eliminar"
                 cancelLabel="Cancelar"
-                onCancel={() => setOpen(false)}
-                onConfirm={() => {
-                    onDelete();
+                onCancel={() => {
                     setOpen(false);
+                    setDeleteLinked(false);
+                }}
+                onConfirm={() => {
+                    onDelete(deleteLinked);
+                    setOpen(false);
+                    setDeleteLinked(false);
                 }}
             />
         </section>

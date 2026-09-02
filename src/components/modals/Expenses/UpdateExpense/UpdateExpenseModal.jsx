@@ -40,15 +40,17 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
     const [saving, setSaving] = useState(false);
     const [showNewEntity, setShowNewEntity] = useState(false);
     const [newEntityName, setNewEntityName] = useState('');
+    const [linkedPrompt, setLinkedPrompt] = useState(false);
+    const [pendingPayload, setPendingPayload] = useState(null);
 
     const { categories, loading: loadingCategories, createCategory } = useCategoriesStore();
     const [selectedCategoryIds, setSelectedCategoryIds] = useState(
-        (gasto.categories ?? []).map((c) => c.id)
+        (gasto.categories ?? []).map((c) => c.id),
     );
 
     const handleToggleCategory = (id) => {
         setSelectedCategoryIds((prev) =>
-            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id]
+            prev.includes(id) ? prev.filter((x) => x !== id) : [...prev, id],
         );
     };
 
@@ -91,6 +93,15 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
         };
     }, [onClose]);
 
+    const doSave = async (payload) => {
+        setSaving(true);
+        try {
+            await onSave?.(payload);
+        } finally {
+            setSaving(false);
+        }
+    };
+
     const handleSubmit = async () => {
         if (!canSave || saving) return;
 
@@ -108,12 +119,22 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
             category_ids: selectedCategoryIds,
         };
 
-        setSaving(true);
-        try {
-            await onSave?.(payload);
-        } finally {
-            setSaving(false);
+        // Si el gasto tiene un movimiento espejo vinculado, preguntamos si el
+        // cambio se aplica sólo a este o también al otro.
+        if (gasto.linked_purchase_id) {
+            setPendingPayload(payload);
+            setLinkedPrompt(true);
+            return;
         }
+
+        await doSave(payload);
+    };
+
+    const confirmLinked = async (applyToLinked) => {
+        const payload = { ...pendingPayload, apply_to_linked: applyToLinked };
+        setLinkedPrompt(false);
+        setPendingPayload(null);
+        await doSave(payload);
     };
 
     const modal = (
@@ -155,7 +176,10 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
                         onChange={({ isInstallment: i, isFixed: f }) => {
                             setIsInstallment(i);
                             setIsFixed(f);
-                            if (!i) { setInstallments(''); setPaidInstallments('0'); }
+                            if (!i) {
+                                setInstallments('');
+                                setPaidInstallments('0');
+                            }
                             setIsPaid(false);
                         }}
                     />
@@ -242,6 +266,44 @@ export default function UpdateExpenseModal({ gasto, onClose, onSave }) {
                         {saving ? 'Guardando...' : 'Guardar cambios'}
                     </button>
                 </footer>
+
+                {linkedPrompt && (
+                    <div className="absolute inset-0 z-20 flex items-center justify-center bg-black/60 rounded-2xl p-4">
+                        <div className="w-full max-w-sm rounded-xl bg-[#111714] p-6 border border-[#29382f] shadow-lg text-white">
+                            <h3 className="text-lg font-bold mb-2">Movimiento vinculado</h3>
+                            <p className="text-sm text-[#9eb7a8] mb-6">
+                                Este movimiento está vinculado a otro en otra entidad. ¿Querés
+                                aplicar los cambios también a ese movimiento?
+                            </p>
+                            <div className="flex flex-col gap-2">
+                                <button
+                                    onClick={() => confirmLinked(true)}
+                                    disabled={saving}
+                                    className="h-11 px-4 text-sm font-bold rounded-lg bg-primary text-black cursor-pointer hover:bg-primary/80 disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    Aplicar a ambos
+                                </button>
+                                <button
+                                    onClick={() => confirmLinked(false)}
+                                    disabled={saving}
+                                    className="h-11 px-4 text-sm font-bold rounded-lg bg-[#29382f] text-white cursor-pointer hover:bg-[#3d5245] disabled:opacity-60 disabled:cursor-not-allowed"
+                                >
+                                    Sólo este
+                                </button>
+                                <button
+                                    onClick={() => {
+                                        setLinkedPrompt(false);
+                                        setPendingPayload(null);
+                                    }}
+                                    disabled={saving}
+                                    className="h-9 px-4 text-sm font-bold text-[#9eb7a8] hover:bg-[#29382f] rounded-lg cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                                >
+                                    Cancelar
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                )}
             </div>
         </div>
     );

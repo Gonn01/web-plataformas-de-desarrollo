@@ -141,9 +141,10 @@ export const updateGasto = async (gastoId, payload, token) => {
     return data.data;
 };
 
-export const deleteGasto = async (gastoId, token) => {
+export const deleteGasto = async (gastoId, token, { deleteLinked = false } = {}) => {
     await api.delete(`/gastos/${gastoId}`, {
         headers: { Authorization: `Bearer ${token}` },
+        data: { delete_linked: deleteLinked },
     });
     return true;
 };
