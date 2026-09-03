@@ -3,7 +3,10 @@ import { fetchCompartidos } from '@/services/api';
 
 export const useCompartidosStore = create((set) => ({
     pendingCount: 0,
-    setPendingCount: (count) => set({ pendingCount: count }),
+    setPendingCount: (count) =>
+        set((s) => ({
+            pendingCount: typeof count === 'function' ? count(s.pendingCount) : count,
+        })),
 
     loadPendingCount: async (token) => {
         if (!token) return;
