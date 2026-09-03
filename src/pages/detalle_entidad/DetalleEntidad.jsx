@@ -82,13 +82,38 @@ export default function EntidadDetalle() {
                     value={stats.finalized}
                     onClick={() => setTab('finalizados')}
                 />
+                {stats.pending > 0 && (
+                    <StatCard
+                        label="Pendientes de aprobación"
+                        value={stats.pending}
+                        onClick={() => setTab('pendientes')}
+                    />
+                )}
             </div>
+
+            {stats.pending > 0 && (
+                <button
+                    type="button"
+                    onClick={() => setTab('pendientes')}
+                    className="mb-6 flex w-full items-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2.5 text-left text-sm font-medium text-amber-700 dark:text-amber-300 hover:bg-amber-500/15 transition-colors cursor-pointer"
+                >
+                    <Icon name="hourglass_empty" className="text-base" />
+                    <span className="flex-1">
+                        {stats.pending}{' '}
+                        {stats.pending === 1
+                            ? 'gasto pendiente de aprobación'
+                            : 'gastos pendientes de aprobación'}
+                        {entity.linked_user_name ? ` de ${entity.linked_user_name}` : ''}
+                    </span>
+                    <Icon name="chevron_right" className="text-base" />
+                </button>
+            )}
 
             <CuotasChart gastos={entity.gastos_activos} />
             <MontoChart gastos={entity.gastos_activos} />
 
             {/* Tabs */}
-            <TabHeader tab={tab} setTab={setTab} />
+            <TabHeader tab={tab} setTab={setTab} pendingCount={stats.pending} />
 
             {/* LISTAS */}
             {tab === 'activos' && (
@@ -122,6 +147,30 @@ export default function EntidadDetalle() {
                                 key={g.id}
                                 gasto={g}
                                 variant="finalizado"
+                                onClick={() => navigate(`/app/gastos/${g.id}`)}
+                            />
+                        ))}
+                </ListContainer>
+            )}
+
+            {tab === 'pendientes' && (
+                <ListContainer
+                    empty={(entity.gastos_pendientes ?? []).length === 0}
+                    emptyLabel="Sin gastos pendientes."
+                >
+                    <p className="mb-2 text-xs text-zinc-500 dark:text-zinc-400">
+                        Estos gastos esperan la aprobación
+                        {entity.linked_user_name
+                            ? ` de ${entity.linked_user_name}`
+                            : ' del usuario vinculado'}
+                        . Pasan a activos cuando se aprueban.
+                    </p>
+                    {[...(entity.gastos_pendientes ?? [])]
+                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at))
+                        .map((g) => (
+                            <ExpenseCard
+                                key={g.id}
+                                gasto={g}
                                 onClick={() => navigate(`/app/gastos/${g.id}`)}
                             />
                         ))}

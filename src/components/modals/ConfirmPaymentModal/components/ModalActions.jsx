@@ -1,6 +1,6 @@
 import Icon from '@/components/Icon';
 
-export default function ModalActions({ onCancel, onConfirm, loading = false }) {
+export default function ModalActions({ onCancel, onConfirm, loading = false, disabled = false }) {
     return (
         <div className="mt-4 flex flex-col-reverse sm:flex-row sm:justify-center gap-3">
             <button
@@ -15,7 +15,7 @@ export default function ModalActions({ onCancel, onConfirm, loading = false }) {
             <button
                 type="button"
                 onClick={onConfirm}
-                disabled={loading}
+                disabled={loading || disabled}
                 className="h-10 px-4 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-primary/90 transition-colors flex items-center gap-2 cursor-pointer disabled:opacity-70 disabled:cursor-not-allowed"
             >
                 {loading ? (
