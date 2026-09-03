@@ -36,6 +36,7 @@ export default function ActiveFinancialEntity({
     onOpenGroup,
     onItemClick,
     onPayClick,
+    onTogglePostpone,
 }) {
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
@@ -175,6 +176,11 @@ export default function ActiveFinancialEntity({
                                     loading={loadingIds?.has(it.id)}
                                     onClick={() => onItemClick?.(it)}
                                     onPayClick={() => onPayClick?.(group, it)}
+                                    onTogglePostpone={
+                                        onTogglePostpone
+                                            ? () => onTogglePostpone(it.id, !it.is_postponed)
+                                            : undefined
+                                    }
                                 />
                             </li>
                         ))}

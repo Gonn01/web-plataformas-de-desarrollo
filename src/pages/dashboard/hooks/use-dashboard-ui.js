@@ -1,5 +1,6 @@
 import { useCallback, useMemo, useState } from 'react';
 import useAuth from '@/store/use-auth-store';
+import { useReconcileStore } from '@/store/use-reconcile-store';
 import { Currency } from '@/utils/enums';
 
 const CURRENCY_VALUES = Object.values(Currency);
@@ -14,6 +15,8 @@ export function useDashboardUI(groups = [], pagarCuotas) {
     const [typeFilter, setTypeFilter] = useState(null);
     const [fixedFilter, setFixedFilter] = useState(null);
     const [loadingPayIds, setLoadingPayIds] = useState(new Set());
+
+    const reconcileActive = useReconcileStore((s) => s.active);
 
     const preferredCurrency = (() => {
         const pref = user?.preferred_currency;
@@ -34,14 +37,16 @@ export function useDashboardUI(groups = [], pagarCuotas) {
                     const matchCurrency = currency === null || it.currency_type === currency;
                     const matchType = typeFilter === null || it.type === typeFilter;
                     const matchFixed = fixedFilter === null || it.fixed_expense === fixedFilter;
+                    // En modo "hacer cuentas" los gastos postergados quedan fuera de la sesión.
+                    const matchPostponed = !reconcileActive || !it.is_postponed;
 
-                    return matchTitle && matchCurrency && matchType && matchFixed;
+                    return matchTitle && matchCurrency && matchType && matchFixed && matchPostponed;
                 });
 
                 return { ...g, items };
             })
             .filter((g) => g.items.length > 0);
-    }, [groups, currency, query, typeFilter, fixedFilter]);
+    }, [groups, currency, query, typeFilter, fixedFilter, reconcileActive]);
 
     const [modalOpen, setModalOpen] = useState(false);
     const [modalEntity, setModalEntity] = useState('');

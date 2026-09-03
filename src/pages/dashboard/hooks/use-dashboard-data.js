@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { fetchDashboardData, createGasto } from '@/services/api';
+import {
+    fetchDashboardData,
+    createGasto,
+    postergarGasto as postergarGastoApi,
+} from '@/services/api';
 import useAuth from '@/store/use-auth-store';
 import { usePayments } from '@/hooks/use-payments';
 import { usePusherChannel } from '@/hooks/use-pusher-channel';
@@ -150,6 +154,26 @@ export function useDashboardData() {
         [token, loadDashboard],
     );
 
+    const postergarGasto = useCallback(
+        async (gastoId, postponed) => {
+            // Optimista: reflejamos el flag y dejamos que loadDashboard reconcilie.
+            setGroups((prev) =>
+                prev.map((g) => ({
+                    ...g,
+                    items: g.items.map((it) =>
+                        String(it.id) === String(gastoId) ? { ...it, is_postponed: postponed } : it,
+                    ),
+                })),
+            );
+            try {
+                await postergarGastoApi(gastoId, postponed, token);
+            } finally {
+                await loadDashboard();
+            }
+        },
+        [token, loadDashboard],
+    );
+
     useEffect(() => {
         loadDashboard();
     }, [loadDashboard]);
@@ -198,6 +222,7 @@ export function useDashboardData() {
         getSummaryForCurrency: (currency) => summaryByCurrency?.[currency] ?? null,
         pagarCuotas,
         crearGasto,
+        postergarGasto,
         loading,
     };
 }

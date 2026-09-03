@@ -21,6 +21,7 @@ export default function ActiveExpenses({
     payModal,
     loadingPayIds,
     onConfirmPay,
+    onTogglePostpone,
 }) {
     const navigate = useNavigate();
 
@@ -136,6 +137,7 @@ export default function ActiveExpenses({
                         onOpenGroup={payModal.openGroup}
                         onItemClick={(it) => navigate(`/app/gastos/${it.id}`)}
                         onPayClick={(g, it) => payModal.openItem(g, it)}
+                        onTogglePostpone={onTogglePostpone}
                     />
                 ))}
 

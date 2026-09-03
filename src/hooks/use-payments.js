@@ -48,8 +48,17 @@ export function usePayments(token, onPaid) {
                 return updatedItems;
             } catch (err) {
                 console.error('Error pagando cuotas:', err);
-                if (err?.response?.data?.code === 'RECONCILE_REQUIRED') {
+                const code = err?.response?.data?.code;
+                if (code === 'RECONCILE_REQUIRED') {
                     useSnackbarStore.getState().show(RECONCILE_MSG, 'error', 'playlist_add_check');
+                } else if (code === 'GASTO_POSTERGADO') {
+                    useSnackbarStore
+                        .getState()
+                        .show(
+                            'Ese gasto está postergado para la próxima sesión de cuentas.',
+                            'error',
+                            'schedule',
+                        );
                 } else {
                     useSnackbarStore.getState().show('No se pudo registrar el pago.', 'error');
                 }

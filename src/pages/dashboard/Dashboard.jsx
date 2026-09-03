@@ -130,6 +130,7 @@ export default function Dashboard() {
                         payModal={ui.payModal}
                         loadingPayIds={ui.loadingPayIds}
                         onConfirmPay={ui.onConfirmPay}
+                        onTogglePostpone={data.postergarGasto}
                     />
                 </div>
             </div>

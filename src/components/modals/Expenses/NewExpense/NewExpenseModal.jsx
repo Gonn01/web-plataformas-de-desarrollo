@@ -37,6 +37,7 @@ export default function NewExpenseModal({
     const [isFixed, setIsFixed] = useState(false);
     const [isInstallment, setIsInstallment] = useState(false);
     const [isPaid, setIsPaid] = useState(false);
+    const [isPostponed, setIsPostponed] = useState(false);
     const [paidInstallments, setPaidInstallments] = useState('0');
     const [payWithEntity, setPayWithEntity] = useState(false);
     const [paymentEntity, setPaymentEntity] = useState('');
@@ -122,6 +123,7 @@ export default function NewExpenseModal({
             payed_quotas: isInstallment ? Number(paidInstallments) : isPaid ? 1 : 0,
             category_ids: selectedCategoryIds,
             payment_entity_id: payWithEntity ? paymentEntity : null,
+            postponed: isPostponed,
         };
 
         onSave?.(payload);
@@ -184,6 +186,23 @@ export default function NewExpenseModal({
                             <span className="text-white text-sm font-medium">Pagado</span>
                         </label>
                     )}
+
+                    <label className="flex items-start gap-3 cursor-pointer select-none">
+                        <div
+                            onClick={() => setIsPostponed((v) => !v)}
+                            className={`mt-0.5 w-5 h-5 rounded flex items-center justify-center border transition-colors shrink-0 cursor-pointer
+                                ${isPostponed ? 'bg-primary border-primary' : 'border-[#3d5245] bg-[#1c2620]'}`}
+                        >
+                            {isPostponed && <span className="text-black text-xs font-bold">✓</span>}
+                        </div>
+                        <span className="text-white text-sm font-medium">
+                            Postergar para la próxima sesión de cuentas
+                            <span className="block text-xs font-normal text-[#9eb7a8]">
+                                Queda fuera de la sesión de cuentas actual (o de la próxima que
+                                abras). Se habilita cuando la cierres.
+                            </span>
+                        </span>
+                    </label>
 
                     <EntitySelector
                         entity={entity}

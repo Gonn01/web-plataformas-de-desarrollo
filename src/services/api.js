@@ -167,6 +167,15 @@ export const pagarCuota = async (gastoId, token) => {
     return data.data;
 };
 
+export const postergarGasto = async (gastoId, postponed, token) => {
+    const { data } = await api.put(
+        `/gastos/${gastoId}/postergar`,
+        { postponed },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
 /* ===============================
    CATEGORIAS
 =============================== */
