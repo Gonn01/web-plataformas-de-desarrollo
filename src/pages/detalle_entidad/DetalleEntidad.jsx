@@ -8,6 +8,7 @@ import { ListContainer } from './components/ListContainer';
 import GastoItem from './components/GastoItem';
 import { StatCard } from './components/StatCard';
 import EditEntityModal from './components/EditEntityModal';
+import LinkUserButton from './components/LinkUserButton';
 
 import { useEntidadUI } from './hooks/use-entidad-ui';
 import CuotasChart from '@/components/CuotasChart';
@@ -53,9 +54,9 @@ export default function EntidadDetalle() {
             {/* Header */}
             <div className="flex flex-wrap items-center justify-between mb-6">
                 <h1 className="text-3xl sm:text-4xl font-black dark:text-white">{entity.name}</h1>
-                <div className="flex">
+                <div className="flex flex-wrap gap-3">
                     <button
-                        className="flex me-3 items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold cursor-pointer"
+                        className="flex items-center gap-2 bg-primary/20 hover:bg-primary/30 px-4 py-2 rounded-lg text-primary font-bold cursor-pointer"
                         onClick={() => setOpenNewExpense(true)}
                     >
                         <Icon name="add" /> Crear Gasto
@@ -66,6 +67,12 @@ export default function EntidadDetalle() {
                     >
                         <Icon name="edit" /> Editar Entidad
                     </button>
+                    <LinkUserButton
+                        entity={entity}
+                        onVincular={onVincular}
+                        onDesvincular={onDesvincular}
+                        loading={loadingVincular}
+                    />
                 </div>
             </div>
 
