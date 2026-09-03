@@ -22,6 +22,8 @@ export default function ActiveExpenses({
     loadingPayIds,
     onConfirmPay,
     onTogglePostpone,
+    onToggleFavoriteGasto,
+    onToggleFavoriteEntity,
 }) {
     const navigate = useNavigate();
 
@@ -138,6 +140,8 @@ export default function ActiveExpenses({
                         onItemClick={(it) => navigate(`/app/gastos/${it.id}`)}
                         onPayClick={(g, it) => payModal.openItem(g, it)}
                         onTogglePostpone={onTogglePostpone}
+                        onToggleFavoriteGasto={onToggleFavoriteGasto}
+                        onToggleFavoriteEntity={onToggleFavoriteEntity}
                     />
                 ))}
 

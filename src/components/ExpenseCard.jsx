@@ -11,6 +11,7 @@ export default function ExpenseCard({
     onClick,
     onPayClick,
     onTogglePostpone,
+    onToggleFavorite,
     loading = false,
     entityName,
 }) {
@@ -67,9 +68,41 @@ export default function ExpenseCard({
                 <div
                     className={`flex flex-col gap-1.5 flex-1 ${reconcileActive && reconcileChecked ? 'opacity-60' : ''}`}
                 >
-                    <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
-                        {gasto.name}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                        {onToggleFavorite && (
+                            <button
+                                type="button"
+                                aria-label={
+                                    gasto.is_favorite
+                                        ? 'Quitar gasto de favoritos'
+                                        : 'Marcar gasto como favorito'
+                                }
+                                title={
+                                    gasto.is_favorite
+                                        ? 'Quitar de favoritos'
+                                        : 'Marcar como favorito'
+                                }
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onToggleFavorite(gasto);
+                                }}
+                                className={`shrink-0 cursor-pointer transition-colors ${
+                                    gasto.is_favorite
+                                        ? 'text-amber-400 hover:text-amber-500'
+                                        : 'text-slate-300 dark:text-slate-600 hover:text-amber-400'
+                                }`}
+                            >
+                                <Icon
+                                    name="star"
+                                    className="text-base"
+                                    filled={gasto.is_favorite}
+                                />
+                            </button>
+                        )}
+                        <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
+                            {gasto.name}
+                        </p>
+                    </div>
                     <div className="flex flex-wrap items-center gap-1.5">
                         <ChipTipoGasto tipo={gasto.type} fijo={gasto.fixed_expense} />
                         {gasto.is_postponed && (

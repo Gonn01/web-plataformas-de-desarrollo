@@ -176,6 +176,24 @@ export const postergarGasto = async (gastoId, postponed, token) => {
     return data.data;
 };
 
+export const favoritoGasto = async (gastoId, favorite, token) => {
+    const { data } = await api.put(
+        `/gastos/${gastoId}/favorito`,
+        { favorite },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+export const favoritoEntidad = async (entidadId, favorite, token) => {
+    const { data } = await api.put(
+        `/entidades-financieras/${entidadId}/favorito`,
+        { favorite },
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
 /* ===============================
    CATEGORIAS
 =============================== */

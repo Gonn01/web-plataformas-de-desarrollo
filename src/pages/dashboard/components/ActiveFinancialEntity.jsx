@@ -37,6 +37,8 @@ export default function ActiveFinancialEntity({
     onItemClick,
     onPayClick,
     onTogglePostpone,
+    onToggleFavoriteGasto,
+    onToggleFavoriteEntity,
 }) {
     const navigate = useNavigate();
     const [collapsed, setCollapsed] = useState(false);
@@ -99,6 +101,28 @@ export default function ActiveFinancialEntity({
                             className="text-xl"
                         />
                     </button>
+
+                    {onToggleFavoriteEntity && (
+                        <button
+                            type="button"
+                            aria-label={
+                                group.is_favorite
+                                    ? 'Quitar entidad de favoritos'
+                                    : 'Marcar entidad como favorita'
+                            }
+                            title={
+                                group.is_favorite ? 'Quitar de favoritos' : 'Marcar como favorita'
+                            }
+                            onClick={() => onToggleFavoriteEntity(group.id, !group.is_favorite)}
+                            className={`shrink-0 cursor-pointer transition-colors ${
+                                group.is_favorite
+                                    ? 'text-amber-400 hover:text-amber-500'
+                                    : 'text-slate-300 dark:text-slate-600 hover:text-amber-400'
+                            }`}
+                        >
+                            <Icon name="star" className="text-xl" filled={group.is_favorite} />
+                        </button>
+                    )}
 
                     <EntityAvatar name={group.name} done={entityDone} />
 
@@ -179,6 +203,11 @@ export default function ActiveFinancialEntity({
                                     onTogglePostpone={
                                         onTogglePostpone
                                             ? () => onTogglePostpone(it.id, !it.is_postponed)
+                                            : undefined
+                                    }
+                                    onToggleFavorite={
+                                        onToggleFavoriteGasto
+                                            ? () => onToggleFavoriteGasto(it.id, !it.is_favorite)
                                             : undefined
                                     }
                                 />

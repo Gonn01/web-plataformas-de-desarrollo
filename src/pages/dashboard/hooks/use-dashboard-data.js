@@ -3,7 +3,15 @@ import {
     fetchDashboardData,
     createGasto,
     postergarGasto as postergarGastoApi,
+    favoritoGasto as favoritoGastoApi,
+    favoritoEntidad as favoritoEntidadApi,
 } from '@/services/api';
+
+// Favoritos primero; a igualdad, más nuevo primero.
+const byFavThenDate = (aFav, bFav, aDate, bDate) => {
+    if (Boolean(bFav) !== Boolean(aFav)) return bFav ? 1 : -1;
+    return new Date(bDate) - new Date(aDate);
+};
 import useAuth from '@/store/use-auth-store';
 import { usePayments } from '@/hooks/use-payments';
 import { usePusherChannel } from '@/hooks/use-pusher-channel';
@@ -79,14 +87,24 @@ export function useDashboardData() {
                                     ? 0
                                     : 100,
                         }))
-                        .sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+                        .sort((a, b) =>
+                            byFavThenDate(a.is_favorite, b.is_favorite, a.created_at, b.created_at),
+                        );
 
-                    if (items.length === 0) return null;
+                    // Una entidad favorita se muestra aunque no tenga gastos activos.
+                    if (items.length === 0 && !entity.is_favorite) return null;
 
                     return { ...entity, items };
                 })
                 .filter(Boolean)
-                .sort((a, b) => new Date(b.items[0].created_at) - new Date(a.items[0].created_at));
+                .sort((a, b) =>
+                    byFavThenDate(
+                        a.is_favorite,
+                        b.is_favorite,
+                        a.items[0]?.created_at ?? a.created_at,
+                        b.items[0]?.created_at ?? b.created_at,
+                    ),
+                );
 
             setGroups(mappedGroups);
             recalcSummary(mappedGroups);
@@ -174,6 +192,41 @@ export function useDashboardData() {
         [token, loadDashboard],
     );
 
+    const favoritoGasto = useCallback(
+        async (gastoId, favorite) => {
+            setGroups((prev) =>
+                prev.map((g) => ({
+                    ...g,
+                    items: g.items.map((it) =>
+                        String(it.id) === String(gastoId) ? { ...it, is_favorite: favorite } : it,
+                    ),
+                })),
+            );
+            try {
+                await favoritoGastoApi(gastoId, favorite, token);
+            } finally {
+                await loadDashboard();
+            }
+        },
+        [token, loadDashboard],
+    );
+
+    const favoritoEntidad = useCallback(
+        async (entidadId, favorite) => {
+            setGroups((prev) =>
+                prev.map((g) =>
+                    String(g.id) === String(entidadId) ? { ...g, is_favorite: favorite } : g,
+                ),
+            );
+            try {
+                await favoritoEntidadApi(entidadId, favorite, token);
+            } finally {
+                await loadDashboard();
+            }
+        },
+        [token, loadDashboard],
+    );
+
     useEffect(() => {
         loadDashboard();
     }, [loadDashboard]);
@@ -223,6 +276,8 @@ export function useDashboardData() {
         pagarCuotas,
         crearGasto,
         postergarGasto,
+        favoritoGasto,
+        favoritoEntidad,
         loading,
     };
 }

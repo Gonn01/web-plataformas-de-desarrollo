@@ -25,6 +25,7 @@ export function useDashboardUI(groups = [], pagarCuotas) {
 
     const filteredGroups = useMemo(() => {
         const q = query.trim().toLowerCase();
+        const sinFiltros = !q && currency === null && typeFilter === null && fixedFilter === null;
 
         return groups
             .map((g) => {
@@ -45,7 +46,7 @@ export function useDashboardUI(groups = [], pagarCuotas) {
 
                 return { ...g, items };
             })
-            .filter((g) => g.items.length > 0);
+            .filter((g) => g.items.length > 0 || (g.is_favorite && sinFiltros && !reconcileActive));
     }, [groups, currency, query, typeFilter, fixedFilter, reconcileActive]);
 
     const [modalOpen, setModalOpen] = useState(false);
