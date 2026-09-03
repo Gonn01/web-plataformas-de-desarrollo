@@ -49,6 +49,13 @@ export function useGastoData() {
             await pagarCuota2(gasto.id, token);
             useReconcileStore.getState().refreshAfterPayment();
             await load(true);
+            useSnackbarStore
+                .getState()
+                .show(
+                    'Gasto marcado. Se registra al terminar las cuentas.',
+                    'success',
+                    'playlist_add_check',
+                );
         } catch (err) {
             if (err?.response?.data?.code === 'RECONCILE_REQUIRED') {
                 useSnackbarStore

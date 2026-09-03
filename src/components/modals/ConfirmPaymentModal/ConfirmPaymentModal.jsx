@@ -76,13 +76,13 @@ export default function ConfirmInstallmentPaymentModal({
             <ModalContainer>
                 <ModalHeader
                     icon="payments"
-                    title={isSingle ? 'Confirmar Pago de Cuota' : 'Confirmar Pago de Cuotas'}
+                    title={isSingle ? 'Marcar Pago de Cuota' : 'Marcar Pago de Cuotas'}
                     description={
                         isSingle
-                            ? `Vas a registrar el pago de ${single.name} en ${entityName}.`
-                            : `Estás por registrar el pago para ${activeItems.length} gasto${
+                            ? `Vas a marcar el pago de ${single.name} en ${entityName}. Se registra al terminar las cuentas.`
+                            : `Vas a marcar el pago de ${activeItems.length} gasto${
                                   activeItems.length === 1 ? '' : 's'
-                              } activo${activeItems.length === 1 ? '' : 's'} de la entidad ${entityName}.`
+                              } activo${activeItems.length === 1 ? '' : 's'} de ${entityName}. Se registran al terminar las cuentas.`
                     }
                 />
 

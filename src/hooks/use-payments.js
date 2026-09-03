@@ -28,21 +28,19 @@ export function usePayments(token, onPaid) {
                     updatedItems = updated;
                 }
 
-                // El backend ya marcó los items en la sesión; resincronizamos.
+                // El backend marcó los items en la sesión; resincronizamos.
+                // El pago real se registra al terminar las cuentas.
                 useReconcileStore.getState().refreshAfterPayment();
 
-                // Gastos compartidos: el pago queda a la espera de que la otra
-                // persona lo confirme desde su sección de Compartidos.
-                const algunoPendiente = updatedItems.some((it) => (it?.pending_quotas ?? 0) > 0);
-                if (algunoPendiente) {
-                    useSnackbarStore
-                        .getState()
-                        .show(
-                            'Pago registrado. Espera la confirmación de la otra persona.',
-                            'success',
-                            'hourglass_top',
-                        );
-                }
+                useSnackbarStore
+                    .getState()
+                    .show(
+                        updatedItems.length === 1
+                            ? 'Gasto marcado. Se registra al terminar las cuentas.'
+                            : `${updatedItems.length} gastos marcados. Se registran al terminar las cuentas.`,
+                        'success',
+                        'playlist_add_check',
+                    );
 
                 onPaid?.();
                 return updatedItems;
