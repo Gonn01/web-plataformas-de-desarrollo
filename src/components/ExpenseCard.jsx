@@ -6,7 +6,15 @@ import { formatMoney } from '@/utils/FormatMoney';
 import { formatDateShort } from '@/utils/FormatDate';
 import { useReconcileStore } from '@/store/use-reconcile-store';
 
-export default function ExpenseCard({ gasto, onClick, onPayClick, loading = false, entityName }) {
+export default function ExpenseCard({
+    gasto,
+    onClick,
+    onPayClick,
+    onTogglePostpone,
+    onToggleFavorite,
+    loading = false,
+    entityName,
+}) {
     const reconcileActive = useReconcileStore((s) => s.active);
     const reconcileChecked = useReconcileStore((s) => Boolean(s.checkedExpenses[String(gasto.id)]));
     const toggleReconcile = useReconcileStore((s) => s.toggleExpense);
@@ -60,11 +68,52 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
                 <div
                     className={`flex flex-col gap-1.5 flex-1 ${reconcileActive && reconcileChecked ? 'opacity-60' : ''}`}
                 >
-                    <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
-                        {gasto.name}
-                    </p>
+                    <div className="flex items-center gap-1.5">
+                        {onToggleFavorite && (
+                            <button
+                                type="button"
+                                aria-label={
+                                    gasto.is_favorite
+                                        ? 'Quitar gasto de favoritos'
+                                        : 'Marcar gasto como favorito'
+                                }
+                                title={
+                                    gasto.is_favorite
+                                        ? 'Quitar de favoritos'
+                                        : 'Marcar como favorito'
+                                }
+                                onClick={(e) => {
+                                    e.stopPropagation();
+                                    onToggleFavorite(gasto);
+                                }}
+                                className={`shrink-0 cursor-pointer transition-colors ${
+                                    gasto.is_favorite
+                                        ? 'text-amber-400 hover:text-amber-500'
+                                        : 'text-slate-300 dark:text-slate-600 hover:text-amber-400'
+                                }`}
+                            >
+                                <Icon
+                                    name="star"
+                                    className="text-base"
+                                    filled={gasto.is_favorite}
+                                />
+                            </button>
+                        )}
+                        <p className="font-semibold text-sm text-slate-800 dark:text-slate-100">
+                            {gasto.name}
+                        </p>
+                    </div>
                     <div className="flex flex-wrap items-center gap-1.5">
                         <ChipTipoGasto tipo={gasto.type} fijo={gasto.fixed_expense} />
+                        {gasto.is_postponed && (
+                            <span
+                                className="inline-flex items-center gap-1 rounded-full bg-sky-500/15 text-sky-600 dark:text-sky-400 text-xs font-bold px-2 py-0.5"
+                                title="Postergada: no entra en la sesión de cuentas actual"
+                            >
+                                <Icon name="schedule" className="text-xs" />
+                                Postergada
+                            </span>
+                        )}
                         {pendingQuotas > 0 && (
                             <span
                                 className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-0.5"
@@ -134,7 +183,26 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
                     </span>
                 )}
 
-                {onPayClick && (
+                {onTogglePostpone && (
+                    <button
+                        className="text-xs cursor-pointer font-bold leading-normal tracking-wide bg-sky-500/15 text-sky-600 dark:text-sky-400 px-2.5 py-1.5 rounded-md hover:bg-sky-500/25 transition-colors flex items-center gap-1.5 shrink-0"
+                        disabled={loading}
+                        title={
+                            gasto.is_postponed
+                                ? 'Volver a incluir en la sesión de cuentas'
+                                : 'Postergar para la próxima sesión de cuentas'
+                        }
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            onTogglePostpone(gasto);
+                        }}
+                    >
+                        <Icon name={gasto.is_postponed ? 'undo' : 'schedule'} className="text-sm" />
+                        {gasto.is_postponed ? 'Reactivar' : 'Postergar'}
+                    </button>
+                )}
+
+                {onPayClick && !gasto.is_postponed && (
                     <button
                         className={`text-xs cursor-pointer font-bold leading-normal tracking-wide bg-primary/20 text-primary px-3 py-1.5 rounded-md hover:bg-primary/30 transition-colors flex items-center gap-2 shrink-0 ${
                             reconcileActive ? '' : 'opacity-50'
@@ -156,7 +224,9 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
                                 Procesando…
                             </>
                         ) : gasto.type === 'INGRESO' ? (
-                            'Registrar cobro'
+                            reconcileActive ? 'Marcar cobro' : 'Registrar cobro'
+                        ) : reconcileActive ? (
+                            'Marcar pago'
                         ) : (
                             'Pagar cuota'
                         )}
