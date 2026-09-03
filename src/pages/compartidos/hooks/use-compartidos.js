@@ -64,13 +64,13 @@ export function useCompartidos() {
             setLoadingAction(gastoId);
             try {
                 await rechazarCompartido(gastoId, token);
-                setCompartidos((prev) => {
-                    const recibidos = prev.recibidos.map((r) =>
+                setCompartidos((prev) => ({
+                    ...prev,
+                    recibidos: prev.recibidos.map((r) =>
                         r.id === gastoId ? { ...r, status: 'REJECTED' } : r,
-                    );
-                    setPendingCount(recibidos.filter((r) => r.status === 'PENDING_APPROVAL').length);
-                    return { ...prev, recibidos };
-                });
+                    ),
+                }));
+                setPendingCount((c) => Math.max(0, c - 1));
             } finally {
                 setLoadingAction(null);
             }
