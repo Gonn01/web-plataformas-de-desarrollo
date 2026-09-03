@@ -16,6 +16,12 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
           ? (gasto.payed_quotas / gasto.number_of_quotas) * 100
           : (gasto.progress ?? 0);
 
+    const pendingQuotas = gasto.pending_quotas ?? 0;
+    const previewProgress =
+        pendingQuotas > 0 && !gasto.fixed_expense && gasto.number_of_quotas > 0
+            ? Math.min(100, ((gasto.payed_quotas + pendingQuotas) / gasto.number_of_quotas) * 100)
+            : null;
+
     const cur = gasto.currency_type;
     const paidTotal = (gasto.payed_quotas ?? 0) * (gasto.amount_per_quota ?? 0);
 
@@ -59,6 +65,17 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
                     </p>
                     <div className="flex flex-wrap items-center gap-1.5">
                         <ChipTipoGasto tipo={gasto.type} fijo={gasto.fixed_expense} />
+                        {pendingQuotas > 0 && (
+                            <span
+                                className="inline-flex items-center gap-1 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 text-xs font-bold px-2 py-0.5"
+                                title="Pago registrado, esperando confirmación de la otra persona"
+                            >
+                                <Icon name="hourglass_empty" className="text-xs" />
+                                {pendingQuotas === 1
+                                    ? 'Pago por confirmar'
+                                    : `${pendingQuotas} pagos por confirmar`}
+                            </span>
+                        )}
                     </div>
                     <CategoryBadges categories={gasto.categories ?? []} />
                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-0.5">
@@ -104,6 +121,7 @@ export default function ExpenseCard({ gasto, onClick, onPayClick, loading = fals
                 <div className="flex-1">
                     <ProgressBar
                         progress={progress}
+                        previewProgress={previewProgress}
                         type={gasto.type}
                         fixed={gasto.fixed_expense}
                         quotas={gasto.number_of_quotas}

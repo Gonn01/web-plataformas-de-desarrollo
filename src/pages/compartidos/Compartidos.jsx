@@ -1,13 +1,24 @@
 import { useCompartidos } from './hooks/use-compartidos';
 import RecibidoCard from './components/RecibidoCard';
 import EmitidoCard from './components/EmitidoCard';
+import PagoCompartidoCard from './components/PagoCompartidoCard';
 import AprobarModal from './components/AprobarModal';
 import Loader from '@/components/Loader';
 import Icon from '@/components/Icon';
 import { useState } from 'react';
 
 export default function Compartidos() {
-    const { compartidos, loading, loadingAction, aprobar, rechazar, reintentar } = useCompartidos();
+    const {
+        compartidos,
+        pagos,
+        loading,
+        loadingAction,
+        aprobar,
+        rechazar,
+        reintentar,
+        confirmarPago,
+        rechazarPago,
+    } = useCompartidos();
     const [section, setSection] = useState('pendientes');
     const [aprobarTarget, setAprobarTarget] = useState(null);
 
@@ -37,6 +48,16 @@ export default function Compartidos() {
             count: recibidosPendientes.length + enviadosPendientes.length,
             badgeClass:
                 recibidosPendientes.length + enviadosPendientes.length > 0
+                    ? 'bg-amber-500 text-white'
+                    : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
+        },
+        {
+            key: 'pagos',
+            label: 'Pagos',
+            icon: 'payments',
+            count: pagos.porConfirmar.length + pagos.esperando.length,
+            badgeClass:
+                pagos.porConfirmar.length > 0
                     ? 'bg-amber-500 text-white'
                     : 'bg-zinc-200 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300',
         },
@@ -87,30 +108,58 @@ export default function Compartidos() {
             </div>
 
             {/* CONTENIDO */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
-                <SubSection title="Enviados" icon="send">
-                    {enviados.map((item) => (
-                        <EmitidoCard
-                            key={item.id}
-                            item={item}
-                            loadingId={loadingAction}
-                            onReintentar={(id) => reintentar(id)}
-                        />
-                    ))}
-                </SubSection>
+            {section === 'pagos' ? (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <SubSection title="Por confirmar" icon="how_to_reg">
+                        {pagos.porConfirmar.map((p) => (
+                            <PagoCompartidoCard
+                                key={p.movement_id}
+                                pago={p}
+                                variant="porConfirmar"
+                                loadingId={loadingAction}
+                                onConfirmar={(id) => confirmarPago(id)}
+                                onRechazar={(id) => rechazarPago(id)}
+                            />
+                        ))}
+                    </SubSection>
 
-                <SubSection title="Recibidos" icon="inbox">
-                    {recibidos.map((item) => (
-                        <RecibidoCard
-                            key={item.id}
-                            item={item}
-                            loadingId={loadingAction}
-                            onAprobar={(g) => setAprobarTarget(g)}
-                            onRechazar={(id) => rechazar(id)}
-                        />
-                    ))}
-                </SubSection>
-            </div>
+                    <SubSection title="Esperando confirmación" icon="hourglass_top">
+                        {pagos.esperando.map((p) => (
+                            <PagoCompartidoCard
+                                key={p.movement_id}
+                                pago={p}
+                                variant="esperando"
+                                loadingId={loadingAction}
+                            />
+                        ))}
+                    </SubSection>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
+                    <SubSection title="Enviados" icon="send">
+                        {enviados.map((item) => (
+                            <EmitidoCard
+                                key={item.id}
+                                item={item}
+                                loadingId={loadingAction}
+                                onReintentar={(id) => reintentar(id)}
+                            />
+                        ))}
+                    </SubSection>
+
+                    <SubSection title="Recibidos" icon="inbox">
+                        {recibidos.map((item) => (
+                            <RecibidoCard
+                                key={item.id}
+                                item={item}
+                                loadingId={loadingAction}
+                                onAprobar={(g) => setAprobarTarget(g)}
+                                onRechazar={(id) => rechazar(id)}
+                            />
+                        ))}
+                    </SubSection>
+                </div>
+            )}
 
             {aprobarTarget && (
                 <AprobarModal

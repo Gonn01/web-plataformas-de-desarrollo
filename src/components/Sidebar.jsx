@@ -1,10 +1,11 @@
 import { NavLink, useNavigate } from 'react-router-dom';
-import { useEffect, useState, useCallback } from 'react';
+import { useEffect, useState, useCallback, useMemo } from 'react';
 import Icon from './Icon';
 import useAuth from '@/store/use-auth-store';
 import { useCompartidosStore } from '@/store/use-compartidos-store';
 import { useUIStore } from '@/store/use-ui-store';
 import { usePusherChannel } from '@/hooks/use-pusher-channel';
+import { useSnackbarStore } from '@/store/use-snackbar-store';
 import Snackbar from './Snackbar';
 import ConfirmDeleteModal from './modals/ConfirmDeleteModal';
 
@@ -15,7 +16,13 @@ export default function Sidebar() {
 
     const { user, logout, token } = useAuth();
     const navigate = useNavigate();
-    const { pendingCount, setPendingCount, loadPendingCount } = useCompartidosStore();
+    const {
+        pendingCount,
+        pendingPaymentsCount,
+        setPendingCount,
+        setPendingPaymentsCount,
+        loadPendingCount,
+    } = useCompartidosStore();
     const collapsed = useUIStore((s) => s.sidebarCollapsed);
     const toggleSidebar = useUIStore((s) => s.toggleSidebar);
     const [notification, setNotification] = useState(null);
@@ -30,9 +37,47 @@ export default function Sidebar() {
         setNotification('Recibiste un nuevo gasto compartido');
     }, [setPendingCount]);
 
-    usePusherChannel(`compartidos-${user?.id}`, {
-        'compartido.nuevo': handleNuevo,
-    });
+    const handleAprobado = useCallback(({ receiverName, gastoName } = {}) => {
+        const quien = receiverName || 'Un usuario';
+        const que = gastoName ? ` "${gastoName}"` : '';
+        useSnackbarStore.getState().show(`${quien} ha aceptado tu gasto${que}`, 'success');
+    }, []);
+
+    const handlePagoPendiente = useCallback(() => {
+        setPendingPaymentsCount((c) => c + 1);
+        useSnackbarStore
+            .getState()
+            .show('Tenés un pago para confirmar en Compartidos', 'success', 'pending_actions');
+    }, [setPendingPaymentsCount]);
+
+    const handlePagoConfirmado = useCallback(({ actorName } = {}) => {
+        const quien = actorName || 'La otra persona';
+        useSnackbarStore.getState().show(`${quien} confirmó tu pago`, 'success');
+    }, []);
+
+    const handlePagoRechazado = useCallback(({ actorName } = {}) => {
+        const quien = actorName || 'La otra persona';
+        useSnackbarStore.getState().show(`${quien} rechazó tu pago`, 'error');
+    }, []);
+
+    const pusherEvents = useMemo(
+        () => ({
+            'compartido.nuevo': handleNuevo,
+            'compartido.aprobado': handleAprobado,
+            'pago.pendiente': handlePagoPendiente,
+            'pago.confirmado': handlePagoConfirmado,
+            'pago.rechazado': handlePagoRechazado,
+        }),
+        [
+            handleNuevo,
+            handleAprobado,
+            handlePagoPendiente,
+            handlePagoConfirmado,
+            handlePagoRechazado,
+        ],
+    );
+
+    usePusherChannel(user?.id ? `compartidos-${user.id}` : null, pusherEvents);
 
     const handleLogout = () => {
         logout();
@@ -62,7 +107,7 @@ export default function Sidebar() {
             to: '/app/compartidos',
             icon: 'group',
             label: 'Compartidos',
-            badge: pendingCount,
+            badge: pendingCount + pendingPaymentsCount,
         },
     ];
 

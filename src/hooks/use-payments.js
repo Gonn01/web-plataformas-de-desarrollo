@@ -31,6 +31,19 @@ export function usePayments(token, onPaid) {
                 // El backend ya marcó los items en la sesión; resincronizamos.
                 useReconcileStore.getState().refreshAfterPayment();
 
+                // Gastos compartidos: el pago queda a la espera de que la otra
+                // persona lo confirme desde su sección de Compartidos.
+                const algunoPendiente = updatedItems.some((it) => (it?.pending_quotas ?? 0) > 0);
+                if (algunoPendiente) {
+                    useSnackbarStore
+                        .getState()
+                        .show(
+                            'Pago registrado. Espera la confirmación de la otra persona.',
+                            'success',
+                            'hourglass_top',
+                        );
+                }
+
                 onPaid?.();
                 return updatedItems;
             } catch (err) {

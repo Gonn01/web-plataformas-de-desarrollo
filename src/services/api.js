@@ -260,7 +260,7 @@ export const fetchCompartidos = async (token) => {
     const { data } = await api.get('/compartidos', {
         headers: { Authorization: `Bearer ${token}` },
     });
-    return data.data;
+    return data.data; // { recibidos, emitidos, pagos: { porConfirmar, esperando } }
 };
 
 export const aprobarCompartido = async (gastoId, payload, token) => {
@@ -282,6 +282,29 @@ export const rechazarCompartido = async (gastoId, token) => {
 export const reintentarCompartido = async (gastoId, token) => {
     const { data } = await api.post(
         `/compartidos/${gastoId}/reintentar`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+/* ===============================
+   PAGOS COMPARTIDOS (confirmación entre usuarios)
+   La lectura viaja dentro de fetchCompartidos() -> data.pagos
+=============================== */
+
+export const confirmarPago = async (movementId, token) => {
+    const { data } = await api.post(
+        `/compartidos/pagos/${movementId}/confirmar`,
+        {},
+        { headers: { Authorization: `Bearer ${token}` } },
+    );
+    return data.data;
+};
+
+export const rechazarPago = async (movementId, token) => {
+    const { data } = await api.post(
+        `/compartidos/pagos/${movementId}/rechazar`,
         {},
         { headers: { Authorization: `Bearer ${token}` } },
     );

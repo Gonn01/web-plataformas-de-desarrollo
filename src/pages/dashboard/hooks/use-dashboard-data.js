@@ -1,10 +1,11 @@
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useEffect, useMemo, useState } from 'react';
 import { fetchDashboardData, createGasto } from '@/services/api';
 import useAuth from '@/store/use-auth-store';
 import { usePayments } from '@/hooks/use-payments';
+import { usePusherChannel } from '@/hooks/use-pusher-channel';
 
 export function useDashboardData() {
-    const { token } = useAuth();
+    const { token, user } = useAuth();
     const { handleConfirm } = usePayments(token);
 
     const [summaryByCurrency, setSummaryByCurrency] = useState(null);
@@ -152,6 +153,41 @@ export function useDashboardData() {
     useEffect(() => {
         loadDashboard();
     }, [loadDashboard]);
+
+    // Cuando el receptor aprueba un gasto compartido, descontamos el pendiente
+    // de la entidad correspondiente y refrescamos para traer el gasto ya activo.
+    const onCompartidoAprobado = useCallback(
+        ({ entityId } = {}) => {
+            if (entityId != null) {
+                setGroups((prev) =>
+                    prev.map((g) =>
+                        String(g.id) === String(entityId)
+                            ? {
+                                  ...g,
+                                  pending_count: Math.max(0, (Number(g.pending_count) || 0) - 1),
+                              }
+                            : g,
+                    ),
+                );
+                setPendingTotal((t) => Math.max(0, t - 1));
+            }
+            loadDashboard();
+        },
+        [loadDashboard],
+    );
+
+    const pusherEvents = useMemo(
+        () => ({
+            'compartido.aprobado': onCompartidoAprobado,
+            // La otra persona confirmó/rechazó un pago que registramos: el estado
+            // "por confirmar" de la cuota cambió, hay que resincronizar.
+            'pago.confirmado': loadDashboard,
+            'pago.rechazado': loadDashboard,
+        }),
+        [onCompartidoAprobado, loadDashboard],
+    );
+
+    usePusherChannel(user?.id ? `compartidos-${user.id}` : null, pusherEvents);
 
     return {
         groups,
