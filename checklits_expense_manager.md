@@ -45,7 +45,7 @@
 
 - [x] sacar del dialog de editar la vinculacion
 - [x] crear boton para vincular, que se alterne con un desvincular, con dialog de alerta.
-- [ ] boton ver graficos
+- [x] boton ver graficos
 - [ ] que las cards de gastos sean iguales a las del dashboard
 - [ ] boton copiar
 - [ ] boton pagar/registrar cobro
