@@ -10,6 +10,7 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
     const [deletedEntities, setDeletedEntities] = useState([]);
     const [loading, setLoading] = useState(false);
     const [selected, setSelected] = useState(null);
+    const [restoringId, setRestoringId] = useState(null);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -45,12 +46,16 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
         load();
     }, [isOpen, token]);
 
-    const confirmRestore = () => {
-        if (selected) {
-            onRestore?.(selected.id);
+    const confirmRestore = async () => {
+        if (!selected) return;
+        setRestoringId(selected.id);
+        try {
+            await onRestore?.(selected.id);
+        } finally {
             setDeletedEntities((prev) => prev.filter((e) => e.id !== selected.id));
+            setRestoringId(null);
+            setSelected(null);
         }
-        setSelected(null);
     };
 
     if (!isOpen) return null;
@@ -115,8 +120,9 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
                                         </span>
                                         <button
                                             type="button"
+                                            disabled={restoringId === entity.id || restoringId !== null}
                                             onClick={() => setSelected(entity)}
-                                            className="flex items-center justify-center gap-2 shrink-0 rounded-lg h-9 px-3 bg-primary text-[#111714] text-sm font-bold tracking-wide transition-opacity duration-200 hover:opacity-80"
+                                            className="flex items-center justify-center gap-2 shrink-0 rounded-lg h-9 px-3 bg-primary text-[#111714] text-sm font-bold tracking-wide transition-opacity duration-200 hover:opacity-80 disabled:opacity-50 disabled:cursor-not-allowed"
                                         >
                                             <Icon name="restore" className="text-base" />
                                             <span className="truncate">Restaurar</span>
@@ -146,6 +152,8 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
                 message={`¿Seguro que querés restaurar "${selected?.name}"?`}
                 confirmLabel="Confirmar"
                 variant="primary"
+                loading={restoringId !== null}
+                loadingLabel="Restaurando..."
                 onCancel={() => setSelected(null)}
                 onConfirm={confirmRestore}
             />

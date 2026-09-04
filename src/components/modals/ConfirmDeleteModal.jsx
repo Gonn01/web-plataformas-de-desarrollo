@@ -8,6 +8,8 @@ export default function ConfirmDeleteModal({
     confirmLabel = 'Eliminar',
     cancelLabel = 'Cancelar',
     variant = 'danger',
+    loading = false,
+    loadingLabel = 'Procesando...',
     onConfirm,
     onCancel,
 }) {
@@ -50,16 +52,18 @@ export default function ConfirmDeleteModal({
                 <div className="flex justify-end gap-3">
                     <button
                         onClick={onCancel}
-                        className="cursor-pointer h-10 px-4 rounded-lg text-sm font-bold text-[#9eb7a8] hover:bg-[#29382f] transition-colors"
+                        disabled={loading}
+                        className="cursor-pointer h-10 px-4 rounded-lg text-sm font-bold text-[#9eb7a8] hover:bg-[#29382f] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         {cancelLabel}
                     </button>
 
                     <button
                         onClick={onConfirm}
-                        className={`cursor-pointer h-10 px-4 rounded-lg text-sm font-bold transition-colors ${confirmButtonClass}`}
+                        disabled={loading}
+                        className={`cursor-pointer h-10 px-4 rounded-lg text-sm font-bold transition-colors disabled:opacity-60 disabled:cursor-not-allowed ${confirmButtonClass}`}
                     >
-                        {confirmLabel}
+                        {loading ? loadingLabel : confirmLabel}
                     </button>
                 </div>
             </div>
