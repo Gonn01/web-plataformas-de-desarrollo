@@ -5,10 +5,11 @@ import { useUIStore } from '@/store/use-ui-store';
 
 export function useEntidadesUI() {
     const navigate = useNavigate();
-    const { entities, loading, crearEntidad, eliminarEntidad } = useEntidadesData();
+    const { entities, loading, crearEntidad, eliminarEntidad, restaurarEntidad } = useEntidadesData();
 
     const [query, setQuery] = useState('');
     const [openNew, setOpenNew] = useState(false);
+    const [showDeletedModal, setShowDeletedModal] = useState(false);
     const viewMode = useUIStore((s) => s.entitiesViewMode);
     const setViewMode = useUIStore((s) => s.setEntitiesViewMode);
 
@@ -58,6 +59,8 @@ export function useEntidadesUI() {
         setQuery,
         openNew,
         setOpenNew,
+        showDeletedModal,
+        setShowDeletedModal,
         viewMode,
         setViewMode,
         filtered,
@@ -66,6 +69,7 @@ export function useEntidadesUI() {
 
         handleSaveNew,
         handleDelete,
+        restaurarEntidad,
 
         navigate,
     };
