@@ -38,7 +38,7 @@
 - [x] sacar la flechita en el listado, porque se oculta
 - [x] al crear entidad se pueda vincular a un usuario
 - [x] modo grid
-- [] pantalla de entidades eliminadas y boton para restaurar
+- [xx] pantalla de entidades eliminadas y boton para restaurar
 - [x] visibilizar a quien esta vinculada
 
 ## Detalle entidad financiera
@@ -56,9 +56,9 @@
 
 ## Detalle gasto
 
-- [ ] si es egreso que diga pagar cuota, si es ingreso que diga cobrar
+- [x] si es egreso que diga pagar cuota, si es ingreso que diga cobrar
 - [ ] historial, debe tener cambio de nombre, cualquier edicion, y que se edito en lo posible, eliminado y restaurado, creado pagos de cuota o reembolsos, y para la ultima cuota pagada debe decir finalizado.
-- [ ] en gastos fijos debe aparecer cuando hiciste cada pago, con la posibilidad de reembolsarlo
+- [x] en gastos fijos debe aparecer cuando hiciste cada pago, con la posibilidad de reembolsarlo
 
 ## Perfil
 

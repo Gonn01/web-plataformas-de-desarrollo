@@ -5,6 +5,8 @@ import HeaderDetalle from './components/HeaderDetalle';
 import InfoItem from './components/InfoItem';
 import ProgresoPago from './components/ProgresoPago';
 import CuotasSection from './components/CuotasSection';
+import PagosFijosSection from './components/PagosFijosSection';
+import HistorialSection from './components/HistorialSection';
 import PeligroEliminar from '@/components/PeligroEliminar';
 import { useGastoUI } from './hooks/use-gasto-ui';
 import Loader from '@/components/Loader';
@@ -88,11 +90,16 @@ export default function DetalleGasto() {
                     {!gasto.fixed_expense && (
                         <CuotasSection gasto={gasto} loading={loading} onRefund={refundCuota} />
                     )}
+                    {gasto.fixed_expense && (
+                        <PagosFijosSection gasto={gasto} onRefund={refundCuota} />
+                    )}
 
                     {/* <AdjuntosSection
                         adjuntos={detalle.adjuntos}
                         onSeleccionAdjuntos={onSeleccionAdjuntos}
                     /> */}
+
+                    <HistorialSection gasto={gasto} />
 
                     <PeligroEliminar
                         linked={Boolean(gasto.linked_purchase_id)}
