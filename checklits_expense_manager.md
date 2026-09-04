@@ -58,7 +58,7 @@
 
 - [x] si es egreso que diga pagar cuota, si es ingreso que diga cobrar
 - [ ] historial, debe tener cambio de nombre, cualquier edicion, y que se edito en lo posible, eliminado y restaurado, creado pagos de cuota o reembolsos, y para la ultima cuota pagada debe decir finalizado.
-- [ ] en gastos fijos debe aparecer cuando hiciste cada pago, con la posibilidad de reembolsarlo
+- [x] en gastos fijos debe aparecer cuando hiciste cada pago, con la posibilidad de reembolsarlo
 
 ## Perfil
 
