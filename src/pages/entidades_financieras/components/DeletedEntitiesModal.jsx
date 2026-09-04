@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
 import Icon from '@/components/Icon';
+import ConfirmDeleteModal from '@/components/modals/ConfirmDeleteModal';
 import { fetchDeletedEntities } from '@/services/api';
 import useAuth from '@/store/use-auth-store';
 
@@ -8,6 +9,7 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
     const { token } = useAuth();
     const [deletedEntities, setDeletedEntities] = useState([]);
     const [loading, setLoading] = useState(false);
+    const [selected, setSelected] = useState(null);
 
     useEffect(() => {
         if (!isOpen) return;
@@ -43,9 +45,12 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
         load();
     }, [isOpen, token]);
 
-    const handleRestore = (id) => {
-        onRestore?.(id);
-        setDeletedEntities((prev) => prev.filter((e) => e.id !== id));
+    const confirmRestore = () => {
+        if (selected) {
+            onRestore?.(selected.id);
+            setDeletedEntities((prev) => prev.filter((e) => e.id !== selected.id));
+        }
+        setSelected(null);
     };
 
     if (!isOpen) return null;
@@ -110,7 +115,7 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
                                         </span>
                                         <button
                                             type="button"
-                                            onClick={() => handleRestore(entity.id)}
+                                            onClick={() => setSelected(entity)}
                                             className="flex items-center justify-center gap-2 shrink-0 rounded-lg h-9 px-3 bg-primary text-[#111714] text-sm font-bold tracking-wide transition-opacity duration-200 hover:opacity-80"
                                         >
                                             <Icon name="restore" className="text-base" />
@@ -134,6 +139,15 @@ export default function DeletedEntitiesModal({ isOpen, onClose, onRestore }) {
                     </div>
                 </div>
             </div>
+
+            <ConfirmDeleteModal
+                open={!!selected}
+                title="Restaurar entidad"
+                message={`¿Seguro que querés restaurar "${selected?.name}"?`}
+                confirmLabel="Restaurar"
+                onCancel={() => setSelected(null)}
+                onConfirm={confirmRestore}
+            />
         </>,
         document.body,
     );

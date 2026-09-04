@@ -38,7 +38,7 @@
 - [x] sacar la flechita en el listado, porque se oculta
 - [x] al crear entidad se pueda vincular a un usuario
 - [x] modo grid
-- [x] pantalla de entidades eliminadas y boton para restaurar
+- [xx] pantalla de entidades eliminadas y boton para restaurar
 - [x] visibilizar a quien esta vinculada
 
 ## Detalle entidad financiera
