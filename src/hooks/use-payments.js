@@ -45,21 +45,8 @@ export function usePayments(token, onPaid) {
                 onPaid?.();
                 return updatedItems;
             } catch (err) {
+                // El interceptor de axios ya mostró el mensaje según el código.
                 console.error('Error pagando cuotas:', err);
-                const code = err?.response?.data?.code;
-                if (code === 'RECONCILE_REQUIRED') {
-                    useSnackbarStore.getState().show(RECONCILE_MSG, 'error', 'playlist_add_check');
-                } else if (code === 'GASTO_POSTERGADO') {
-                    useSnackbarStore
-                        .getState()
-                        .show(
-                            'Ese gasto está postergado para la próxima sesión de cuentas.',
-                            'error',
-                            'schedule',
-                        );
-                } else {
-                    useSnackbarStore.getState().show('No se pudo registrar el pago.', 'error');
-                }
                 return [];
             }
         },

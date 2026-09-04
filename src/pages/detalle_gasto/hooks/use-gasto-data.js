@@ -57,17 +57,8 @@ export function useGastoData() {
                     'playlist_add_check',
                 );
         } catch (err) {
-            if (err?.response?.data?.code === 'RECONCILE_REQUIRED') {
-                useSnackbarStore
-                    .getState()
-                    .show(
-                        'Activá el modo "Hacer cuentas" para registrar pagos.',
-                        'error',
-                        'playlist_add_check',
-                    );
-            } else {
-                useSnackbarStore.getState().show('No se pudo registrar el pago.', 'error');
-            }
+            // El interceptor de axios ya mostró el mensaje según el código.
+            console.error('Error registrando pago', err);
         }
     }
 
