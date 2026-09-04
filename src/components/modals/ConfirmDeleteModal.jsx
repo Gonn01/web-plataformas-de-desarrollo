@@ -7,10 +7,14 @@ export default function ConfirmDeleteModal({
     message = 'Esta acción no se puede deshacer.',
     confirmLabel = 'Eliminar',
     cancelLabel = 'Cancelar',
+    variant = 'danger',
     onConfirm,
     onCancel,
 }) {
     const [visible, setVisible] = useState(open);
+    const confirmButtonClass = variant === 'primary'
+        ? 'bg-primary text-[#111714] hover:opacity-80'
+        : 'bg-red-600 text-white hover:bg-red-700';
 
     useEffect(() => {
         if (open) {
@@ -53,7 +57,7 @@ export default function ConfirmDeleteModal({
 
                     <button
                         onClick={onConfirm}
-                        className="cursor-pointer h-10 px-4 rounded-lg bg-red-600 text-white text-sm font-bold hover:bg-red-700 transition-colors"
+                        className={`cursor-pointer h-10 px-4 rounded-lg text-sm font-bold transition-colors ${confirmButtonClass}`}
                     >
                         {confirmLabel}
                     </button>
