@@ -29,7 +29,7 @@ export default function EditEntityModal({
         try {
             await onSave(name.trim());
         } catch (err) {
-            setNameError(err?.response?.data?.error || 'No se pudo actualizar la entidad.');
+            setNameError(err?.message || 'No se pudo actualizar la entidad.');
         }
     };
 
@@ -48,7 +48,7 @@ export default function EditEntityModal({
             setEmailInput('');
             onClose();
         } catch (err) {
-            setVincularError(err?.response?.data?.error || 'Error al vincular usuario');
+            setVincularError(err?.message || 'Error al vincular usuario');
         }
     };
 
@@ -58,7 +58,7 @@ export default function EditEntityModal({
             await onDesvincular();
             onClose();
         } catch (err) {
-            setVincularError(err?.response?.data?.error || 'Error al desvincular usuario');
+            setVincularError(err?.message || 'Error al desvincular usuario');
         }
     };
 
@@ -72,7 +72,10 @@ export default function EditEntityModal({
                 {/* OVERLAY LOADER */}
                 {saving && (
                     <div className="absolute inset-0 z-10 bg-black/40 backdrop-blur-sm flex flex-col items-center justify-center gap-3">
-                        <Icon name="progress_activity" className="animate-spin text-primary text-4xl" />
+                        <Icon
+                            name="progress_activity"
+                            className="animate-spin text-primary text-4xl"
+                        />
                         <p className="text-sm font-medium text-white">Guardando cambios…</p>
                     </div>
                 )}
@@ -125,7 +128,10 @@ export default function EditEntityModal({
                                 className="shrink-0 flex items-center gap-1 text-xs text-red-500 hover:text-red-600 disabled:opacity-50"
                             >
                                 {loadingVincular ? (
-                                    <Icon name="progress_activity" className="animate-spin text-sm" />
+                                    <Icon
+                                        name="progress_activity"
+                                        className="animate-spin text-sm"
+                                    />
                                 ) : (
                                     <Icon name="link_off" className="text-sm" />
                                 )}
@@ -152,7 +158,10 @@ export default function EditEntityModal({
                                     className="shrink-0 px-3 py-2 bg-primary text-white rounded-lg text-sm font-medium disabled:opacity-50 flex items-center gap-1"
                                 >
                                     {loadingVincular ? (
-                                        <Icon name="progress_activity" className="animate-spin text-sm" />
+                                        <Icon
+                                            name="progress_activity"
+                                            className="animate-spin text-sm"
+                                        />
                                     ) : (
                                         'Vincular'
                                     )}
@@ -162,7 +171,8 @@ export default function EditEntityModal({
                                 <p className="text-xs text-red-500">{vincularError}</p>
                             )}
                             <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                                Los gastos creados en esta entidad se compartirán automáticamente con ese usuario.
+                                Los gastos creados en esta entidad se compartirán automáticamente
+                                con ese usuario.
                             </p>
                         </div>
                     )}
